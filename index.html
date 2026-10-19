@@ -250,7 +250,7 @@ const S = {
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
-const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
+const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','Entrate'],['negozio','Negozio online']];
 const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
@@ -344,7 +344,7 @@ const PRES_MESE=[
  ['Autista 1','39 h',129,18,9,4,'—'],
  ['Magazziniere 1','40 h',132,14,22,8,'—']
 ];
-const CONT_BASE={Apple:[['Colli consegne Nord',24,'Codici collo','Pistola','Magazziniere 1','07:41']],Snam:[['Materiale con seriali',18,'Seriali Snam','Pistola','Magazziniere 1','07:44'],['Cavi e accessori',6,'—','Pistola','Magazziniere 1','07:45']],Luxiona:[['Lampade, ordine magazzino',32,'—','Pistola','Magazziniere 2','08:02']],Econocom:[['Motorola moto g',40,'IMEI + cespite','Pistola','Magazziniere 2','08:15'],['Caricabatterie',40,'—','Pistola','Magazziniere 2','08:16']]};
+const CONT_BASE={Apple:[['Colli consegne Nord',24,'Codici collo','Pistola','Magazziniere 1','07:41']],Snam:[['Materiale con seriali',18,'Seriali Snam','Pistola','Magazziniere 1','07:44'],['Cavi e accessori',6,'—','Pistola','Magazziniere 1','07:45']],Luxiona:[['Lampade, ordine magazzino',32,'—','Pistola','Magazziniere 2','08:02']],Econocom:[['Motorola moto g',40,'IMEI + cespite','Pistola','Magazziniere 2','08:15'],['Caricabatterie',40,'—','Pistola','Magazziniere 2','08:16']],Corporation:[['Lenovo ThinkPad T14 Gen 2',14,'Seriali','Foto','Simone','09:20'],['HP EliteBook 840 G8',9,'Seriali','Foto','Simone','09:34']]};
 const STORICO=[
  ['10:41','Magazziniere 3','Uscita','4 bancali Snam','S03-2-1 → Motrice [targa]','Pistola'],
  ['10:12','Magazziniere 2','Modifica','Bancale Apple: colli da 32 a 31','Ricevimento','Manuale'],
@@ -355,10 +355,10 @@ const STORICO=[
  ['08:15','Magazziniere 2','Entrata','1.000 telefoni Econocom','Ricevimento → S08-1-1','Pistola'],
  ['07:40','Magazziniere 1','Entrata','40 colli Snam','Ricevimento → S04-2-3','Pistola']
 ];
-const MAGCLI=['Tutti','Apple','Snam','Luxiona','Econocom'];
-const SC_CLI=['Apple','Snam','Snam','Snam','Luxiona','Luxiona','Econocom','Econocom','Apple','Snam','Luxiona','Econocom'];
+const MAGCLI=['Tutti','Apple','Snam','Luxiona','Econocom','Corporation'];
+const SC_CLI=['Apple','Snam','Snam','Snam','Luxiona','Luxiona','Econocom','Econocom','Apple','Snam','Corporation','Corporation'];
 const scCell=(sc,pi,po)=>((sc*7+pi*3+po*5)%10)<7;
-const SC_CONT={Apple:'Colli consegne Nord',Snam:'Bancale materiale con seriali',Luxiona:'Bancale ordine magazzino',Econocom:'Telefoni con IMEI e cespite'};
+const SC_CONT={Apple:'Colli consegne Nord',Snam:'Bancale materiale con seriali',Luxiona:'Bancale ordine magazzino',Econocom:'Telefoni con IMEI e cespite',Corporation:'Bancale computer Messina Corporation'};
 const CONTROLLO=[
  {bolla:'[n. bolla]',cli:'Snam',tipo:'Entrata',attesi:40,letti:40,chi:'Magazziniere 1',ora:'07:40'},
  {bolla:'[n. bolla]',cli:'Econocom',tipo:'Entrata',attesi:1000,letti:1000,chi:'Magazziniere 2',ora:'08:15'},
@@ -387,7 +387,12 @@ const CLIENTI=[
  {nome:'Apple',cosa:'Distribuzione Nord',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Consegna','a collo','Milano'],['Consegna','a collo','Lombardia'],['Consegna','a collo','Nord Italia']],extra:EXTRA},
  {nome:'Snam',cosa:'Materiale con seriali, stoccaggio',ref:'Pier',val:'[data]',n:'[n]',esig:'Portale magazzino aggiornato in tempo reale, 24 ore su 24, con tutti i seriali.',base:[['Ritiro e consegna','a bancale','Milano'],['Ritiro e consegna','a bancale','Lombardia'],['Stoccaggio','a bancale al mese','Lacchiarella']],extra:EXTRA.concat([['Movimentazione magazzino','a bancale','Entrata o uscita dal deposito']])},
  {nome:'Luxiona',cosa:'Ordini magazzino',ref:'Anna',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Consegna','a bancale','Milano'],['Preparazione ordine','a ordine','—']],extra:EXTRA},
- {nome:'[Cliente]',cosa:'[cosa spedisce]',ref:'[referente]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['[voce]','[unità]','[zona]']],extra:EXTRA}
+ {nome:'Econocom',cosa:'Telefoni e PC: entrata, preparazione, spedizione',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'Seriali visibili live a ogni sparo, carico e scarico.',base:[['Entrata merce','a device','—'],['Gestione ordine','a ordine','—'],['Spedizione','a scaglioni di peso','Italia']],extra:EXTRA},
+ {nome:'Asystel',cosa:'[da chiarire]',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'Gruppo Econocom: seriali visibili live.',base:[['[voce]','[unità]','[zona]']],extra:EXTRA},
+ {nome:'Accenture',cosa:'PC per lo stage di formattazione',ref:'Simone',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Ritiro PC','a bancale','[zona]'],['Stage','a PC','Lacchiarella']],extra:EXTRA},
+ {nome:'Velier',cosa:'[da chiarire]',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'Consegna in cantina.',base:[['Consegna','[unità]','[zona]']],extra:EXTRA.concat([['Consegna in cantina','a consegna','Se richiesta nell’ordine']])},
+ {nome:'L’Oréal',cosa:'[da chiarire]',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['[voce]','[unità]','[zona]']],extra:EXTRA},
+ {nome:'Messina Corporation',cosa:'Computer usati: stoccaggio e spedizioni',ref:'Matteo, Pier',val:'[data]',n:'[n]',esig:'Vede solo i suoi bancali nel proprio gestionale.',base:[['Stoccaggio','a bancale al mese','Lacchiarella'],['Spedizione ordini online','a pacco','Italia']],extra:EXTRA}
 ];
 const MEZZI=[
  ['[targa]','Sprinter','No','Autista 1','[n. apparato]','Revisione [data]','Partito'],
@@ -419,22 +424,22 @@ const C_MAILS=[
  {da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’[percentuale] dal test. Se ordini oggi spediamo entro [giorno]. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
  {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 412 PC formattati, 2 interruzioni con report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
  {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'},
- {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è sullo scaffale B3.',azGo:'ordini'}
+ {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0142.',azGo:'ordini'}
 ];
 const DEVICES=[
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'B3',costo:'€ 61',price:'€ 249',status:'In vendita su 4 siti',gg:9},
- {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'A1',costo:'€ 61',price:'€ 329',status:'Venduto su eBay',gg:3},
- {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'C2',costo:'€ 61',price:'€ 179',status:'Fermo da 64 giorni',gg:64},
- {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'D1',costo:'€ 61',price:'€ 449',status:'In vendita su 3 siti',gg:12},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'B1',costo:'€ 61',price:'€ 399',status:'In vendita su 4 siti',gg:5},
- {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'A4',costo:'€ 61',price:'€ 219',status:'Da fotografare',gg:1}
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'S11-2-1',banc:'B-0142',costo:'€ 61',price:'€ 249',status:'In vendita su 4 siti',gg:9},
+ {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'S11-3-2',banc:'B-0139',costo:'€ 61',price:'€ 329',status:'Venduto su eBay',gg:3},
+ {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'S12-1-1',banc:'B-0121',costo:'€ 61',price:'€ 179',status:'Fermo da 64 giorni',gg:64},
+ {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'S11-1-3',banc:'B-0145',costo:'€ 61',price:'€ 449',status:'In vendita su 3 siti',gg:12},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'S11-2-3',banc:'B-0144',costo:'€ 61',price:'€ 399',status:'In vendita su 4 siti',gg:5},
+ {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'Ricevimento',banc:'B-0146',costo:'€ 61',price:'€ 219',status:'Da fotografare',gg:1}
 ];
 const ORDINI=[
- ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','B3','Da preparare'],
- ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','A1','Da preparare'],
- ['08:10','Subito','Dell','Latitude 5420','C','JXXXXXX','C2','Spedito'],
- ['Ieri','Refurbed','Apple','MacBook Air M1','B','C02XXXXX','D1','Reso aperto'],
- ['Ieri','Sito proprio','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','B1','Consegnato']
+ ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
+ ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
+ ['08:10','Subito','Dell','Latitude 5420','C','JXXXXXX','S12-1-1','Spedito'],
+ ['Ieri','Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Reso aperto'],
+ ['Ieri','Sito proprio','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','S11-2-3','Consegnato']
 ];
 const TELEFONI=[
  ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Pronto'],
@@ -543,16 +548,17 @@ const A={
   cLic:()=>{S.c.licOk=true;},
   cBanco:i=>{S.c.banco=+i;},
   cTelF:f=>{S.c.telF=f;},
-  cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è sullo scaffale '+ORDINI[+i][6]+'.';},
+  cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è nel posto '+ORDINI[+i][6]+'.';},
   cDdt:()=>{S.c.ordMsg='ddt';},
   /* carico */
-  kGo:s=>{S.k.scr=s;},
+  kGo:s=>{S.k.scr=s; if(s==='scan') S.k.banc=null;},
   kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
   kDif:l=>{S.k.difetti[l]=!S.k.difetti[l];},
   kCan:l=>{S.k.canali[l]=!S.k.canali[l];},
   kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
   kPiu:()=>{S.k.prezzo+=10;},
-  kFatto:()=>{S.k.scr='fatto'; S.k.n+=1;},
+  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.n+=1;},
+  kBanc:v=>{S.k.banc=v;},
   /* negozio */
   nHome:()=>{S.n.view='home'; S.n.payMsg=false;},
   nCart:()=>{S.n.view='cart'; S.n.payMsg=false;},
@@ -579,11 +585,11 @@ function intro(){
     ['magazzino','App magazzino','Entrata, uscita, trasferimenti e verifiche: ogni collo scansionato con il suo posto.'],
     ['presenze','App presenze','Il badge virtuale sul telefono: entrata e uscita con un QR che cambia ogni 30 secondi.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
-    ['carico','App carico merce','Foto del seriale, grado, prezzo ed etichetta: così un computer entra in magazzino.'],
+    ['carico','Entrate','Foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
     ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.']
   ];
   const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['view','magazzino','La merce entra in magazzino ed esce sul camion, sempre scansionata','App magazzino'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
-  const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','App carico merce'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
+  const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','Entrate'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
   const steps=list=>`<ol class="steps">${list.map((s,i)=>`<li><button class="step" data-act="${s[0]}" data-arg="${s[1]}"><span class="num">${i+1}</span><span><b>${s[2]}</b><br><span class="lbl">${s[3]}</span></span></button></li>`).join('')}</ol>`;
   return `
   <section class="hero glass">
@@ -723,7 +729,7 @@ function trasp(){
         inner=`<div class="glass card stack">
           <div class="row between"><h3 style="font-size:20px">Contenuto · ${t.posto}</h3><span class="lbl">${cli}</span></div>
           <div class="tbox"><table class="t nw"><thead><tr><th>Articolo</th><th>Quantità</th><th>Codici</th><th>Inserito</th><th>Chi</th><th>Ora</th></tr></thead><tbody>
-          ${items.map(x=>`<tr class="${x[3]==='Manuale'?'korow':''}"><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]==='Manuale'?'Manuale':'Pistola'}</td><td>${x[4]}</td><td>${x[5]}</td></tr>`).join('')}
+          ${items.map(x=>`<tr class="${x[3]==='Manuale'?'korow':''}"><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]==='Manuale'?'Manuale':(x[3]==='Foto'?'Foto':'Pistola')}</td><td>${x[4]}</td><td>${x[5]}</td></tr>`).join('')}
           </tbody></table></div>
           <div class="row">${b('Aggiungi con la pistola','tContScan')}${b('Modifica a mano','tContMan','','ghost')}<span class="lbl">Ogni modifica finisce nello Storico con chi l’ha fatta e quando. Quelle a mano sono in rosso.</span></div>
         </div>`+inner;
@@ -1003,16 +1009,16 @@ function corp(){
     const filters=`<div class="row">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'cBrand',x,c.brand===x)).join('')}<span style="width:8px"></span>${['Tutti','A','B','C'].map(x=>chip(x==='Tutti'?'Tutti i gradi':'Grado '+x,'cGrado',x,c.grado===x)).join('')}${toggle}</div>`;
     const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
     if(c.vista==='schede'){
-      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · scaffale ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.status}</span></div></div>`).join('')}</div>`:empty);
+      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.status}</span></div></div>`).join('')}</div>`:empty);
     } else {
-      body=filters+(list.length?`<div class="glass tbox"><table class="t" style="min-width:1400px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Scaffale</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td class="lbl">${d.status}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
+      body=filters+(list.length?`<div class="glass tbox"><table class="t" style="min-width:1400px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Bancale</th><th>Posto</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.banc}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td class="lbl">${d.status}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
     }
   }
   if(s==='ordini'){
     title='Ordini'; hintTxt='premi «Etichetta spedizione» su un ordine da preparare.';
     body=`<p class="lbl" style="margin:0">Un solo inventario: quando un computer si vende su un sito, sparisce subito dagli altri.</p>
     ${c.ordMsg&&c.ordMsg!=='ddt'?msg(c.ordMsg):''}
-    <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marchio</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Scaffale</th><th>Stato</th><th></th></tr></thead><tbody>
+    <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marchio</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Posto</th><th>Stato</th><th></th></tr></thead><tbody>
     ${ORDINI.map((o,i)=>{const st=o[7]==='Da preparare'?pill(o[7]):(o[7]==='Reso aperto'?pill(o[7],'red'):pill(o[7],'dark'));return `<tr><td>${o[0]}</td><td>${o[1]}</td><td>${o[2]}</td><td><b>${o[3]}</b></td><td>${pill(o[4],'dark')}</td><td>${o[5]}</td><td>${o[6]}</td><td>${st}</td><td>${o[7]==='Da preparare'?b('Etichetta spedizione','cEtichetta',i,'ghost sm'):''}</td></tr>`;}).join('')}
     </tbody></table></div>`;
   }
@@ -1249,12 +1255,19 @@ function magApp(){
   </div>`;
 }
 
+const KI={"cam": "<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 8h3l2-3h6l2 3h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z\"/><circle cx=\"12\" cy=\"13.5\" r=\"3.5\"/></svg>", "pen": "<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20h4L19 9l-4-4L4 16v4z\"/><path d=\"M13.5 6.5l4 4\"/></svg>", "star": "<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z\"/></svg>", "eur": "<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M17 6.5A6.5 6.5 0 1017 17.5\"/><path d=\"M4 10.5h9M4 13.5h9\"/></svg>", "pal": "<svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"8\" width=\"8\" height=\"7\"/><rect x=\"13\" y=\"8\" width=\"8\" height=\"7\"/><rect x=\"8\" y=\"2\" width=\"8\" height=\"6\"/><path d=\"M2 15h20v3H2zM4 18v3M12 18v3M20 18v3\"/></svg>"};
+function kSteps(cur){
+  const st=[['scan','cam'],['scheda','pen'],['grado','star'],['prezzo','eur'],['bancale','pal']];
+  const ci=st.findIndex(x=>x[0]===cur);
+  return `<div class="row" style="gap:6px;justify-content:space-between;flex-wrap:nowrap">${st.map((x,i)=>`<span title="${x[0]}" style="flex:1;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;${i===ci?'background:var(--solid);color:var(--on-solid)':(i<ci?'background:var(--soft);color:var(--ink)':'box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)')}">${KI[x[1]]}</span>`).join('')}</div>`;
+}
 function caricoApp(){
   const k=S.k; let inner='';
   const on='chipbtn on', off='chipbtn';
   if(k.scr==='scan'){
     inner=`<div class="pscr">
-      <div><div class="lbl">Lotto L-015 · ${k.n} di 612 caricati</div><div class="ptitle">Carica merce</div></div>
+      ${kSteps('scan')}
+      <div class="lbl">Lotto L-015 · ${k.n} di 612 caricati</div>
       <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM 20W0XXXXIX</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N PF3XXXXX</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
       <button class="bigbtn" data-act="kGo" data-arg="scheda">Fotografa il seriale</button>
       <button class="bigbtn ghost" style="font-size:16px" data-act="kGo" data-arg="scheda">Seriale illeggibile? Scrivilo a mano</button>
@@ -1262,7 +1275,7 @@ function caricoApp(){
   }
   if(k.scr==='scheda'){
     inner=`<div class="pscr">
-      <button class="back" data-act="kGo" data-arg="scan">Rifai la foto</button>
+      ${kSteps('scheda')}
       <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXXX</b></div>${pill('Verificato su Lenovo','ok')}</div>
       <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Lavorato da noi')}</div>
       <div class="ptitle" style="font-size:24px">Lenovo ThinkPad T14 Gen 2</div>
@@ -1276,8 +1289,7 @@ function caricoApp(){
   if(k.scr==='grado'){
     const dif=['Graffi sul coperchio','Ammaccatura','Tastiera lucida','Segni sullo schermo','Batteria sotto 80%','Manca un tasto'];
     inner=`<div class="pscr">
-      <button class="back" data-act="kGo" data-arg="scheda">Scheda</button>
-      <div class="ptitle">Com’è messo?</div>
+      ${kSteps('grado')}
       <div class="lbl">Il programma propone B dal report. Cambialo con un tocco.</div>
       <div class="grades">${['A','B','C','D'].map(g=>`<button class="gbtn ${k.grado===g?'on':''}" data-act="kGrado" data-arg="${g}">${g}</button>`).join('')}</div>
       <div class="lbl">Difetti visti</div>
@@ -1289,8 +1301,7 @@ function caricoApp(){
   }
   if(k.scr==='prezzo'){
     inner=`<div class="pscr">
-      <button class="back" data-act="kGo" data-arg="grado">Grado</button>
-      <div class="ptitle">Prezzo</div>
+      ${kSteps('prezzo')}
       <div class="pcard stack" style="padding:16px;align-items:center;gap:10px">
         <div class="lbl">Proposto per il grado ${k.grado}</div>
         <div class="stepper" style="width:100%"><button class="round" data-act="kMeno" aria-label="Meno 10 euro">−</button><div style="font-size:46px;font-weight:800;letter-spacing:-.04em">€ ${k.prezzo}</div><button class="round" data-act="kPiu" aria-label="Più 10 euro">+</button></div>
@@ -1299,17 +1310,28 @@ function caricoApp(){
       <div class="lbl">Pubblica su</div>
       <div class="row" style="gap:8px">${Object.keys(k.canali).map(x=>`<button class="${k.canali[x]?on:off}" data-act="kCan" data-arg="${x}">${x}</button>`).join('')}</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="kFatto">Stampa etichetta e pubblica</button>
+      <button class="bigbtn" data-act="kGo" data-arg="bancale">Avanti</button>
+    </div>`;
+  }
+  if(k.scr==='bancale'){
+    inner=`<div class="pscr">
+      ${kSteps('bancale')}
+      <div class="lbl">Su quale bancale lo metti? Spara l’etichetta del bancale, oppure creane uno nuovo.</div>
+      ${k.banc?`<div class="pcard row between" style="padding:14px"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.banc==='B-0142'?'S11-2-1':'Ricevimento'} · ${k.banc==='B-0142'?'14 computer':'nuovo, etichetta stampata'}</div></div>${pill('Letto','ok')}</div>`
+      :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
+      <div class="row" style="gap:8px">${b('Spara il bancale','kBanc','B-0142','ghost')}${b('Nuovo bancale','kBanc','B-0147','ghost')}</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Stampa etichetta e pubblica</button>
     </div>`;
   }
   if(k.scr==='fatto'){
     const att=Object.keys(k.canali).filter(x=>k.canali[x]);
     inner=`<div class="pscr">
-      <div class="ptitle">Caricato</div>
-      <div class="lbl">Metti il PC sullo scaffale B3. Da ora si riconosce dal QR dell’etichetta.</div>
+      <div class="pcard" style="padding:12px 14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Caricato</b></div>
+      <div class="lbl">Mettilo sul bancale ${k.banc}${k.banc==='B-0142'?', posto S11-2-1':', in ricevimento'}. È già nell’inventario della Corporation e nell’Excel.</div>
       <div class="pcard row" style="padding:16px;gap:14px;flex-wrap:nowrap">
         <svg width="76" height="76" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges" style="flex:none;background:#ffffff;border-radius:6px"><g fill="#111214"><rect x="0" y="0" width="7" height="7"></rect><rect x="14" y="0" width="7" height="7"></rect><rect x="0" y="14" width="7" height="7"></rect></g><g fill="#ffffff"><rect x="1" y="1" width="5" height="5"></rect><rect x="15" y="1" width="5" height="5"></rect><rect x="1" y="15" width="5" height="5"></rect></g><g fill="#111214"><rect x="2" y="2" width="3" height="3"></rect><rect x="16" y="2" width="3" height="3"></rect><rect x="2" y="16" width="3" height="3"></rect><rect x="9" y="1" width="2" height="2"></rect><rect x="8" y="5" width="3" height="1"></rect><rect x="9" y="8" width="4" height="2"></rect><rect x="14" y="9" width="2" height="3"></rect><rect x="17" y="10" width="3" height="2"></rect><rect x="8" y="12" width="2" height="3"></rect><rect x="11" y="14" width="3" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect><rect x="18" y="17" width="2" height="3"></rect><rect x="9" y="17" width="3" height="3"></rect><rect x="1" y="9" width="3" height="2"></rect></g></svg>
-        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">PF3XXXXX · lotto L-015 · B3</div></div>
+        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">PF3XXXXX · lotto L-015 · ${k.banc}</div></div>
       </div>
       <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}. Quando si vende su un sito, sparisce dagli altri.</div>
       <div style="flex:1"></div>
@@ -1317,8 +1339,8 @@ function caricoApp(){
     </div>`;
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>App carico merce</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
-      <ol><li>Premi «Fotografa il seriale».</li><li>Controlla la scheda letta dal sito del marchio.</li><li>Scegli il grado e tocca i difetti che vedi.</li><li>Regola il prezzo con − e +, scegli i siti.</li><li>Premi «Stampa etichetta e pubblica».</li></ol></div>
+    <div class="appinfo glass"><h2>Entrate</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
+      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Fotografa il seriale» e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Spara il bancale o creane uno nuovo.</li><li>Premi «Stampa etichetta e pubblica»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
