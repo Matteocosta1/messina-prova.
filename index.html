@@ -239,10 +239,10 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:''},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
-  b:{timb:[], n:0},
+  b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
@@ -314,6 +314,11 @@ const FERIE=[
  ['Mauro',[20,18,2],[32,8,24],''],
  ['Autista 1',[20,2,18],[32,0,32],'Meno di 2 settimane godute quest’anno: va pianificato entro dicembre'],
  ['Magazziniere 1',[20,11,9],[32,16,16],'']
+];
+const ALLARMI=[
+ {ora:'Oggi 07:52',badge:'Alberto',tel:'Telefono non registrato (Android)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'},
+ {ora:'Ieri 13:04',badge:'Autista 3',tel:'Telefono di Autista 5',ingresso:'Ingresso magazzino',tipo:'QR scaduto: probabilmente uno screenshot'},
+ {ora:'12 ottobre 06:10',badge:'[Ex dipendente]',tel:'Telefono non registrato',ingresso:'Ingresso magazzino',tipo:'Badge chiuso il 30 settembre'}
 ];
 const PRES_MESE=[
  ['Christian','40 h',128,4,0,0,'—'],
@@ -448,6 +453,8 @@ const A={
   tPresTab:v=>{S.t.presTab=v; S.t.presMsg='';},
   tPresFix:i=>{S.t.presFix[i]=true;},
   tPresExp:()=>{S.t.presMsg='exp';},
+  tAllVisto:i=>{S.t.allVisti[i]=true; S.t.allMsg='Messaggio pronto per il dipendente: gli spiega cosa è successo e lo invita a parlarne con Angela.';},
+  bFinto:()=>{S.b.finto=true;},
   bTimbra:()=>{const now=new Date(); const hh=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); S.b.timb.unshift([S.b.timb.length%2===0?'Entrata':'Uscita',hh]);},
   tMagCli:v=>{S.t.magCli=v;},
   tScaf:i=>{S.t.scaf=+i;},
@@ -609,6 +616,7 @@ function trasp(){
         <button class="li" data-act="tGo" data-arg="giacenze"><span class="row between" style="width:100%"><span>2 giacenze con riconsegna da prenotare</span>${pill('Giacenze','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="mezzi"><span class="row between" style="width:100%"><span>Motrice [targa]: tagliando tra 500 km</span>${pill('Mezzi')}</span></button>
         <button class="li" data-act="tGo" data-arg="presenze"><span class="row between" style="width:100%"><span>3 uscite non timbrate ieri</span>${pill('Presenze','red')}</span></button>
+        <button class="li" data-act="tGo" data-arg="presenze"><span class="row between" style="width:100%"><span>Badge di Alberto passato da un altro telefono</span>${pill('Allarme','red')}</span></button>
       </div></div>
     </div>`;
   }
@@ -743,9 +751,10 @@ function trasp(){
       </div></div>`;
   }
   if(s==='presenze'){
-    title='Presenze'; hintTxt='apri «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
-    const tabsP=[['oggi','Oggi'],['fix','Da sistemare'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
+    title='Presenze'; hintTxt='apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
+    const tabsP=[['oggi','Oggi'],['fix','Da sistemare'],['allarmi','Allarmi'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
     const nFix=PRES_IERI.filter((x,i)=>!t.presFix[i]).length;
+    const nAll=(S.b.finto?1:0)+ALLARMI.length-Object.keys(t.allVisti).length;
     let inner='';
     if(t.presTab==='oggi'){
       inner=`<div class="grid g4">
@@ -763,6 +772,16 @@ function trasp(){
       <div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Dipendente</th><th>Entrata</th><th>Problema</th><th>Suggerimento</th><th></th></tr></thead><tbody>
       ${PRES_IERI.map((x,i)=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${t.presFix[i]?pill('Sistemata','ok'):`<span class="miss">${x[2]}</span>`}</td><td class="lbl">${x[3]}</td><td>${t.presFix[i]?'':b('Usa il suggerimento','tPresFix',i,'ghost sm')}</td></tr>`).join('')}
       </tbody></table></div>`;
+    }
+    if(t.presTab==='allarmi'){
+      const live=S.b.finto?[{ora:'Adesso',badge:'Christian',tel:'Telefono non registrato (iPhone)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'}]:[];
+      const AL=live.concat(ALLARMI);
+      inner=`<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Lo vedono solo Angela e la Direzione','dark')}</div>
+      ${t.allMsg?msg(t.allMsg):''}
+      <div class="glass tbox"><table class="t" style="min-width:980px"><thead><tr><th>Quando</th><th>Badge di</th><th>Da quale telefono</th><th>Dove</th><th>Cosa è successo</th><th></th></tr></thead><tbody>
+      ${AL.map((a,i)=>`<tr class="${t.allVisti[i]?'':'korow'}"><td>${a.ora}</td><td><b>${a.badge}</b></td><td>${a.tel}</td><td>${a.ingresso}</td><td>${a.tipo}</td><td>${t.allVisti[i]?pill('Gestito','ok'):b('Avvisa il dipendente','tAllVisto',i,'ghost sm')}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="lbl" style="margin:0">Ogni badge è legato a un solo telefono, registrato quando il dipendente attiva l’app. Un badge su un altro telefono, uno screenshot vecchio o un badge chiuso non timbrano: il programma li riconosce sempre e sa a chi appartenevano.</p>`;
     }
     if(t.presTab==='riep'){
       inner=`<div class="glass card row between"><span><b>Ottobre</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Lo vedono solo Angela e la Direzione','dark')}</div>
@@ -784,7 +803,7 @@ function trasp(){
       ${t.presMsg==='exp'?msg('Conteggi di ottobre pronti per Angela e per il consulente del lavoro, divisi secondo il contratto di ognuno.'):''}
       <div class="row">${t.presMsg==='exp'?'':b('Prepara i conteggi del mese','tPresExp')}<span class="lbl">Contributi e tasse: da decidere con la Direzione se li prepara il programma o il consulente.</span></div>`;
     }
-    body=`<div class="row">${tabsP.map(x=>chip(x[1]+(x[0]==='fix'&&nFix?' · '+nFix:''),'tPresTab',x[0],t.presTab===x[0])).join('')}</div>${inner}
+    body=`<div class="row">${tabsP.map(x=>chip(x[1]+(x[0]==='fix'&&nFix?' · '+nFix:'')+(x[0]==='allarmi'&&nAll>0?' · '+nAll:''),'tPresTab',x[0],t.presTab===x[0])).join('')}</div>${inner}
     <p class="lbl" style="margin:0">Ognuno timbra con il badge virtuale sul suo telefono, passandolo sul lettore all’ingresso. Il QR cambia ogni 30 secondi, così una foto o uno screenshot non servono a timbrare per un collega.</p>`;
   }
   if(s==='clienti'){
@@ -1052,15 +1071,16 @@ function presApp(){
       <div id="qrbox">${qrSvg(slot)}</div>
       <div class="lbl">Cambia tra <b id="qrleft">${left}</b> secondi · uno screenshot non funziona</div>
     </div>
-    <div class="lbl" style="text-align:center">Avvicina il telefono al lettore all’ingresso</div>
+    <div class="lbl" style="text-align:center">Avvicina il telefono al lettore all’ingresso · telefono registrato: iPhone di Christian</div>
     <button class="bigbtn" data-act="bTimbra">${dentro?'Simula: timbro l’uscita':'Simula: timbro l’entrata'}</button>
+    ${S.b.finto?`<div class="pcard" style="padding:14px;border:2px solid var(--alert);background:var(--alert-soft)"><b style="color:var(--alert)">Lettore: timbratura rifiutata</b><div style="font-size:14px;margin-top:4px">Badge di Christian passato da un telefono non registrato. Allarme inviato ad Angela e alla Direzione.</div></div>`:b('Simula: un collega prova con il mio badge','bFinto','','ghost')}
     <div class="pcard" style="padding:12px 14px"><b>Oggi</b>${t.length?t.map(x=>`<div class="kvp"><span>${x[0]}</span><b>${x[1]}</b></div>`).join(''):'<div class="lbl" style="margin-top:4px">Nessuna timbratura ancora</div>'}</div>
     <div class="pcard" style="padding:12px 14px"><b>Ottobre</b><div class="kvp"><span>Ore ordinarie</span><b>128 h</b></div><div class="kvp"><span>Straordinari</span><b>4 h</b></div><div class="kvp" style="border:0"><span>Ferie</span><b>11 gg</b></div></div>
     <div class="pcard" style="padding:12px 14px"><b>I miei orari</b><div class="lbl" style="margin-top:2px">Solo tu vedi i tuoi</div><div class="kvp"><span>Ritardi a ottobre</span><b>1 · 6 min</b></div><div class="kvp"><span>Uscite anticipate</span><b>0</b></div><div class="kvp" style="border:0"><span>Permessi</span><b>26 h</b></div></div>
   </div>`;
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App presenze</h2><p class="muted" style="margin:8px 0 0">Il badge virtuale sul telefono di ogni dipendente, al posto della tessera.</p>
-      <ol><li>Guarda il QR: cambia ogni 30 secondi, così una foto mandata a un collega non serve.</li><li>Premi «Simula: timbro l’entrata», poi l’uscita.</li><li>Più in basso: «I miei orari» e le ferie. Ognuno vede solo i suoi.</li><li>Nel gestionale apri Autotrasporti › Presenze: Riepiloghi e Ferie li vedono solo Angela e la Direzione.</li></ol>
+      <ol><li>Guarda il QR: cambia ogni 30 secondi, così una foto mandata a un collega non serve.</li><li>Premi «Simula: timbro l’entrata», poi l’uscita.</li><li>Prova «Simula: un collega prova con il mio badge»: il lettore rifiuta e parte l’allarme.</li><li>Più in basso: «I miei orari» e le ferie. Ognuno vede solo i suoi.</li><li>Nel gestionale apri Autotrasporti › Presenze: Allarmi, Riepiloghi e Ferie li vedono solo Angela e la Direzione.</li></ol>
       <p class="lbl" style="margin:10px 0 0">Il lettore all’ingresso lo collegheremo appena sappiamo il modello.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
