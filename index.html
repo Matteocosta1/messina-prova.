@@ -241,7 +241,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
@@ -343,6 +343,17 @@ const PRES_MESE=[
  ['Mauro','40 h',132,11,6,0,'—'],
  ['Autista 1','39 h',129,18,9,4,'—'],
  ['Magazziniere 1','40 h',132,14,22,8,'—']
+];
+const CONT_BASE={Apple:[['Colli consegne Nord',24,'Codici collo','Pistola','Magazziniere 1','07:41']],Snam:[['Materiale con seriali',18,'Seriali Snam','Pistola','Magazziniere 1','07:44'],['Cavi e accessori',6,'—','Pistola','Magazziniere 1','07:45']],Luxiona:[['Lampade, ordine magazzino',32,'—','Pistola','Magazziniere 2','08:02']],Econocom:[['Motorola moto g',40,'IMEI + cespite','Pistola','Magazziniere 2','08:15'],['Caricabatterie',40,'—','Pistola','Magazziniere 2','08:16']]};
+const STORICO=[
+ ['10:41','Magazziniere 3','Uscita','4 bancali Snam','S03-2-1 → Motrice [targa]','Pistola'],
+ ['10:12','Magazziniere 2','Modifica','Bancale Apple: colli da 32 a 31','Ricevimento','Manuale'],
+ ['10:05','Magazziniere 2','Entrata','31 colli Apple','Ricevimento → Passaggio Apple','Pistola'],
+ ['09:58','Magazziniere 2','Modifica','Bancale Econocom: caricabatterie da 40 a 38','S07-2-2','Manuale'],
+ ['09:47','Magazziniere 1','Trasferimento','1 bancale Luxiona','S05-1-2 → S06-3-1','Pistola'],
+ ['09:02','Magazziniere 3','Uscita','11 colli Apple su 12','S01-1-1 → Sprinter [targa]','Pistola'],
+ ['08:15','Magazziniere 2','Entrata','1.000 telefoni Econocom','Ricevimento → S08-1-1','Pistola'],
+ ['07:40','Magazziniere 1','Entrata','40 colli Snam','Ricevimento → S04-2-3','Pistola']
 ];
 const MAGCLI=['Tutti','Apple','Snam','Luxiona','Econocom'];
 const SC_CLI=['Apple','Snam','Snam','Snam','Luxiona','Luxiona','Econocom','Econocom','Apple','Snam','Luxiona','Econocom'];
@@ -481,7 +492,11 @@ const A={
   bFinto:()=>{S.b.finto=true;},
   bTimbra:()=>{const now=new Date(); const hh=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); S.b.timb.unshift([S.b.timb.length%2===0?'Entrata':'Uscita',hh]);},
   tMagCli:v=>{S.t.magCli=v;},
-  tScaf:i=>{S.t.scaf=+i;},
+  tScaf:i=>{S.t.scaf=+i; S.t.posto=null;},
+  tPosto:c=>{S.t.posto=c;},
+  tContScan:()=>{const c=S.t.posto; const l=S.t.cont[c]||[]; const now=new Date(); const h=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); l.push(['Articolo letto con la pistola',1,'[codice]','Pistola','Tu',h]); S.t.cont[c]=l; S.t.log.unshift([h,'Tu','Aggiunta','1 articolo nel contenuto',c,'Pistola']);},
+  tContMan:()=>{const c=S.t.posto; const now=new Date(); const h=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); S.t.contMan=(S.t.contMan||{}); S.t.contMan[c]=true; S.t.log.unshift([h,'Tu','Modifica','Quantità cambiata a mano',c,'Manuale']);},
+  tStF:v=>{S.t.stF=v;},
   tCerca:v=>{S.t.cerca=v;},
   tInv:()=>{S.t.invOn=true; S.m.conta={};},
   /* app magazzino */
@@ -684,15 +699,15 @@ function trasp(){
     </div>`;
   }
   if(s==='magazzino'){
-    title='Magazzino'; hintTxt='tocca uno scaffale nella pianta, poi apri «Controllo»: le righe rosse sono colli che non tornano con le bolle.';
-    const tabsM=[['pianta','Pianta'],['controllo','Controllo'],['mov','Movimenti'],['inv','Verifiche']];
+    title='Magazzino'; hintTxt='tocca uno scaffale e poi un posto per vedere il Contenuto; apri «Storico» per tutte le operazioni di tutti.';
+    const tabsM=[['pianta','Pianta'],['controllo','Controllo'],['mov','Movimenti'],['inv','Verifiche'],['storico','Storico']];
     const cliF=t.magCli, match=c=>cliF==='Tutti'||c===cliF;
     const ko=CONTROLLO.filter(r=>r.letti!==r.attesi).length;
     let inner='';
     if(t.magTab==='pianta'){
       const sel=t.scaf, cli=SC_CLI[sel];
       const rows=[];
-      for(let pi=6;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); rows.push(`<tr><td><b>S${String(sel+1).padStart(2,'0')}-${pi}-${po}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_CONT[cli]:'—'}</td><td>${full?((sel+pi+po)%9+1)+' giorni':'—'}</td></tr>`); }
+      for(let pi=6;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); const code=`S${String(sel+1).padStart(2,'0')}-${pi}-${po}`; rows.push(`<tr ${full?`class="click" data-act="tPosto" data-arg="${code}"`:''} style="${t.posto===code?'background:var(--soft)':''}"><td><b>${code}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_CONT[cli]:'—'}</td><td>${full?((sel+pi+po)%9+1)+' giorni':'—'}</td></tr>`); }
       inner=`<div class="row" style="align-items:flex-start;gap:16px">
         <div class="glass card" style="flex:1 1 420px;min-width:0">
           <div class="row between"><b>Pianta del capannone</b><span class="lbl">12 scaffali · 6 piani · 3 posti</span></div>
@@ -702,6 +717,17 @@ function trasp(){
         </div>
         <div class="glass" style="flex:1 1 380px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Scaffale S${String(sel+1).padStart(2,'0')} · ${cli}</div><div class="tbox"><table class="t"><thead><tr><th>Posto</th><th>Piano</th><th>Cliente</th><th>Cosa c’è</th><th>Da</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>
       </div>`;
+      if(t.posto){
+        const base=(CONT_BASE[cli]||[]).map(x=>x.slice()); if(t.contMan&&t.contMan[t.posto]&&base[0]){ base[0][1]=base[0][1]-2; base[0][3]='Manuale'; base[0][4]='Tu'; const ml=t.log.find(r=>r[4]===t.posto&&r[5]==='Manuale'); if(ml) base[0][5]=ml[0]; }
+        const items=base.concat(t.cont[t.posto]||[]);
+        inner=`<div class="glass card stack">
+          <div class="row between"><h3 style="font-size:20px">Contenuto · ${t.posto}</h3><span class="lbl">${cli}</span></div>
+          <div class="tbox"><table class="t nw"><thead><tr><th>Articolo</th><th>Quantità</th><th>Codici</th><th>Inserito</th><th>Chi</th><th>Ora</th></tr></thead><tbody>
+          ${items.map(x=>`<tr class="${x[3]==='Manuale'?'korow':''}"><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]==='Manuale'?'Manuale':'Pistola'}</td><td>${x[4]}</td><td>${x[5]}</td></tr>`).join('')}
+          </tbody></table></div>
+          <div class="row">${b('Aggiungi con la pistola','tContScan')}${b('Modifica a mano','tContMan','','ghost')}<span class="lbl">Ogni modifica finisce nello Storico con chi l’ha fatta e quando. Quelle a mano sono in rosso.</span></div>
+        </div>`+inner;
+      } else inner=`<p class="lbl" style="margin:0">Tocca un posto pieno nella tabella per vedere il suo contenuto.</p>`+inner;
     }
     if(t.magTab==='controllo'){
       const list=CONTROLLO.filter(r=>match(r.cli));
@@ -716,6 +742,19 @@ function trasp(){
       inner=`<div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Ora</th><th>Movimento</th><th>Cliente</th><th>Cosa</th><th>Da → a</th><th>Chi</th></tr></thead><tbody>
       ${list.map(r=>`<tr><td>${r[0]}</td><td>${r[1]==='Entrata'?pill('Entrata','dark'):(r[1]==='Uscita'?pill('Uscita'):pill(r[1]))}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')||'<tr><td colspan="6" class="lbl">Nessun movimento per questo cliente negli esempi.</td></tr>'}
       </tbody></table></div>`;
+    }
+    if(t.magTab==='storico'){
+      const all=t.log.concat(STORICO).filter(r=>t.stF==='Tutto'||r[5]===t.stF);
+      inner=`${warn('2 cose strane da guardare')}
+      <div class="grid g2">
+        <div class="glass card stack" style="gap:6px"><b>Collo Apple mancante</b><div>Bolla [n. bolla]: 12 colli, 11 caricati alle 09:02. L’ultimo a toccarlo è stato Magazziniere 3 in uscita; dopo, nessuna scansione.</div><div class="lbl">Da chiarire con la persona: può essere un errore.</div></div>
+        <div class="glass card stack" style="gap:6px"><b>Modifiche a mano</b><div>Magazziniere 2 oggi ha fatto 2 modifiche a mano, entrambe in calo di quantità. Di solito ne fa una a settimana.</div><div class="lbl">Da chiarire con la persona: può essere un errore.</div></div>
+      </div>
+      <div class="row">${['Tutto','Pistola','Manuale'].map(x=>chip(x,'tStF',x,t.stF===x)).join('')}</div>
+      <div class="glass tbox"><table class="t nw" style="min-width:860px"><thead><tr><th>Ora</th><th>Chi</th><th>Operazione</th><th>Cosa</th><th>Dove</th><th>Come</th></tr></thead><tbody>
+      ${all.map(r=>`<tr class="${r[5]==='Manuale'?'korow':''}"><td>${r[0]}</td><td><b>${r[1]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="lbl" style="margin:0">Ogni scansione, modifica e cancellazione resta registrata e non si può cancellare. Il programma indica dove guardare; chi ha sbagliato lo decidete voi dopo aver parlato con la persona. Da scrivere nell’informativa e da far vedere al consulente.</p>`;
     }
     if(t.magTab==='inv'){
       const done=Object.keys(S.m.conta).length, diff=Object.keys(S.m.conta).filter(k=>S.m.conta[k]==='diff');
