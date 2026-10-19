@@ -120,6 +120,22 @@ table.t tr.click:hover td{background:var(--soft)}
 .banco.free{background:var(--glass-strong);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
 .banco.err{background:var(--alert-soft);color:var(--alert);box-shadow:inset 0 0 0 2px var(--alert)}
 .sq{width:13px;height:13px;border-radius:4px;display:inline-block}
+.scaf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.sc{border:0;border-radius:12px;padding:10px 6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;gap:6px;align-items:center;background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.sc.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.sc .lv{display:grid;grid-template-rows:repeat(4,8px);gap:3px;width:100%}
+.sc .lv span{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.sc .lv i{display:block;border-radius:2px;background:var(--soft)}
+.sc .lv i.f{background:var(--solid)}
+.sc .lv i.h{background:var(--ink)}
+.sc .lv i.dim{background:var(--muted);opacity:.35}
+.zone{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.zone div{border-radius:12px;padding:10px 12px;background:var(--soft);font-size:13px}
+.okrow td:last-child{color:var(--ok);font-weight:700}
+.korow td{background:var(--alert-soft)}
+.korow td:last-child{color:var(--alert);font-weight:700}
+.scanbox{border:2px dashed var(--muted);border-radius:18px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px}
+
 textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-radius:14px;border:1px solid var(--line);background:var(--glass-strong);color:var(--ink);padding:12px;resize:vertical;width:100%}
 
 /* app su telefono */
@@ -173,6 +189,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
   .phone{width:100%;height:760px;padding:0;border-radius:30px;background:transparent;box-shadow:none}
   .screen{border-radius:28px;box-shadow:inset 0 0 0 1px var(--line)}
   .banchi{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .scaf{grid-template-columns:repeat(3,minmax(0,1fr))}
   .hint b{display:none}
 }
 @media (max-width:760px){
@@ -221,15 +238,16 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
+  m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
-const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
-const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti']];
+const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
+const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
 const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
@@ -266,6 +284,28 @@ const EXTRA=[
  ['Giacenza','[a spedizione o al giorno]','La merce non consegnata torna in magazzino e resta in deposito'],
  ['Riconsegna','a consegna','Nuova consegna prenotata dal cliente dopo la giacenza']
 ];
+const MAGCLI=['Tutti','Apple','Snam','Luxiona','Econocom'];
+const SC_CLI=['Apple','Snam','Snam','Snam','Luxiona','Luxiona','Econocom','Econocom','Apple','Snam','Luxiona','Econocom'];
+const scCell=(sc,pi,po)=>((sc*7+pi*3+po*5)%10)<7;
+const SC_CONT={Apple:'Colli consegne Nord',Snam:'Bancale materiale con seriali',Luxiona:'Bancale ordine magazzino',Econocom:'Telefoni con IMEI e cespite'};
+const CONTROLLO=[
+ {bolla:'[n. bolla]',cli:'Snam',tipo:'Entrata',attesi:40,letti:40,chi:'Magazziniere 1',ora:'07:40'},
+ {bolla:'[n. bolla]',cli:'Econocom',tipo:'Entrata',attesi:1000,letti:1000,chi:'Magazziniere 2',ora:'08:15'},
+ {bolla:'[n. bolla]',cli:'Apple',tipo:'Uscita',attesi:12,letti:11,chi:'Magazziniere 3',ora:'09:02',manca:'Manca il collo [codice]: spedizione ferma, non parte'},
+ {bolla:'[n. bolla]',cli:'Luxiona',tipo:'Uscita',attesi:3,letti:3,chi:'Magazziniere 1',ora:'09:30'},
+ {bolla:'[n. bolla]',cli:'Apple',tipo:'Entrata',attesi:32,letti:31,chi:'Magazziniere 2',ora:'10:05',manca:'Manca 1 collo rispetto alla bolla: da ricontare in ricevimento'},
+ {bolla:'[n. bolla]',cli:'Snam',tipo:'Uscita',attesi:4,letti:4,chi:'Magazziniere 3',ora:'10:40'}
+];
+const MOVIMENTI=[
+ ['10:41','Uscita','Snam','4 bancali','S03-2-1 → Motrice [targa]','Magazziniere 3'],
+ ['10:05','Entrata','Apple','31 colli','Ricevimento → Passaggio Apple','Magazziniere 2'],
+ ['09:47','Spostamento','Luxiona','1 bancale','S05-1-2 → S06-3-1','Magazziniere 1'],
+ ['09:30','Uscita','Luxiona','3 bancali','S06-1-1 → Furgone [targa]','Magazziniere 1'],
+ ['08:15','Entrata','Econocom','1.000 telefoni','Ricevimento → S08-1-1','Magazziniere 2'],
+ ['07:40','Entrata','Snam','40 colli','Ricevimento → S04-2-3','Magazziniere 1']
+];
+const CONTA=[['S07-1-1','Econocom'],['S07-1-2','Econocom'],['S07-2-1','Econocom'],['S07-2-2','Econocom'],['S07-3-1','Econocom'],['S07-3-2','Econocom']];
+const USCITA=[['Collo 1 di 4','S03-2-1'],['Collo 2 di 4','S03-2-1'],['Collo 3 di 4','S03-2-2'],['Collo 4 di 4','S03-2-2']];
 const GIACENZE=[
  {sped:'[n. spedizione]',cliente:'Apple',dest:'[Destinatario], Rozzano',motivo:'Destinatario assente',dal:'Ven 16 ottobre',gg:3,rico:'Da prenotare'},
  {sped:'[n. spedizione]',cliente:'Snam',dest:'[Destinatario], Milano',motivo:'Chiuso o fuori orario',dal:'Gio 15 ottobre',gg:4,rico:'Prenotata · gio 22 ottobre'},
@@ -365,6 +405,23 @@ const A={
   tMezzoF:f=>{S.t.mezzoF=f;},
   tAutF:f=>{S.t.autF=f;},
   tGiac:i=>{S.t.giac=+i; S.t.giacMsg='';},
+  tMagTab:v=>{S.t.magTab=v;},
+  tMagCli:v=>{S.t.magCli=v;},
+  tScaf:i=>{S.t.scaf=+i;},
+  tCerca:v=>{S.t.cerca=v;},
+  tInv:()=>{S.t.invOn=true; S.m.conta={};},
+  /* app magazzino */
+  mGo:v=>{S.m.scr=v; S.m.inStep=0; S.m.mvStep=0; S.m.contaCur=null; window.scrollTo(0,0);},
+  mHome:()=>{S.m.scr='home'; S.m.contaCur=null;},
+  mInScan:()=>{ if(S.m.inStep===0){S.m.inStep=1;} else {S.m.inStep=0; S.m.inN=Math.min(4,S.m.inN+1);} },
+  mInReset:()=>{S.m.inN=0; S.m.inStep=0;},
+  mOutScan:()=>{ if(S.m.outN===2&&!S.m.outErr&&!S.m.errShown){S.m.outErr=true; S.m.errShown=true; return;} S.m.outErr=false; S.m.outN=Math.min(4,S.m.outN+1);},
+  mOutGo:()=>{ if(S.m.outN===4) S.m.outGo=true; },
+  mOutReset:()=>{S.m.outN=0; S.m.outErr=false; S.m.errShown=false; S.m.outGo=false;},
+  mMv:()=>{S.m.mvStep=Math.min(2,S.m.mvStep+1);},
+  mMvReset:()=>{S.m.mvStep=0;},
+  mConta:i=>{S.m.contaCur=+i;},
+  mContaScan:()=>{const i=S.m.contaCur; S.m.conta[i]=(i===3)?'diff':'ok'; S.m.contaCur=null;},
   tGiacChiedi:()=>{S.t.giacMsg='chiesto';},
   tGiacPren:()=>{S.t.giacPren[S.t.giac]=true; S.t.giacMsg='prenotata';},
   /* autisti */
@@ -429,13 +486,14 @@ function hint(text){return `<div class="hint glass"><b>Da provare</b><span>${tex
 
 function intro(){
   const parts=[
-    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, giacenze, clienti con le tariffe, fatture, mezzi e autisti.'],
+    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi e autisti.'],
     ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
+    ['magazzino','App magazzino','Entrata, uscita, spostamenti e inventario: ogni collo scansionato con il suo posto.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
     ['carico','App carico merce','Foto del seriale, grado, prezzo ed etichetta: così un computer entra in magazzino.'],
     ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.']
   ];
-  const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
+  const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['view','magazzino','La merce entra in magazzino ed esce sul camion, sempre scansionata','App magazzino'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
   const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','App carico merce'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
   const steps=list=>`<ol class="steps">${list.map((s,i)=>`<li><button class="step" data-act="${s[0]}" data-arg="${s[1]}"><span class="num">${i+1}</span><span><b>${s[2]}</b><br><span class="lbl">${s[3]}</span></span></button></li>`).join('')}</ol>`;
   return `
@@ -504,6 +562,7 @@ function trasp(){
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
         <button class="li" data-act="tGo" data-arg="bolle"><span class="row between" style="width:100%"><span>Bolla Snam senza piano di consegna</span>${pill('Bolle','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="traffico"><span class="row between" style="width:100%"><span>2 mancate consegne da rimettere in giro</span>${pill('Traffico')}</span></button>
+        <button class="li" data-act="tGo" data-arg="magazzino"><span class="row between" style="width:100%"><span>Spedizione Apple ferma: manca 1 collo scansionato</span>${pill('Magazzino','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="giacenze"><span class="row between" style="width:100%"><span>2 giacenze con riconsegna da prenotare</span>${pill('Giacenze','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="mezzi"><span class="row between" style="width:100%"><span>Motrice [targa]: tagliando tra 500 km</span>${pill('Mezzi')}</span></button>
         <button class="li" data-act="tGo" data-arg="autisti"><span class="row between" style="width:100%"><span>3 autisti senza timbratura di uscita</span>${pill('Autisti')}</span></button>
@@ -547,6 +606,59 @@ function trasp(){
       ${giri.map(g=>`<div class="glass card"><div class="row between"><b>${g[0]}</b>${pill(g[1])}</div><ol style="margin:12px 0 0;padding-left:20px;line-height:1.9">${g[2].map(x=>`<li>${x}</li>`).join('')}${t.giriOk&&g[1]==='Milano'?'<li>[Cliente] · consegna sabato</li>':''}</ol><div class="lbl" style="margin-top:8px">${g[3]}</div></div>`).join('')}
       <div class="glass card" style="border-style:dashed"><b>Da assegnare</b>${t.giriOk?'<p class="lbl" style="margin:10px 0 0">Tutto assegnato.</p>':'<ul style="margin:12px 0 0;padding-left:20px;line-height:1.9"><li>[Cliente] · consegna sabato</li><li>Rimessa in giro · destinatario assente</li><li>Rimessa in giro · orario chiuso</li><li>Riconsegna da giacenza · Snam, gio 22</li></ul>'}</div>
     </div>`;
+  }
+  if(s==='magazzino'){
+    title='Magazzino'; hintTxt='tocca uno scaffale nella pianta, poi apri «Controllo del giorno»: le righe rosse sono colli che non tornano con le bolle.';
+    const tabsM=[['pianta','Pianta'],['controllo','Controllo del giorno'],['mov','Entrate e uscite'],['inv','Inventario']];
+    const cliF=t.magCli, match=c=>cliF==='Tutti'||c===cliF;
+    const ko=CONTROLLO.filter(r=>r.letti!==r.attesi).length;
+    let inner='';
+    if(t.magTab==='pianta'){
+      const sel=t.scaf, cli=SC_CLI[sel];
+      const rows=[];
+      for(let pi=4;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); rows.push(`<tr><td><b>S${String(sel+1).padStart(2,'0')}-${pi}-${po}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_CONT[cli]:'—'}</td><td>${full?((sel+pi+po)%9+1)+' giorni':'—'}</td></tr>`); }
+      inner=`<div class="row" style="align-items:flex-start;gap:16px">
+        <div class="glass card" style="flex:1 1 420px;min-width:0">
+          <div class="row between"><b>Pianta del capannone</b><span class="lbl">12 scaffali · 4 piani · 3 posti</span></div>
+          <div class="scaf" style="margin-top:12px">${SC_CLI.map((c,i)=>`<button class="sc ${sel===i?'on':''}" data-act="tScaf" data-arg="${i}" aria-label="Scaffale ${i+1}"><span>S${String(i+1).padStart(2,'0')}</span><span class="lv">${[4,3,2,1].map(pi=>`<span>${[1,2,3].map(po=>`<i class="${scCell(i,pi,po)?(match(c)?'f':'dim'):''}"></i>`).join('')}</span>`).join('')}</span><span class="lbl" style="font-size:11px">${c}</span></button>`).join('')}</div>
+          <div class="lbl" style="margin:14px 0 8px">Zone a terra</div>
+          <div class="zone"><div><b>Ricevimento</b><br>3 bancali da sistemare</div><div><b>Passaggio Apple</b><br>entra ed esce in giornata</div><div><b>Giacenze</b><br>4 spedizioni</div><div><b>Resi</b><br>2 colli</div></div>
+        </div>
+        <div class="glass" style="flex:1 1 380px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Scaffale S${String(sel+1).padStart(2,'0')} · ${cli}</div><div class="tbox"><table class="t"><thead><tr><th>Posto</th><th>Piano</th><th>Cliente</th><th>Cosa c’è</th><th>Da</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>
+      </div>`;
+    }
+    if(t.magTab==='controllo'){
+      const list=CONTROLLO.filter(r=>match(r.cli));
+      inner=`<div class="glass card row between"><span><b>Oggi, bolle contro scansioni</b> <span class="lbl">ogni collo della bolla deve essere stato scansionato</span></span>${ko?pill(ko+' da controllare','red'):pill('Tutto torna','ok')}</div>
+      <div class="glass tbox"><table class="t" style="min-width:820px"><thead><tr><th>Ora</th><th>Bolla</th><th>Cliente</th><th>Movimento</th><th>Colli in bolla</th><th>Scansionati</th><th>Chi</th><th>Esito</th></tr></thead><tbody>
+      ${list.map(r=>{const ok=r.letti===r.attesi;return `<tr class="${ok?'okrow':'korow'}"><td>${r.ora}</td><td>${r.bolla}</td><td><b>${r.cli}</b></td><td>${r.tipo}</td><td>${r.attesi.toLocaleString('it-IT')}</td><td>${r.letti.toLocaleString('it-IT')}</td><td>${r.chi}</td><td>${ok?'Torna':r.manca}</td></tr>`;}).join('')}
+      </tbody></table></div>
+      <p class="lbl" style="margin:0">Una spedizione con un collo non scansionato non può partire: il mezzo resta fermo finché i numeri non tornano.</p>`;
+    }
+    if(t.magTab==='mov'){
+      const list=MOVIMENTI.filter(r=>match(r[2]));
+      inner=`<div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Ora</th><th>Movimento</th><th>Cliente</th><th>Cosa</th><th>Da → a</th><th>Chi</th></tr></thead><tbody>
+      ${list.map(r=>`<tr><td>${r[0]}</td><td>${r[1]==='Entrata'?pill('Entrata','dark'):(r[1]==='Uscita'?pill('Uscita'):pill(r[1]))}</td><td><b>${r[2]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')||'<tr><td colspan="6" class="lbl">Nessun movimento per questo cliente negli esempi.</td></tr>'}
+      </tbody></table></div>`;
+    }
+    if(t.magTab==='inv'){
+      const done=Object.keys(S.m.conta).length, diff=Object.keys(S.m.conta).filter(k=>S.m.conta[k]==='diff');
+      inner=`<div class="grid g2">
+        <div class="glass card stack"><b>Inventario in corso · Scaffale S07 (Econocom)</b>
+          <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div>
+          <div class="lbl">${done} di ${CONTA.length} posti controllati · si salva a ogni scansione, anche se il magazziniere esce dall’app</div>
+          ${diff.length?msg('Differenza in '+CONTA[+diff[0]][0]+': il programma ha trovato meno pezzi di quelli registrati. Mandare qualcuno a ricontare.'):''}
+          <div class="row">${b('Apri l’app magazzino','view','magazzino','ghost')}</div></div>
+        <div class="glass card stack"><b>Lancia un inventario</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
+          <div class="row">${['Tutto','Zona','Scaffale','Cliente'].map(x=>chip(x,'noop','',x==='Scaffale')).join('')}</div>
+          <div class="row">${b('Lancia','tInv')}</div></div>
+      </div>
+      <p class="lbl" style="margin:0">Il magazziniere scansiona quello che trova senza vedere quanti pezzi dovrebbero esserci: il confronto lo fa il programma.</p>`;
+    }
+    body=`<div class="row">${tabsM.map(x=>chip(x[1]+(x[0]==='controllo'&&ko?' · '+ko:''),'tMagTab',x[0],t.magTab===x[0])).join('')}</div>
+    <div class="row"><label class="search">${SEARCH}<span class="sr">Cerca</span><input id="s-mag" placeholder="Cerca seriale, bolla o cliente"></label>${b('Cerca','tCerca','x','sm')}<span style="width:6px"></span>${MAGCLI.map(x=>chip(x,'tMagCli',x,cliF===x)).join('')}</div>
+    ${t.cerca?msg('Esempio: la bolla Snam [n. bolla] è nello scaffale S03, piano 2, posto 1 (S03-2-1), dentro da 3 giorni.'):''}
+    ${inner}`;
   }
   if(s==='giacenze'){
     title='Giacenze'; hintTxt='scegli una giacenza e premi «Chiedi al cliente quando riconsegnare» oppure «Prenota la riconsegna».';
@@ -831,6 +943,74 @@ function autistiApp(){
   </div>`;
 }
 
+function magApp(){
+  const m=S.m; let inner='';
+  const big=(label,act,arg,sub,dark)=>`<button class="bigbtn ${dark?'':'ghost'}" style="text-align:left;font-size:19px" data-act="${act}" data-arg="${arg||''}">${label}${sub?`<span style="display:block;font-weight:500;font-size:13px;opacity:.7;margin-top:2px">${sub}</span>`:''}</button>`;
+  const back=`<button class="back" data-act="mHome">Magazzino</button>`;
+  if(m.scr==='home'){
+    const done=Object.keys(m.conta).length;
+    inner=`<div class="pscr">
+      <div><div class="lbl">Martedì 20 ottobre · Magazziniere 1</div><div class="ptitle">Magazzino</div></div>
+      ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Inventario da fare · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
+      ${big('Entrata','mGo','entrata','Scarico dal camion e metto a posto',true)}
+      ${big('Uscita','mGo','uscita','Preparo e carico una spedizione')}
+      ${big('Sposta','mGo','sposta','Cambio posto a un collo o a un bancale')}
+      ${big('Conta','mGo','conta','Inventario: scansiono quello che trovo')}
+    </div>`;
+  }
+  if(m.scr==='entrata'){
+    const fin=m.inN===4;
+    inner=`<div class="pscr">${back}
+      <div><div class="lbl">Bolla Snam [n. bolla] · 4 bancali</div><div class="ptitle">Entrata</div></div>
+      <div class="bar"><i style="width:${m.inN*25}%"></i></div><div class="lbl">${m.inN} di 4 bancali messi a posto</div>
+      ${fin?`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Bolla completa: 4 su 4</b><div style="font-size:14px;margin-top:4px">Il cliente lo vede subito sul suo portale.</div></div>${b('Ricomincia la prova','mInReset','','ghost')}`
+      :`<div class="scanbox"><b style="font-size:18px">${m.inStep===0?'1. Scansiona il bancale':'2. Scansiona il posto'}</b><span class="lbl">${m.inStep===0?'Etichetta del bancale o del collo':'Posto proposto: <b>S04-2-'+(m.inN%3+1)+'</b>, in basso vicino alla baia'}</span></div>
+      <button class="bigbtn" data-act="mInScan">${m.inStep===0?'Scansiona bancale':'Scansiona posto'}</button>`}
+    </div>`;
+  }
+  if(m.scr==='uscita'){
+    inner=`<div class="pscr">${back}
+      <div><div class="lbl">Spedizione Snam · Motrice [targa] · Autista 2</div><div class="ptitle">Uscita</div></div>
+      ${USCITA.map((u,i)=>`<div class="pcard row between" style="padding:12px 14px"><span><b>${u[0]}</b><span class="lbl" style="display:block">prendi da ${u[1]}</span></span>${i<m.outN?pill('Caricato','ok'):(i===m.outN?pill('Adesso'):'')}</div>`).join('')}
+      ${m.outErr?`<div class="pcard" style="padding:14px;border:2px solid var(--alert);background:var(--alert-soft)"><b style="color:var(--alert)">Collo sbagliato</b><div style="font-size:14px;margin-top:4px">Questo è della spedizione Luxiona. Rimettilo in S05-1-2 e prendi quello giusto da S03-2-2.</div></div>`:''}
+      <div style="flex:1"></div>
+      ${m.outGo?`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Mezzo pronto a partire</b><div style="font-size:14px;margin-top:4px">4 colli su 4 scansionati sul mezzo giusto.</div></div>${b('Ricomincia la prova','mOutReset','','ghost')}`
+      :(m.outN<4?`<button class="bigbtn" data-act="mOutScan">Scansiona il collo</button>`:'')}
+      ${m.outGo?'':`<button class="bigbtn ${m.outN===4?'':'ghost'}" data-act="mOutGo" ${m.outN===4?'':'disabled style="opacity:.4;cursor:not-allowed"'}>${m.outN===4?'Spedizione completa: può partire':'Non parte finché mancano colli'}</button>`}
+    </div>`;
+  }
+  if(m.scr==='sposta'){
+    inner=`<div class="pscr">${back}
+      <div class="ptitle">Sposta</div>
+      ${m.mvStep===2?`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Spostato</b><div style="font-size:14px;margin-top:4px">Bancale Luxiona da S05-1-2 a S06-3-1.</div></div>${b('Sposta un altro','mMvReset','','ghost')}`
+      :`<div class="scanbox"><b style="font-size:18px">${m.mvStep===0?'1. Scansiona cosa sposti':'2. Scansiona il posto nuovo'}</b><span class="lbl">${m.mvStep===0?'Collo o bancale':'Bancale Luxiona, adesso in S05-1-2'}</span></div><button class="bigbtn" data-act="mMv">${m.mvStep===0?'Scansiona collo':'Scansiona posto'}</button>`}
+    </div>`;
+  }
+  if(m.scr==='conta'){
+    const done=Object.keys(m.conta).length;
+    if(m.contaCur===null){
+      inner=`<div class="pscr">${back}
+        <div><div class="lbl">Compito obbligatorio dall’ufficio</div><div class="ptitle">Inventario · Scaffale S07</div></div>
+        <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div><div class="lbl">${done} di ${CONTA.length} posti · salvato a ogni scansione</div>
+        ${CONTA.map((c,i)=>`<button class="stop ${m.conta[i]?'done':''}" data-act="mConta" data-arg="${i}"><span class="n">${i+1}</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${c[0]}</b><span class="lbl">${c[1]}</span></span><b style="font-size:12px">${m.conta[i]?'Fatto':''}</b></button>`).join('')}
+        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Inventario finito</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
+      </div>`;
+    } else {
+      inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Inventario</button>
+        <div class="ptitle">${CONTA[m.contaCur][0]}</div>
+        <div class="scanbox"><b style="font-size:18px">Scansiona tutto quello che c’è in questo posto</b><span class="lbl">Uno per uno. Il confronto con quello che dovrebbe esserci lo fa il programma.</span></div>
+        <div style="flex:1"></div>
+        <button class="bigbtn" data-act="mContaScan">Fatto, posto finito</button>
+      </div>`;
+    }
+  }
+  return `<div class="appsec">
+    <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste.</p>
+      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso dell’inventario, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
+    <div class="phone"><div class="screen">${inner}</div></div>
+  </div>`;
+}
+
 function caricoApp(){
   const k=S.k; let inner='';
   const on='chipbtn on', off='chipbtn';
@@ -939,7 +1119,7 @@ function negozio(){
 function render(){
   document.getElementById('tabs').innerHTML=tabs();
   const v=S.view, app=document.getElementById('app');
-  app.innerHTML = v==='intro'?intro():v==='trasp'?trasp():v==='autisti'?autistiApp():v==='corp'?corp():v==='carico'?caricoApp():negozio();
+  app.innerHTML = v==='intro'?intro():v==='trasp'?trasp():v==='autisti'?autistiApp():v==='magazzino'?magApp():v==='corp'?corp():v==='carico'?caricoApp():negozio();
 }
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]'); if(!el) return;
