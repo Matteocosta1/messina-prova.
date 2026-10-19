@@ -121,6 +121,8 @@ table.t tr.click:hover td{background:var(--soft)}
 .banco.free{background:var(--glass-strong);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
 .banco.err{background:var(--alert-soft);color:var(--alert);box-shadow:inset 0 0 0 2px var(--alert)}
 .sq{width:13px;height:13px;border-radius:4px;display:inline-block}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:99px;background:var(--alert);color:#fff;font-size:12px;font-weight:700;line-height:1}
+.warn{border-radius:14px;padding:12px 14px;font-weight:700;color:var(--alert);background:var(--alert-soft);box-shadow:inset 0 0 0 1px var(--alert)}
 .scaf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 .sc{border:0;border-radius:12px;padding:10px 6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;gap:6px;align-items:center;background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
 .sc.on{box-shadow:inset 0 0 0 2px var(--ink)}
@@ -239,7 +241,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
@@ -258,6 +260,8 @@ const CLIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="
 
 const b=(label,act,arg,cls)=>`<button class="btn ${cls||''}" data-act="${act}" data-arg="${arg===undefined?'':arg}">${label}</button>`;
 const chip=(label,act,arg,on)=>`<button class="chipbtn ${on?'on':''}" data-act="${act}" data-arg="${arg}">${label}</button>`;
+const badge=n=>n>0?`<span class="badge">${n}</span>`:'';
+const warn=t=>`<div class="warn">${t}</div>`;
 const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
 const srch=(ph,id)=>`<label class="search">${SEARCH}<span class="sr">Cerca</span><input id="${id}" placeholder="${ph}"></label>`;
 const msg=(text,btnLabel,act,arg)=>`<div class="msg"><span>${text}</span>${btnLabel?b(btnLabel,act,arg,'sm'):''}</div>`;
@@ -463,6 +467,8 @@ const A={
   tCliente:i=>{S.t.cliente=+i; window.scrollTo(0,0);},
   tClienteNo:()=>{S.t.cliente=null;},
   tFatt:()=>{S.t.fattOk=true;},
+  tNuovaF:()=>{S.t.nuovaF=!S.t.nuovaF; S.t.nfMsg='';},
+  tInviaF:()=>{S.t.nfMsg='ok'; S.t.nuovaF=false;},
   tMezzoF:f=>{S.t.mezzoF=f;},
   tAutF:f=>{S.t.autF=f;},
   tGiac:i=>{S.t.giac=+i; S.t.giacMsg='';},
@@ -699,7 +705,7 @@ function trasp(){
     }
     if(t.magTab==='controllo'){
       const list=CONTROLLO.filter(r=>match(r.cli));
-      inner=`<div class="glass card row between"><span><b>Oggi, bolle contro scansioni</b> <span class="lbl">ogni collo della bolla deve essere stato scansionato</span></span>${ko?pill(ko+' da controllare','red'):pill('Tutto torna','ok')}</div>
+      inner=`${ko?warn(ko+' bolle da controllare: i colli scansionati non tornano con la bolla'):msg('Tutto torna: ogni collo delle bolle di oggi è stato scansionato.')}
       <div class="glass tbox"><table class="t" style="min-width:820px"><thead><tr><th>Ora</th><th>Bolla</th><th>Cliente</th><th>Movimento</th><th>Colli in bolla</th><th>Scansionati</th><th>Chi</th><th>Esito</th></tr></thead><tbody>
       ${list.map(r=>{const ok=r.letti===r.attesi;return `<tr class="${ok?'okrow':'korow'}"><td>${r.ora}</td><td>${r.bolla}</td><td><b>${r.cli}</b></td><td>${r.tipo}</td><td>${r.attesi.toLocaleString('it-IT')}</td><td>${r.letti.toLocaleString('it-IT')}</td><td>${r.chi}</td><td>${ok?'Torna':r.manca}</td></tr>`;}).join('')}
       </tbody></table></div>
@@ -725,7 +731,7 @@ function trasp(){
       </div>
       <p class="lbl" style="margin:0">Il magazziniere scansiona quello che trova senza vedere quanti pezzi dovrebbero esserci: il confronto lo fa il programma.</p>`;
     }
-    body=`<div class="row">${tabsM.map(x=>chip(x[1]+(x[0]==='controllo'&&ko?' · '+ko:''),'tMagTab',x[0],t.magTab===x[0])).join('')}</div>
+    body=`<div class="row">${tabsM.map(x=>chip(x[1]+(x[0]==='controllo'?badge(ko):''),'tMagTab',x[0],t.magTab===x[0])).join('')}</div>
     <div class="row">${MAGCLI.map(x=>chip(x,'tMagCli',x,cliF===x)).join('')}</div>
     ${inner}`;
   }
@@ -805,7 +811,7 @@ function trasp(){
       </tbody></table></div>`;
     }
     if(t.presTab==='fix'){
-      inner=`<p class="lbl" style="margin:0">Il programma suggerisce l’orario guardando l’ultima attività nelle app. Angela conferma o corregge.</p>
+      inner=`${nFix?warn(nFix+' uscite da correggere'):msg('Nessuna timbratura da correggere.')}<p class="lbl" style="margin:0">Il programma suggerisce l’orario guardando l’ultima attività nelle app. Angela conferma o corregge.</p>
       <div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Dipendente</th><th>Entrata</th><th>Problema</th><th>Suggerimento</th><th></th></tr></thead><tbody>
       ${PRES_IERI.map((x,i)=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${t.presFix[i]?pill('Sistemata','ok'):`<span class="miss">${x[2]}</span>`}</td><td class="lbl">${x[3]}</td><td>${t.presFix[i]?'':b('Usa il suggerimento','tPresFix',i,'ghost sm')}</td></tr>`).join('')}
       </tbody></table></div>`;
@@ -813,7 +819,7 @@ function trasp(){
     if(t.presTab==='allarmi'){
       const live=S.b.finto?[{ora:'Adesso',badge:'Christian',tel:'Telefono non registrato (iPhone)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'}]:[];
       const AL=live.concat(ALLARMI);
-      inner=`<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Riservato','dark')}</div>
+      inner=`${nAll>0?warn(nAll+' tentativi di timbratura bloccati da guardare'):''}<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Riservato','dark')}</div>
       ${t.allMsg?msg(t.allMsg):''}
       <div class="glass tbox"><table class="t" style="min-width:980px"><thead><tr><th>Quando</th><th>Badge di</th><th>Da quale telefono</th><th>Dove</th><th>Cosa è successo</th><th></th></tr></thead><tbody>
       ${AL.map((a,i)=>`<tr class="${t.allVisti[i]?'':'korow'}"><td>${a.ora}</td><td><b>${a.badge}</b></td><td>${a.tel}</td><td>${a.ingresso}</td><td>${a.tipo}</td><td>${t.allVisti[i]?pill('Gestito','ok'):b('Avvisa il dipendente','tAllVisto',i,'ghost sm')}</td></tr>`).join('')}
@@ -840,7 +846,7 @@ function trasp(){
       ${t.presMsg==='exp'?msg('Conteggi di ottobre pronti per Angela e per il consulente del lavoro, divisi secondo il contratto di ognuno.'):''}
       <div class="row">${t.presMsg==='exp'?'':b('Prepara i conteggi del mese','tPresExp')}<span class="lbl">Contributi e tasse: da decidere con la Direzione se li prepara il programma o il consulente.</span></div>`;
     }
-    body=`<div class="row">${tabsP.map(x=>chip(x[1]+(x[0]==='fix'&&nFix?' · '+nFix:'')+(x[0]==='allarmi'&&nAll>0?' · '+nAll:''),'tPresTab',x[0],t.presTab===x[0])).join('')}</div>${inner}
+    body=`<div class="row">${tabsP.map(x=>chip(x[1]+(x[0]==='fix'?badge(nFix):'')+(x[0]==='allarmi'?badge(nAll):''),'tPresTab',x[0],t.presTab===x[0])).join('')}</div>${inner}
     <p class="lbl" style="margin:0">Ognuno timbra con il badge virtuale sul suo telefono, passandolo sul lettore all’ingresso. Il QR cambia ogni 30 secondi, così una foto o uno screenshot non servono a timbrare per un collega.</p>`;
   }
   if(s==='clienti'){
@@ -865,13 +871,26 @@ function trasp(){
     }
   }
   if(s==='fatture'){
-    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte»: nessuna fattura parte senza questo passaggio.';
+    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte», oppure «Nuova fattura» per farne una a mano senza aprire Fatture in Cloud.';
     const rows=[['Apple','[n]','Sabato ×3 · Giacenza ×1','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio · Giacenza ×1 · Riconsegna ×1','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
     body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th></tr></thead><tbody>
     ${rows.map(r=>{const st=r[3]==='Pronta'?(t.fattOk?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td></tr>`;}).join('')}
     </tbody></table></div>
     ${t.fattOk?msg('Fatture approvate da Angela e inviate a Fatture in Cloud. Quella di Snam aspetta un controllo.'):''}
-    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna.</span></div>`;
+    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}${b(t.nuovaF?'Chiudi':'Nuova fattura','tNuovaF','','ghost')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna.</span></div>
+    ${t.nfMsg?msg('Fattura inviata a Fatture in Cloud, che la manda allo SdI. Resta registrata qui con cliente, bolle e incasso.'):''}
+    ${t.nuovaF?`<div class="glass card stack">
+      <div class="row between"><h3 style="font-size:20px">Nuova fattura</h3><span class="lbl">Numero e data li assegna Fatture in Cloud</span></div>
+      <div class="kv"><div><div class="lbl">Cliente</div><b>Snam</b></div><div><div class="lbl">Partita IVA</div><b>[dal cliente]</b></div><div><div class="lbl">Pagamento</div><b>[dal contratto]</b></div></div>
+      <div class="tbox"><table class="t"><thead><tr><th>Voce</th><th>Quantità</th><th>Prezzo</th><th>Totale</th></tr></thead><tbody>
+        <tr><td><b>Ritiro e consegna</b> <span class="lbl">dalle bolle di ottobre</span></td><td>[n] bancali</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
+        <tr><td><b>Sponda</b></td><td>12</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
+        <tr><td><b>Stoccaggio</b></td><td>[n] bancali al mese</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
+        <tr><td><b>Giacenza</b></td><td>1</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
+      </tbody></table></div>
+      <div class="row between"><span class="lbl">Righe già compilate dalle bolle e dalle tariffe del cliente: si possono cambiare o aggiungere.</span><b>Totale € [importo] + IVA</b></div>
+      <div class="row">${b('Invia a Fatture in Cloud','tInviaF')}${b('Salva in bozza','noop','','ghost')}</div>
+    </div>`:''}`;
   }
   if(s==='mezzi'){
     title='Mezzi'; hintTxt='tocca un tipo di mezzo: la colonna Sponda dice se ce l’ha.';
