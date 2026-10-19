@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prova programma Messina</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: barra in alto con le parti del programma; sotto, una parte alla volta. Gestionali con menu laterale (in riga sul telefono), app dentro la cornice di un telefono. Bianco e nero con vetro leggero. */
+:root{
+  --bg:#f2f3f5; --halo1:#e0e4eb; --halo2:#e9e9ee;
+  --ink:#111214; --muted:#5b5e66; --line:rgba(17,18,20,.09);
+  --glass:rgba(255,255,255,.72); --glass-edge:rgba(255,255,255,.95); --glass-strong:rgba(255,255,255,.92);
+  --solid:#111214; --on-solid:#ffffff; --soft:rgba(17,18,20,.05);
+  --alert:#b42318; --alert-soft:#fdecea; --ok:#146c43; --ok-soft:#e7f5ec;
+  --frame:#1b1c20; --screen1:#eceef3; --screen2:#f6f7f9;
+  --shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1013; --halo1:#1b1e25; --halo2:#16171c;
+  --ink:#f1f2f4; --muted:#a3a6ae; --line:rgba(255,255,255,.1);
+  --glass:rgba(32,34,40,.72); --glass-edge:rgba(255,255,255,.08); --glass-strong:rgba(42,44,51,.94);
+  --solid:#f1f2f4; --on-solid:#111214; --soft:rgba(255,255,255,.06);
+  --alert:#ff8f85; --alert-soft:rgba(255,143,133,.13); --ok:#72d6a0; --ok-soft:rgba(114,214,160,.13);
+  --frame:#2a2c32; --screen1:#17181c; --screen2:#1d1f24;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 36px -22px rgba(0,0,0,.7);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1013; --halo1:#1b1e25; --halo2:#16171c;
+  --ink:#f1f2f4; --muted:#a3a6ae; --line:rgba(255,255,255,.1);
+  --glass:rgba(32,34,40,.72); --glass-edge:rgba(255,255,255,.08); --glass-strong:rgba(42,44,51,.94);
+  --solid:#f1f2f4; --on-solid:#111214; --soft:rgba(255,255,255,.06);
+  --alert:#ff8f85; --alert-soft:rgba(255,143,133,.13); --ok:#72d6a0; --ok-soft:rgba(114,214,160,.13);
+  --frame:#2a2c32; --screen1:#17181c; --screen2:#1d1f24;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 36px -22px rgba(0,0,0,.7);
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);
+  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);
+  background-color:var(--bg);background-attachment:fixed;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font-family:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-edge);box-shadow:var(--shadow);border-radius:20px}
+.card{padding:18px}
+.muted{color:var(--muted)}
+.lbl{font-size:13px;color:var(--muted);font-weight:500}
+.big{font-size:30px;font-weight:800;letter-spacing:-.025em;margin-top:4px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);white-space:nowrap}
+.pill.dark{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.pill.red{color:var(--alert);border-color:var(--alert);background:var(--alert-soft)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.btn{font-size:15px;font-weight:700;padding:11px 18px;border-radius:999px;border:1px solid var(--solid);background:var(--solid);color:var(--on-solid);cursor:pointer;min-height:44px}
+.btn.ghost{background:var(--glass-strong);color:var(--ink);border-color:var(--line)}
+.btn.sm{font-size:13px;padding:7px 12px;min-height:36px}
+.chipbtn{font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);cursor:pointer;min-height:40px}
+.chipbtn.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.msg{border-radius:14px;padding:12px 14px;font-weight:600;background:var(--solid);color:var(--on-solid);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.msg .btn{background:var(--on-solid);color:var(--solid);border-color:var(--on-solid)}
+.miss{color:var(--alert);font-weight:700}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass-strong);border-radius:999px;padding:0 14px;min-height:42px;max-width:100%}
+.search input{border:0;outline:none;background:transparent;font:inherit;font-size:14px;color:var(--ink);width:220px;max-width:100%}
+.sr{position:absolute;left:-9999px}
+
+/* barra in alto */
+.wrap{max-width:1380px;margin:0 auto;padding-block:14px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:18px;padding:10px 12px;display:flex;align-items:center;gap:14px}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:19px;white-space:nowrap;padding:0 6px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;min-height:40px}
+.tab.on{background:var(--solid);color:var(--on-solid)}
+.hint{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;margin-bottom:16px;border-radius:16px;font-size:14px}
+.hint b{white-space:nowrap}
+
+/* intro */
+.hero{padding:28px 26px;margin-bottom:16px}
+.hero h1{font-size:clamp(28px,4.4vw,44px);font-weight:800;letter-spacing:-.035em;line-height:1.05}
+.hero p{max-width:62ch;margin:12px 0 0;font-size:16px;color:var(--muted)}
+.part{display:flex;flex-direction:column;gap:8px;text-align:left;cursor:pointer;border:1px solid var(--glass-edge);padding:18px}
+.part h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.part .go{margin-top:auto;font-weight:700;font-size:14px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.step{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:10px;border-radius:14px;cursor:pointer}
+.step:hover{background:var(--soft)}
+.num{flex:none;width:30px;height:30px;border-radius:99px;background:var(--solid);color:var(--on-solid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+
+/* gestionale */
+.gest{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.side{flex:0 0 232px;padding:18px 12px;display:flex;flex-direction:column;gap:3px}
+.side .co{padding:0 10px 14px}
+.side .co b{font-size:20px;letter-spacing:-.03em;font-weight:800;display:block}
+.nav{border:0;background:transparent;text-align:left;font-size:15px;font-weight:600;padding:10px 12px;border-radius:12px;cursor:pointer;min-height:42px;white-space:nowrap}
+.nav.on{background:var(--solid);color:var(--on-solid)}
+.content{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.chead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.chead h2{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.list{display:flex;flex-direction:column;gap:2px}
+.li{border:0;background:transparent;text-align:left;padding:12px;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;width:100%}
+.li.on{background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kv div{background:var(--soft);border-radius:14px;padding:10px 12px}
+.kv .bad{background:var(--alert-soft);box-shadow:inset 0 0 0 1px var(--alert)}
+.tbox{overflow-x:auto;border-radius:16px}
+table.t{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+table.t th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:12px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
+table.t tr:last-child td{border-bottom:0}
+table.t tr.click{cursor:pointer}
+table.t tr.click:hover td{background:var(--soft)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--solid);border-radius:99px}
+.banchi{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.banco{height:36px;border-radius:9px;font-size:11px;font-weight:700;border:0;cursor:pointer}
+.banco.fin{background:var(--solid);color:var(--on-solid)}
+.banco.run{background:var(--muted);color:var(--on-solid)}
+.banco.free{background:var(--glass-strong);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.banco.err{background:var(--alert-soft);color:var(--alert);box-shadow:inset 0 0 0 2px var(--alert)}
+.sq{width:13px;height:13px;border-radius:4px;display:inline-block}
+textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-radius:14px;border:1px solid var(--line);background:var(--glass-strong);color:var(--ink);padding:12px;resize:vertical;width:100%}
+
+/* app su telefono */
+.appsec{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+.appinfo{flex:1 1 300px;max-width:440px;padding:22px}
+.appinfo h2{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.appinfo ol{margin:12px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.phone{flex:none;width:390px;max-width:100%;height:800px;border-radius:48px;padding:10px;background:var(--frame);box-shadow:var(--shadow)}
+.screen{height:100%;border-radius:38px;overflow:hidden;position:relative;background:linear-gradient(180deg,var(--screen1),var(--screen2) 55%,var(--screen1))}
+.pscr{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px;padding:22px 16px 16px;overflow-y:auto}
+.pcard{background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--glass-edge);border-radius:18px;box-shadow:var(--shadow)}
+.bigbtn{width:100%;font-size:18px;font-weight:800;padding:16px;border-radius:18px;border:2px solid var(--solid);background:var(--solid);color:var(--on-solid);cursor:pointer;min-height:56px}
+.bigbtn.ghost{background:var(--glass-strong);color:var(--ink)}
+.back{align-self:flex-start;border:0;background:var(--glass-strong);border-radius:999px;font-size:14px;font-weight:600;padding:9px 14px;cursor:pointer;min-height:40px}
+.ptitle{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.stop{border:1px solid var(--glass-edge);background:var(--glass);border-radius:16px;padding:12px;display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;width:100%;min-height:68px}
+.stop .n{flex:none;width:32px;height:32px;border-radius:99px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800}
+.stop.done{opacity:.5}
+.cam{flex:1;min-height:300px;border-radius:22px;background:#1d1e22;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px}
+.label{width:100%;max-width:270px;background:#e9e8ee;color:#2b2a31;border-radius:14px;padding:16px;outline:3px solid #ffffff;outline-offset:8px}
+.camtxt{color:#e6e6ea;font-size:14px;text-align:center;max-width:280px}
+.kvp{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px;gap:10px}
+.grades{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.gbtn{font-size:24px;font-weight:800;border-radius:16px;border:2px solid var(--solid);padding:14px 0;cursor:pointer;background:var(--glass-strong);color:var(--ink)}
+.gbtn.on{background:var(--solid);color:var(--on-solid)}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.round{width:52px;height:52px;border-radius:99px;border:2px solid var(--solid);background:var(--glass-strong);font-size:22px;font-weight:800;cursor:pointer}
+
+/* negozio */
+.shop{padding:0;overflow:hidden}
+.shophead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line)}
+.shopbody{padding:22px 18px 30px}
+.shoph1{font-size:clamp(34px,6vw,64px);font-weight:900;letter-spacing:-.05em;line-height:1;margin:16px 0 24px}
+.prod{border:1px solid var(--glass-edge);background:var(--glass);border-radius:22px;padding:14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.ph{aspect-ratio:4/3;max-width:100%;border-radius:16px;background:var(--soft);display:flex;align-items:center;justify-content:center}
+.pdet{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.pdet > *{flex:1 1 360px;min-width:0}
+.gradebox{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gopt{border-radius:16px;padding:12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px;border:2px solid var(--line);background:var(--glass-strong)}
+.gopt.on{border-color:var(--solid);background:var(--solid);color:var(--on-solid)}
+
+@media (max-width:760px){
+  .side{flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:8px;gap:4px;align-items:center}
+  .side .co{display:none}
+  .nav{padding:9px 12px}
+  .chead h2{font-size:24px}
+  .hero{padding:22px 18px}
+}
+@media (max-width:520px){
+  .brand{display:none}
+  .phone{width:100%;height:760px;padding:0;border-radius:30px;background:transparent;box-shadow:none}
+  .screen{border-radius:28px;box-shadow:inset 0 0 0 1px var(--line)}
+  .banchi{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .hint b{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <header class="top glass">
+    <div class="brand">Messina</div>
+    <nav class="tabs" id="tabs" aria-label="Parti del programma"></nav>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+(function(){
+const S = {
+  view:'intro',
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti'},
+  a:{scr:'lista', cur:0, done:{}, scanned:false, acc:{}, accOpen:false, nav:false},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
+  k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
+  n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
+};
+
+const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
+const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti']];
+const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
+
+const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
+const SEARCH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>';
+const CLIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.5l-8.5 8.5a5 5 0 01-7-7L14 5.5a3.5 3.5 0 015 5L10.5 19"></path></svg>';
+
+const b=(label,act,arg,cls)=>`<button class="btn ${cls||''}" data-act="${act}" data-arg="${arg===undefined?'':arg}">${label}</button>`;
+const chip=(label,act,arg,on)=>`<button class="chipbtn ${on?'on':''}" data-act="${act}" data-arg="${arg}">${label}</button>`;
+const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
+const srch=(ph,id)=>`<label class="search">${SEARCH}<span class="sr">Cerca</span><input id="${id}" placeholder="${ph}"></label>`;
+const msg=(text,btnLabel,act,arg)=>`<div class="msg"><span>${text}</span>${btnLabel?b(btnLabel,act,arg,'sm'):''}</div>`;
+
+/* ---------- DATI ---------- */
+const T_MAILS=[
+ {da:'Snam',ind:'logistica@[dominio]',ora:'08:12',ogg:'Ritiro 4 bancali domani',tag:'Ordine',cart:'Ordini',ant:'Domani mattina ritirare 4 bancali…',testo:'Buongiorno,\ndomani mattina ritirare 4 bancali dal nostro magazzino e consegnare in via [indirizzo], Milano, entro le 12. Serve la sponda.\nGrazie',all:'',bozza:'Buongiorno, confermiamo il ritiro di domani mattina con consegna entro le 12 e sponda. Ci indicate a che piano consegnare? Grazie'},
+ {da:'Apple',ind:'ordini@[dominio]',ora:'08:05',ogg:'Consegne zona Nord del 20/10',tag:'Ordine',cart:'Ordini',ant:'In allegato l’elenco delle 32 consegne…',testo:'Buongiorno,\nin allegato l’elenco delle 32 consegne per martedì 20.\nCordiali saluti',all:'consegne_20-10.xlsx',bozza:'Buongiorno, ricevuto. Le 32 consegne sono pianificate per martedì 20. Cordiali saluti'},
+ {da:'Luxiona',ind:'magazzino@[dominio]',ora:'07:58',ogg:'Ordine magazzino',tag:'Ordine',cart:'Ordini',ant:'Vi giriamo l’ordine di oggi…',testo:'Ciao Anna,\nvi giriamo l’ordine di oggi, 3 bancali.\nGrazie',all:'ordine_luxiona.pdf',bozza:'Ciao, ricevuto, grazie. Anna'},
+ {da:'[Cliente]',ind:'info@[dominio]',ora:'07:41',ogg:'Richiesta preventivo',tag:'Preventivo',cart:'Clienti',ant:'Vorremmo un preventivo per…',testo:'Buongiorno,\nvorremmo un preventivo per 10 bancali al mese verso Torino.\nGrazie',all:'',bozza:'Buongiorno, grazie della richiesta. Vi giro a Gianluca che vi preparerà il preventivo.'},
+ {da:'Officina [nome]',ind:'officina@[dominio]',ora:'Ieri',ogg:'Tagliando motrice',tag:'Mezzi',cart:'In arrivo',ant:'La motrice è pronta da giovedì…',testo:'Buongiorno,\nla motrice è pronta da giovedì.\nSaluti',all:'',bozza:'Grazie, passiamo giovedì mattina.'}
+];
+const BOLLE=[
+ {cliente:'Snam',cosa:'Ritiro 4 bancali',ora:'08:12',chi:'Gabriele',stato:'Manca 1 dato',data:'Martedì 20 ottobre',fascia:'Entro le 12:00',colli:'4 bancali',acc:'Sponda',manca:'Piano di consegna'},
+ {cliente:'Apple',cosa:'32 consegne zona Nord',ora:'08:05',chi:'Alberto',stato:'Pronta',data:'Martedì 20 ottobre',fascia:'10:00–12:00',colli:'32 consegne',acc:'—',manca:''},
+ {cliente:'Luxiona',cosa:'Ordine magazzino',ora:'07:58',chi:'Anna',stato:'Pronta',data:'Martedì 20 ottobre',fascia:'9:00–13:00',colli:'3 bancali',acc:'Piano terra',manca:''},
+ {cliente:'[Cliente]',cosa:'Consegna Torino',ora:'07:41',chi:'Giovanni',stato:'Nuova',data:'Mercoledì 21 ottobre',fascia:'Da definire',colli:'2 bancali',acc:'—',manca:''},
+ {cliente:'[Cliente]',cosa:'Consegna sabato',ora:'07:30',chi:'Giovanni',stato:'Manca 2 dati',data:'Sabato 24 ottobre',fascia:'Da chiedere',colli:'1 bancale',acc:'Sabato',manca:'Indirizzo e fascia oraria'}
+];
+const EXTRA=[
+ ['Sponda','a consegna','Dalla bolla o aggiunta dall’autista'],
+ ['Consegna al piano','a consegna','Se il cliente indica un piano'],
+ ['Attesa','ogni [minuti]','Oltre [minuti] di attesa allo scarico'],
+ ['Fascia oraria','a consegna','Se il cliente chiede un orario preciso'],
+ ['Sabato','a consegna','Consegne di sabato'],
+ ['Seconda consegna','a consegna','Dopo una mancata consegna']
+];
+const CLIENTI=[
+ {nome:'Apple',cosa:'Distribuzione Nord',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Consegna','a collo','Milano'],['Consegna','a collo','Lombardia'],['Consegna','a collo','Nord Italia']],extra:EXTRA},
+ {nome:'Snam',cosa:'Materiale con seriali, stoccaggio',ref:'Pier',val:'[data]',n:'[n]',esig:'Portale magazzino aggiornato in tempo reale, 24 ore su 24, con tutti i seriali.',base:[['Ritiro e consegna','a bancale','Milano'],['Ritiro e consegna','a bancale','Lombardia'],['Stoccaggio','a bancale al mese','Lacchiarella']],extra:EXTRA.concat([['Movimentazione magazzino','a bancale','Entrata o uscita dal deposito']])},
+ {nome:'Luxiona',cosa:'Ordini magazzino',ref:'Anna',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Consegna','a bancale','Milano'],['Preparazione ordine','a ordine','—']],extra:EXTRA},
+ {nome:'[Cliente]',cosa:'[cosa spedisce]',ref:'[referente]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['[voce]','[unità]','[zona]']],extra:EXTRA}
+];
+const MEZZI=[
+ ['[targa]','Sprinter','No','Autista 1','Sì','Revisione [data]','In strada'],
+ ['[targa]','Motrice','Sì','Autista 2','Sì','Tagliando tra 500 km','In strada'],
+ ['[targa]','Bilico','Sì','Autista 3','Sì','Assicurazione [data]','In strada'],
+ ['[targa]','Tre assi','Sì','—','Sì','In officina','Fermo'],
+ ['[targa]','Furgone','No','Autista 5','Sì','—','In strada']
+];
+const AUTISTI=[
+ ['Autista 1','Sprinter [targa]','Ovest','18 di 22 fermate','06:02','Valide','In giro'],
+ ['Autista 2','Motrice [targa]','Milano','9 di 14 fermate','06:15','CQC scade il [data]','In giro'],
+ ['Autista 3','Bilico [targa]','Lombardia Est','2 di 5 fermate','05:58','Valide','In giro'],
+ ['Autista 4','—','—','Ferie','—','Valide','Assenti'],
+ ['Autista 5','Furgone [targa]','Pavia','In carico','06:30','Valide','In magazzino']
+];
+const STOPS=[
+ {cliente:'Snam',ind:'Via [indirizzo], Milano',fascia:'entro le 12',colli:'4 bancali',nota:'Sponda'},
+ {cliente:'Luxiona',ind:'Via [indirizzo], Assago',fascia:'9–13',colli:'3 bancali',nota:'Piano terra'},
+ {cliente:'Apple',ind:'Via [indirizzo], Rozzano',fascia:'10–12',colli:'12 colli',nota:'Firma obbligatoria'},
+ {cliente:'[Cliente]',ind:'Via [indirizzo], Opera',fascia:'14–17',colli:'1 bancale',nota:'Chiamare prima'},
+ {cliente:'Apple',ind:'Via [indirizzo], Pieve Emanuele',fascia:'15–18',colli:'8 colli',nota:'Sponda'}
+];
+const C_MAILS=[
+ {da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’[percentuale] dal test. Se ordini oggi spediamo entro [giorno]. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
+ {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 412 PC formattati, 2 interruzioni con report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
+ {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'},
+ {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è sullo scaffale B3.',azGo:'ordini'}
+];
+const DEVICES=[
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'B3',costo:'€ 61',price:'€ 249',status:'In vendita su 4 siti',gg:9},
+ {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'A1',costo:'€ 61',price:'€ 329',status:'Venduto su eBay',gg:3},
+ {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'C2',costo:'€ 61',price:'€ 179',status:'Fermo da 64 giorni',gg:64},
+ {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'D1',costo:'€ 61',price:'€ 449',status:'In vendita su 3 siti',gg:12},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'B1',costo:'€ 61',price:'€ 399',status:'In vendita su 4 siti',gg:5},
+ {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'A4',costo:'€ 61',price:'€ 219',status:'Da fotografare',gg:1}
+];
+const ORDINI=[
+ ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','B3','Da preparare'],
+ ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','A1','Da preparare'],
+ ['08:10','Subito','Dell','Latitude 5420','C','JXXXXXX','C2','Spedito'],
+ ['Ieri','Refurbed','Apple','MacBook Air M1','B','C02XXXXX','D1','Reso aperto'],
+ ['Ieri','Sito proprio','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','B1','Consegnato']
+];
+const TELEFONI=[
+ ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Pronto'],
+ ['35XXXXXXXXXXXX2','Samsung','Galaxy S21','Accenture','[n. ticket]','Fatto','Da fare','Manuel','Da disattivare'],
+ ['35XXXXXXXXXXXX3','Apple','iPhone 12','Accenture','[n. ticket]','Da fare','Da fare','—','Da resettare'],
+ ['35XXXXXXXXXXXX4','Apple','iPhone SE','Accenture','Aperto','Fatto','Fatta','Manuel','Ticket da chiudere'],
+ ['35XXXXXXXXXXXX5','Samsung','Galaxy A52','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Pronto']
+];
+const SHOP=[
+ {brand:'Lenovo',name:'ThinkPad T14 Gen 2',spec:'Intel i5 · 14" Full HD',base:249},
+ {brand:'HP',name:'EliteBook 840 G8',spec:'Intel i7 · 14" Full HD',base:309},
+ {brand:'Dell',name:'Latitude 5420',spec:'Intel i5 · 14" Full HD',base:209},
+ {brand:'Apple',name:'MacBook Air M1',spec:'Apple M1 · 13,3" Retina',base:449},
+ {brand:'Lenovo',name:'ThinkPad X1 Carbon',spec:'Intel i7 · 14" Full HD',base:379},
+ {brand:'HP',name:'ProBook 450 G8',spec:'Intel i5 · 15,6" Full HD',base:219}
+];
+const GDELTA={'Ottimo':40,'Buono':0,'Discreto':-40};
+const GDESC={'Ottimo':'Grado A: quasi impossibile distinguerlo da nuovo. Al massimo micro-segni visibili da vicino.','Buono':'Grado B: leggeri segni d’uso sulla scocca. Schermo e tastiera in ordine. Funziona al 100%.','Discreto':'Grado C: segni evidenti d’uso, possibile piccola ammaccatura. Funziona al 100%.'};
+const banchiState=i=>{ if(i===23||i===47) return 'err'; if(i%9===0) return 'free'; if(i%4===0||i%7===0) return 'run'; return 'fin'; };
+const BANCO_TXT={fin:'Cancellazione finita, report pronto',run:'Cancellazione in corso',free:'Postazione libera',err:'Cancellazione interrotta: report dell’interruzione pronto per il cliente'};
+
+/* ---------- AZIONI ---------- */
+const A={
+  noop:()=>{},
+  view:v=>{S.view=v; window.scrollTo(0,0);},
+  tGo:s=>{S.view='trasp'; S.t.sec=s; S.t.mailMsg=''; S.t.reply=false; S.t.bollaMsg=''; if(s==='clienti') S.t.cliente=null; window.scrollTo(0,0);},
+  cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; window.scrollTo(0,0);},
+  /* trasporti */
+  tCart:c=>{S.t.cart=c; S.t.mailMsg=''; S.t.reply=false; const f=T_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.t.mail=f;},
+  tMail:i=>{S.t.mail=+i; S.t.mailMsg=''; S.t.reply=false;},
+  tCrea:()=>{S.t.mailMsg='bolla'; S.t.reply=false;},
+  tReply:()=>{S.t.reply=true; S.t.mailMsg='';},
+  tReplyNo:()=>{S.t.reply=false;},
+  tSend:()=>{S.t.reply=false; S.t.mailMsg='inviata';},
+  tFwd:()=>{S.t.mailMsg='inoltrata'; S.t.reply=false;},
+  tAssign:()=>{S.t.mailMsg='assegnata'; S.t.reply=false;},
+  tBolla:i=>{S.t.bolla=+i; S.t.bollaMsg='';},
+  tConferma:()=>{S.t.bolleOk[S.t.bolla]=true; S.t.bollaMsg='ok';},
+  tChiedi:()=>{S.t.bollaMsg='chiesto';},
+  tGiri:()=>{S.t.giriOk=true;},
+  tCliente:i=>{S.t.cliente=+i; window.scrollTo(0,0);},
+  tClienteNo:()=>{S.t.cliente=null;},
+  tFatt:()=>{S.t.fattOk=true;},
+  tMezzoF:f=>{S.t.mezzoF=f;},
+  tAutF:f=>{S.t.autF=f;},
+  /* autisti */
+  aOpen:i=>{S.a.cur=+i; S.a.scr='dett'; S.a.scanned=false; S.a.accOpen=false; S.a.nav=false;},
+  aBack:()=>{S.a.scr='lista';},
+  aDett:()=>{S.a.scr='dett';},
+  aScan:()=>{S.a.scanned=true;},
+  aNav:()=>{S.a.nav=!S.a.nav;},
+  aAccT:()=>{S.a.accOpen=!S.a.accOpen;},
+  aAcc:l=>{const e=S.a.acc[S.a.cur]||[]; S.a.acc[S.a.cur]=e.concat([l]); S.a.accOpen=false;},
+  aFirma:()=>{S.a.scr='firma';},
+  aMancata:()=>{S.a.scr='mancata';},
+  aOk:()=>{S.a.done[S.a.cur]='ok'; S.a.scr='lista';},
+  aKo:()=>{S.a.done[S.a.cur]='ko'; S.a.scr='lista';},
+  aReset:()=>{S.a={scr:'lista',cur:0,done:{},scanned:false,acc:{},accOpen:false,nav:false};},
+  /* corporation */
+  cCart:c=>{S.c.cart=c; S.c.mailMsg=''; S.c.reply=false; const f=C_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.c.mail=f;},
+  cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false;},
+  cAz:()=>{S.c.mailMsg='az'; S.c.reply=false;},
+  cReply:()=>{S.c.reply=true; S.c.mailMsg='';},
+  cReplyNo:()=>{S.c.reply=false;},
+  cSend:()=>{S.c.reply=false; S.c.mailMsg='inviata';},
+  cFwd:()=>{S.c.mailMsg='inoltrata'; S.c.reply=false;},
+  cAssign:()=>{S.c.mailMsg='assegnata'; S.c.reply=false;},
+  cVista:v=>{S.c.vista=v;},
+  cBrand:v=>{S.c.brand=v;},
+  cGrado:v=>{S.c.grado=v;},
+  cLic:()=>{S.c.licOk=true;},
+  cBanco:i=>{S.c.banco=+i;},
+  cTelF:f=>{S.c.telF=f;},
+  cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è sullo scaffale '+ORDINI[+i][6]+'.';},
+  cDdt:()=>{S.c.ordMsg='ddt';},
+  /* carico */
+  kGo:s=>{S.k.scr=s;},
+  kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
+  kDif:l=>{S.k.difetti[l]=!S.k.difetti[l];},
+  kCan:l=>{S.k.canali[l]=!S.k.canali[l];},
+  kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
+  kPiu:()=>{S.k.prezzo+=10;},
+  kFatto:()=>{S.k.scr='fatto'; S.k.n+=1;},
+  /* negozio */
+  nHome:()=>{S.n.view='home'; S.n.payMsg=false;},
+  nCart:()=>{S.n.view='cart'; S.n.payMsg=false;},
+  nBrand:v=>{S.n.brand=v;},
+  nOpen:i=>{S.n.view='prod'; S.n.pid=+i; S.n.g='Buono'; S.n.ram=16; S.n.added=false;},
+  nG:g=>{S.n.g=g; S.n.added=false;},
+  nRam:r=>{S.n.ram=+r; S.n.added=false;},
+  nAdd:()=>{ if(S.n.added){S.n.view='cart';return;} const p=SHOP[S.n.pid]; S.n.cart.push({name:p.name,det:S.n.g+' · '+S.n.ram+' GB RAM',p:nPrice(p,S.n.g,S.n.ram)}); S.n.added=true;},
+  nRemove:i=>{S.n.cart.splice(+i,1);},
+  nPay:()=>{S.n.payMsg=true;}
+};
+function nPrice(p,g,ram){return p.base+GDELTA[g]+(ram===16?0:-30);}
+
+/* ---------- VISTE ---------- */
+function tabs(){
+  return VIEWS.map(v=>`<button class="tab ${S.view===v[0]?'on':''}" data-act="view" data-arg="${v[0]}">${v[1]}</button>`).join('');
+}
+function hint(text){return `<div class="hint glass"><b>Da provare</b><span>${text}</span></div>`;}
+
+function intro(){
+  const parts=[
+    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, clienti con le tariffe, fatture, mezzi e autisti.'],
+    ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne.'],
+    ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
+    ['carico','App carico merce','Foto del seriale, grado, prezzo ed etichetta: così un computer entra in magazzino.'],
+    ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.']
+  ];
+  const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
+  const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','App carico merce'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
+  const steps=list=>`<ol class="steps">${list.map((s,i)=>`<li><button class="step" data-act="${s[0]}" data-arg="${s[1]}"><span class="num">${i+1}</span><span><b>${s[2]}</b><br><span class="lbl">${s[3]}</span></span></button></li>`).join('')}</ol>`;
+  return `
+  <section class="hero glass">
+    <h1>Il nuovo programma Messina</h1>
+    <p>Questa è una prova da toccare: tutti i tasti funzionano e i dati sono di esempio, quindi niente arriva davvero a clienti o colleghi. Messina Autotrasporti e Messina Corporation hanno due programmi separati.</p>
+  </section>
+  <div class="grid g4" style="margin-bottom:16px">
+    ${parts.map(p=>`<button class="part glass" data-act="view" data-arg="${p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+  </div>
+  <div class="grid g2">
+    <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di una consegna</h3>${steps(consegna)}</div>
+    <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di un computer</h3>${steps(computer)}</div>
+  </div>`;
+}
+
+function shell(company,navList,cur,act,title,body,searchPh){
+  return `<div class="gest">
+    <nav class="side glass" aria-label="Sezioni ${company}">
+      <div class="co"><b>MESSINA</b><span class="lbl">${company}</span></div>
+      ${navList.map(n=>`<button class="nav ${cur===n[0]?'on':''}" data-act="${act}" data-arg="${n[0]}">${n[1]}</button>`).join('')}
+    </nav>
+    <div class="content">
+      <div class="chead"><div><div class="lbl">Lunedì 19 ottobre 2026 · ${company}</div><h2>${title}</h2></div><div class="row">${srch(searchPh,'s-'+act)}${pill('Dati di esempio')}</div></div>
+      ${body}
+    </div></div>`;
+}
+
+function mailView(mails,st,pre,actionBtn,cartNames){
+  const filt=mails.map((m,i)=>Object.assign({i:i},m)).filter(m=>st.cart==='In arrivo'||m.cart===st.cart);
+  const cur=mails[st.mail];
+  const count=c=>c==='Inviate'?'':(c==='In arrivo'?mails.length:mails.filter(m=>m.cart===c).length);
+  return `<div class="row" style="align-items:flex-start;gap:16px">
+    <div class="glass" style="flex:0 1 190px;padding:10px;display:flex;flex-direction:column;gap:3px">
+      ${b('Scrivi',pre+'Reply','', 'sm')}
+      ${cartNames.map(c=>`<button class="nav ${st.cart===c?'on':''}" style="display:flex;justify-content:space-between" data-act="${pre}Cart" data-arg="${c}"><span>${c}</span><span>${count(c)}</span></button>`).join('')}
+    </div>
+    <div class="glass" style="flex:1 1 260px;padding:8px;min-width:0"><div class="list">
+      ${filt.length?filt.map(m=>`<button class="li ${st.mail===m.i?'on':''}" data-act="${pre}Mail" data-arg="${m.i}"><span class="row between" style="width:100%"><b>${m.da}</b><span class="lbl">${m.ora}</span></span><span style="font-weight:600;font-size:14px">${m.ogg}</span><span class="lbl">${m.ant}</span></button>`).join(''):'<div class="lbl" style="padding:14px">Nessuna mail inviata in questa prova.</div>'}
+    </div></div>
+    <div class="glass card stack" style="flex:2 1 400px;min-width:0">
+      <div class="row between" style="align-items:flex-start"><div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">${cur.ogg}</div><div class="lbl">${cur.da} · ${cur.ind} · ${cur.ora}</div></div>${pill(cur.tag)}</div>
+      <div style="white-space:pre-line;line-height:1.6">${cur.testo}</div>
+      ${cur.all?`<div class="row pill" style="align-self:flex-start;padding:8px 12px;font-size:14px">${CLIP}${cur.all}</div>`:''}
+      ${st.mailMsg==='inviata'?msg('Risposta inviata dalla casella aziendale.'):''}
+      ${st.mailMsg==='inoltrata'?msg('Mail inoltrata.'):''}
+      ${st.mailMsg==='assegnata'?msg('Mail assegnata a un collega: la vede nella sua coda.'):''}
+      ${actionBtn.msg}
+      ${st.reply?`<div class="stack" style="gap:8px"><label class="lbl" for="${pre}-risposta">Risposta preparata dal programma, da controllare</label><textarea id="${pre}-risposta">${cur.bozza}</textarea><div class="row">${b('Invia',pre+'Send')}${b('Annulla',pre+'ReplyNo','','ghost')}</div></div>`:''}
+      <div class="row" style="border-top:1px solid var(--line);padding-top:14px">${actionBtn.btn}${b('Rispondi',pre+'Reply','','ghost')}${b('Inoltra',pre+'Fwd','','ghost')}${b('Assegna a un collega',pre+'Assign','','ghost')}</div>
+    </div></div>`;
+}
+
+function trasp(){
+  const t=S.t, s=t.sec; let body='', title='', hintTxt='';
+  if(s==='home'){
+    title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare dritta alla pagina giusta.';
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">1.240</div><div class="lbl">1.168 consegnate</div></div>
+      <div class="glass card"><div class="lbl">Consegnate al primo tentativo</div><div class="big">94%</div><div class="lbl">obiettivo 97%</div></div>
+      <div class="glass card"><div class="lbl">Bolle da confermare</div><div class="big">${18-Object.keys(t.bolleOk).length}</div><div class="lbl">3 con dati mancanti</div></div>
+      <div class="glass card"><div class="lbl">Fatturabile ottobre</div><div class="big">€ [importo]</div><div class="lbl">si aggiorna a ogni consegna</div></div>
+    </div>
+    <div class="grid g2">
+      <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Resoconto del mattino</h3><p style="margin:0 0 8px">Ieri 1.198 consegne, costo medio per consegna in linea con la settimana. Due mezzi della zona Est hanno consumato più gasolio del solito: conviene guardare i loro giri.</p><p class="lbl" style="margin:0">Arriva ogni mattina alle 7:00 a Direzione e Amministrazione.</p></div>
+      <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
+        <button class="li" data-act="tGo" data-arg="bolle"><span class="row between" style="width:100%"><span>Bolla Snam senza piano di consegna</span>${pill('Bolle','red')}</span></button>
+        <button class="li" data-act="tGo" data-arg="traffico"><span class="row between" style="width:100%"><span>2 mancate consegne da rimettere in giro</span>${pill('Traffico')}</span></button>
+        <button class="li" data-act="tGo" data-arg="mezzi"><span class="row between" style="width:100%"><span>Motrice [targa]: tagliando tra 500 km</span>${pill('Mezzi')}</span></button>
+        <button class="li" data-act="tGo" data-arg="autisti"><span class="row between" style="width:100%"><span>3 autisti senza timbratura di uscita</span>${pill('Autisti')}</span></button>
+      </div></div>
+    </div>`;
+  }
+  if(s==='mail'){
+    title='Mail'; hintTxt='apri la mail di Snam e premi «Crea bolla da questa mail», poi «Apri in Bolle».';
+    const ab={btn:b('Crea bolla da questa mail','tCrea'), msg:t.mailMsg==='bolla'?msg('Bolla creata con i dati della mail: la trovi in Bolle, con i campi già compilati.','Apri in Bolle','tGo','bolle'):''};
+    body=mailView(T_MAILS,t,'t',ab,['In arrivo','Ordini','Clienti','Inviate']);
+  }
+  if(s==='bolle'){
+    title='Bolle'; hintTxt='scegli una bolla, controlla i dati e premi «Conferma bolla». I dati mancanti sono in rosso.';
+    const cur=BOLLE[t.bolla], ok=t.bolleOk[t.bolla];
+    body=`<div class="row" style="align-items:flex-start;gap:16px">
+      <div class="glass" style="flex:1 1 280px;padding:8px;min-width:0"><div class="row between" style="padding:8px 10px"><b>Da confermare</b><span class="lbl">${18-Object.keys(t.bolleOk).length} bolle</span></div><div class="list">
+        ${BOLLE.map((x,i)=>{const st=t.bolleOk[i]?pill('Confermata','ok'):(x.manca?pill(x.stato,'red'):(x.stato==='Pronta'?pill('Pronta','dark'):pill(x.stato)));return `<button class="li ${t.bolla===i?'on':''}" data-act="tBolla" data-arg="${i}"><span class="row between" style="width:100%"><b>${x.cliente}</b>${st}</span><span class="lbl">${x.cosa} · ${x.ora} · ${x.chi}</span></button>`;}).join('')}
+      </div></div>
+      <div class="glass card stack" style="flex:2 1 420px;min-width:0">
+        <div class="row between"><h3 style="font-size:22px;letter-spacing:-.02em">${cur.cliente} · ${cur.cosa}</h3><span class="lbl">Bolla n. [numero]</span></div>
+        <div class="kv">
+          <div><div class="lbl">Cliente</div><b>${cur.cliente}</b></div>
+          <div><div class="lbl">Data</div><b>${cur.data}</b></div>
+          <div><div class="lbl">Fascia</div><b>${cur.fascia}</b></div>
+          <div><div class="lbl">Colli</div><b>${cur.colli}</b></div>
+          <div><div class="lbl">Accessori</div><b>${cur.acc}</b></div>
+          ${cur.manca?`<div class="bad"><div class="lbl">Manca</div><b class="miss">${cur.manca}</b></div>`:''}
+        </div>
+        <div style="border-top:1px solid var(--line);padding-top:12px"><div class="lbl">Tariffa applicata dal contratto</div><div>Base del cliente + accessori · totale <b>€ [importo]</b></div></div>
+        ${t.bollaMsg==='ok'||ok?msg('Bolla confermata: è nei giri di domani e gli accessori sono già sull’app dell’autista. Al cliente parte la mail di conferma.','Vai al Traffico','tGo','traffico'):''}
+        ${t.bollaMsg==='chiesto'?msg('Mail al cliente pronta in Mail, con la domanda sul dato mancante.'):''}
+        <div class="row">${ok?'':b('Conferma bolla','tConferma')}${cur.manca?b('Chiedi il dato al cliente','tChiedi','','ghost'):''}</div>
+      </div></div>`;
+  }
+  if(s==='traffico'){
+    title='Traffico e giri'; hintTxt='premi «Proponi i giri»: il programma assegna da solo le spedizioni ancora aperte.';
+    const giri=[['Sprinter · Autista 1','Zona Ovest',['Apple · Rho','Apple · Pero','[Cliente] · Arese','Apple · Garbagnate'],'86 km · circa 6 ore'],['Motrice con sponda · Autista 2','Milano',['Snam · ritiro','Snam · consegna entro le 12','Luxiona · 3 bancali'],'54 km · circa 5 ore e mezza'],['Bilico · Autista 3','Lombardia Est',['Apple · Bergamo','Apple · Brescia'],'210 km · circa 7 ore']];
+    body=`<div class="glass card row between"><span><b>Domani</b> <span class="lbl">42 spedizioni · 12 mezzi · pronto entro [orario]</span></span><div class="row">${b(t.giriOk?'Giri proposti':'Proponi i giri','tGiri')}</div></div>
+    ${t.giriOk?msg('Giri proposti: 38 spedizioni assegnate, 4 spostate sui mezzi liberi. Mauro e Nelson possono cambiare le fermate trascinandole.'):''}
+    <div class="grid g4">
+      ${giri.map(g=>`<div class="glass card"><div class="row between"><b>${g[0]}</b>${pill(g[1])}</div><ol style="margin:12px 0 0;padding-left:20px;line-height:1.9">${g[2].map(x=>`<li>${x}</li>`).join('')}${t.giriOk&&g[1]==='Milano'?'<li>[Cliente] · consegna sabato</li>':''}</ol><div class="lbl" style="margin-top:8px">${g[3]}</div></div>`).join('')}
+      <div class="glass card" style="border-style:dashed"><b>Da assegnare</b>${t.giriOk?'<p class="lbl" style="margin:10px 0 0">Tutto assegnato.</p>':'<ul style="margin:12px 0 0;padding-left:20px;line-height:1.9"><li>[Cliente] · consegna sabato</li><li>Rimessa in giro · destinatario assente</li><li>Rimessa in giro · orario chiuso</li></ul>'}</div>
+    </div>`;
+  }
+  if(s==='clienti'){
+    if(t.cliente===null){
+      title='Clienti'; hintTxt='tocca un cliente per aprire la sua scheda con tutte le tariffe, voce per voce.';
+      body=`<div class="row between">${srch('Cerca cliente','s-cli')}${b('Nuovo cliente','noop')}</div>
+      <div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Cosa spedisce</th><th>Referente interno</th><th>Contratto fino al</th><th>Spedizioni mese</th></tr></thead><tbody>
+      ${CLIENTI.map((c,i)=>`<tr class="click" data-act="tCliente" data-arg="${i}"><td><b>${c.nome}</b></td><td>${c.cosa}</td><td>${c.ref}</td><td>${c.val}</td><td>${c.n}</td></tr>`).join('')}
+      </tbody></table></div>`;
+    } else {
+      const c=CLIENTI[t.cliente]; title=c.nome; hintTxt='qui ci sono le tariffe del cliente. Torna a «Tutti i clienti» per aprirne un altro.';
+      body=`<div class="row between">${b('Tutti i clienti','tClienteNo','','ghost')}<div class="row">${b('Contratto PDF','noop','','ghost sm')}${b('Modifica tariffe','noop','','sm')}</div></div>
+      <div class="grid g4">
+        <div class="glass card"><div class="lbl">Cosa spedisce</div><b>${c.cosa}</b></div>
+        <div class="glass card"><div class="lbl">Referente interno</div><b>${c.ref}</b></div>
+        <div class="glass card"><div class="lbl">Contratto</div><b>dal [data] al ${c.val}</b></div>
+        <div class="glass card"><div class="lbl">Fatturazione</div><b>[mensile o a spedizione]</b></div>
+      </div>
+      <div class="glass"><div style="padding:14px 14px 0;font-weight:700">Tariffa base</div><div class="tbox"><table class="t"><thead><tr><th>Voce</th><th>Unità</th><th>Zona</th><th>Prezzo</th></tr></thead><tbody>${c.base.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [—]</td></tr>`).join('')}</tbody></table></div></div>
+      <div class="glass"><div style="padding:14px 14px 0;font-weight:700">Accessori e voci extra</div><div class="tbox"><table class="t"><thead><tr><th>Voce</th><th>Come si conta</th><th>Prezzo</th><th>Quando scatta</th></tr></thead><tbody>${c.extra.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>€ [—]</td><td class="lbl">${r[2]}</td></tr>`).join('')}</tbody></table></div></div>
+      <div class="grid g2"><div class="glass card"><b>Eccezioni e accordi</b><p style="margin:8px 0 0">[sconti, minimi, accordi particolari: li inserisce la Direzione]</p></div><div class="glass card"><b>Cosa chiede il cliente</b><p style="margin:8px 0 0">${c.esig}</p></div></div>`;
+    }
+  }
+  if(s==='fatture'){
+    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte»: nessuna fattura parte senza questo passaggio.';
+    const rows=[['Apple','[n]','Sabato ×3','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
+    body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th></tr></thead><tbody>
+    ${rows.map(r=>{const st=r[3]==='Pronta'?(t.fattOk?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    ${t.fattOk?msg('Fatture approvate da Angela e inviate a Fatture in Cloud. Quella di Snam aspetta un controllo.'):''}
+    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna.</span></div>`;
+  }
+  if(s==='mezzi'){
+    title='Mezzi'; hintTxt='tocca un tipo di mezzo per filtrare l’elenco.';
+    const tipi=['Tutti','Sprinter','Furgone','Motrice','Tre assi','Bilico','Con sponda'];
+    const list=MEZZI.filter(m=>t.mezzoF==='Tutti'||(t.mezzoF==='Con sponda'?m[2]==='Sì':m[1]===t.mezzoF));
+    body=`<div class="row">${srch('Cerca per targa o tipo','s-mez')}${tipi.map(x=>chip(x,'tMezzoF',x,t.mezzoF===x)).join('')}</div>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Targa</th><th>Tipo</th><th>Sponda</th><th>Autista di solito</th><th>Telepass</th><th>Prossima scadenza</th><th>Oggi</th></tr></thead><tbody>
+    ${list.length?list.map(m=>`<tr><td><b>${m[0]}</b></td><td>${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td><td>${m[4]}</td><td>${m[5]}</td><td>${m[6]==='Fermo'?pill('Fermo','red'):pill(m[6],'dark')}</td></tr>`).join(''):'<tr><td colspan="7" class="lbl">Nessun mezzo di questo tipo negli esempi.</td></tr>'}
+    </tbody></table></div>`;
+  }
+  if(s==='autisti'){
+    title='Autisti'; hintTxt='tocca «In giro», «In magazzino» o «Assenti» per filtrare.';
+    const f=['Tutti','In giro','In magazzino','Assenti'];
+    const list=AUTISTI.filter(a=>t.autF==='Tutti'||a[6]===t.autF);
+    body=`<div class="row">${srch('Cerca per nome','s-aut')}${f.map(x=>chip(x,'tAutF',x,t.autF===x)).join('')}</div>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Autista</th><th>Mezzo di oggi</th><th>Zona</th><th>Giro di oggi</th><th>Entrata</th><th>Patente e CQC</th></tr></thead><tbody>
+    ${list.map(a=>`<tr><td><b>${a[0]}</b></td><td>${a[1]}</td><td>${a[2]}</td><td>${a[3]==='Ferie'?pill('Ferie'):a[3]}</td><td>${a[4]}</td><td>${a[5].indexOf('scade')>=0?`<span class="miss">${a[5]}</span>`:a[5]}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="lbl" style="margin:0">Entrate e uscite arrivano dal timbracartellino; Angela le trova già pronte per gli stipendi.</p>`;
+  }
+  return hint(hintTxt)+shell('Autotrasporti',T_NAV,s,'tGo',title,body,'Cerca cliente, bolla, targa');
+}
+
+function corp(){
+  const c=S.c, s=c.sec; let body='', title='', hintTxt='';
+  if(s==='home'){
+    title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare alla pagina giusta.';
+    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',32],['Subito',30]];
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Dispositivi in magazzino</div><div class="big">3.120</div><div class="lbl">1.840 in vendita</div></div>
+      <div class="glass card"><div class="lbl">Venduti questo mese</div><div class="big">214</div><div class="lbl">online 168 · di persona 46</div></div>
+      <div class="glass card"><div class="lbl">Ordini da spedire</div><div class="big">9</div><div class="lbl">entro le 16:00</div></div>
+      <div class="glass card"><div class="lbl">Incassato ottobre</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
+    </div>
+    <div class="grid g2">
+      <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
+        <button class="li" data-act="cGo" data-arg="inv"><span class="row between" style="width:100%"><span>11 PC fermi da oltre 60 giorni</span>${pill('Inventario','red')}</span></button>
+        <button class="li" data-act="cGo" data-arg="ordini"><span class="row between" style="width:100%"><span>1 reso aperto su Refurbed</span>${pill('Ordini')}</span></button>
+        <button class="li" data-act="cGo" data-arg="lotti"><span class="row between" style="width:100%"><span>DDT lotto L-015: 3 seriali da verificare</span>${pill('Lotti','red')}</span></button>
+        <button class="li" data-act="cGo" data-arg="stage"><span class="row between" style="width:100%"><span>Licenze Certus: chiavetta 3 quasi finita</span>${pill('Stage Computer')}</span></button>
+      </div></div>
+      <div class="glass card"><h3 style="font-size:18px;margin-bottom:12px">Venduti per sito, ottobre</h3><div class="stack" style="gap:10px">
+        ${can.map(x=>`<div class="row" style="flex-wrap:nowrap"><span style="width:96px;flex:none;font-size:14px">${x[0]}</span><div class="bar" style="flex:1"><i style="width:${Math.round(x[1]/62*100)}%"></i></div><b style="width:30px;text-align:right">${x[1]}</b></div>`).join('')}
+      </div></div>
+    </div>`;
+  }
+  if(s==='mail'){
+    title='Mail'; hintTxt='apri la mail del DDT e premi «Carica il DDT nel lotto». Il tasto principale cambia con il tipo di mail.';
+    const cur=C_MAILS[c.mail];
+    const ab={btn:b(cur.az,'cAz'), msg:c.mailMsg==='az'?msg(cur.azMsg,'Vai alla pagina','cGo',cur.azGo):''};
+    body=mailView(C_MAILS,c,'c',ab,['In arrivo','Vendite','Lotti','Stage','Inviate']);
+  }
+  if(s==='lotti'){
+    title='Lotti'; hintTxt='la colonna «Incassato finora» sale a ogni computer venduto del lotto.';
+    const L=[['L-015','Ott 2026',612,'€ 36.700',12,'€ 2.202','6%'],['L-014','Set 2026',480,'€ 28.800',131,'€ 20.736','72%'],['L-013','Ago 2026',320,'€ 19.500',298,'€ 31.980','164%']];
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Costo medio reale per PC</div><div class="big">€ 61</div><div class="lbl">calcolato su tutti i lotti</div></div>
+      <div class="glass card"><div class="lbl">Lotti aperti</div><div class="big">6</div></div>
+      <div class="glass card"><div class="lbl">Fermi da oltre 60 giorni</div><div class="big">11</div><div class="lbl">conviene svendere</div></div>
+    </div>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato finora</th><th>Recuperato</th></tr></thead><tbody>
+    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><b>${r[5]}</b></td><td>${r[6]}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
+    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
+  }
+  if(s==='inv'){
+    title='Inventario'; hintTxt='prova i tasti «Schede» e «Tabella» in alto a destra, e i filtri per marchio e grado.';
+    const list=DEVICES.filter(d=>(c.brand==='Tutti'||d.brand===c.brand)&&(c.grado==='Tutti'||d.grade===c.grado));
+    const toggle=`<div class="row" style="margin-left:auto;gap:4px;padding:4px;border-radius:999px" >${chip('Schede','cVista','schede',c.vista==='schede')}${chip('Tabella','cVista','tabella',c.vista==='tabella')}</div>`;
+    const filters=`<div class="row">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'cBrand',x,c.brand===x)).join('')}<span style="width:8px"></span>${['Tutti','A','B','C'].map(x=>chip(x==='Tutti'?'Tutti i gradi':'Grado '+x,'cGrado',x,c.grado===x)).join('')}${toggle}</div>`;
+    const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
+    if(c.vista==='schede'){
+      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · scaffale ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.status}</span></div></div>`).join('')}</div>`:empty);
+    } else {
+      body=filters+(list.length?`<div class="glass tbox"><table class="t" style="min-width:1400px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Scaffale</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td class="lbl">${d.status}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
+    }
+  }
+  if(s==='ordini'){
+    title='Ordini'; hintTxt='premi «Etichetta spedizione» su un ordine da preparare.';
+    body=`<p class="lbl" style="margin:0">Un solo inventario: quando un computer si vende su un sito, sparisce subito dagli altri.</p>
+    ${c.ordMsg&&c.ordMsg!=='ddt'?msg(c.ordMsg):''}
+    <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marchio</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Scaffale</th><th>Stato</th><th></th></tr></thead><tbody>
+    ${ORDINI.map((o,i)=>{const st=o[7]==='Da preparare'?pill(o[7]):(o[7]==='Reso aperto'?pill(o[7],'red'):pill(o[7],'dark'));return `<tr><td>${o[0]}</td><td>${o[1]}</td><td>${o[2]}</td><td><b>${o[3]}</b></td><td>${pill(o[4],'dark')}</td><td>${o[5]}</td><td>${o[6]}</td><td>${st}</td><td>${o[7]==='Da preparare'?b('Etichetta spedizione','cEtichetta',i,'ghost sm'):''}</td></tr>`;}).join('')}
+    </tbody></table></div>`;
+  }
+  if(s==='stage'){
+    title='Stage Computer'; hintTxt='tocca una postazione del banco per vedere a che punto è. Le due rosse si sono interrotte.';
+    const sel=c.banco;
+    body=`<div class="row" style="align-items:flex-start;gap:16px">
+      <div class="glass card" style="flex:2 1 440px;min-width:0">
+        <div class="row between"><b>Banco · 60 postazioni</b><span class="lbl">aggiornato in tempo reale</span></div>
+        <div class="row" style="margin:10px 0 14px;font-size:13px;gap:14px">
+          <span class="row" style="gap:6px"><span class="sq" style="background:var(--solid)"></span>Finito</span>
+          <span class="row" style="gap:6px"><span class="sq" style="background:var(--muted)"></span>In cancellazione</span>
+          <span class="row" style="gap:6px"><span class="sq" style="box-shadow:inset 0 0 0 1px var(--line);background:var(--glass-strong)"></span>Libero</span>
+          <span class="row" style="gap:6px"><span class="sq" style="box-shadow:inset 0 0 0 2px var(--alert);background:var(--alert-soft)"></span>Interrotto</span>
+        </div>
+        <div class="banchi">${Array.from({length:60},(_,k)=>{const i=k+1;return `<button class="banco ${banchiState(i)}" data-act="cBanco" data-arg="${i}" aria-label="Postazione ${i}">${i}</button>`;}).join('')}</div>
+        ${sel?`<div style="margin-top:14px">${msg('Postazione '+sel+': '+BANCO_TXT[banchiState(sel)]+'.')}</div>`:''}
+      </div>
+      <div class="stack" style="flex:1 1 260px;min-width:0">
+        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>430</b> · Formattati <b>412</b> · Interrotti <b>2</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
+        <div class="glass card"><div class="lbl">Licenze Certus</div><div style="margin-top:6px">Chiavetta 3: <b class="miss">40 licenze rimaste</b></div>${c.licOk?`<div style="margin-top:10px">${msg('Mail di richiesta licenze inviata.')}</div>`:`<div style="margin-top:12px">${b('Invia la mail già pronta','cLic')}</div>`}</div>
+      </div></div>`;
+  }
+  if(s==='stageTel'){
+    title='Stage Cellulari'; hintTxt='tocca un filtro, ad esempio «Da disattivare», per vedere solo quei telefoni.';
+    const f=['Tutti','Da resettare','Ticket da chiudere','Da disattivare','Pronto'];
+    const list=TELEFONI.filter(x=>c.telF==='Tutti'||x[8]===c.telF);
+    const cnt=st=>TELEFONI.filter(x=>x[8]===st).length;
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Ricevuti oggi</div><div class="big">${TELEFONI.length}</div></div>
+      <div class="glass card"><div class="lbl">Da resettare</div><div class="big">${cnt('Da resettare')}</div></div>
+      <div class="glass card"><div class="lbl">Ticket da chiudere sul portale</div><div class="big">${cnt('Ticket da chiudere')}</div></div>
+      <div class="glass card"><div class="lbl">Da disattivare su Habble</div><div class="big">${cnt('Da disattivare')}</div></div>
+    </div>
+    <div class="row">${srch('Cerca IMEI, modello o ticket','s-tel')}${f.map(x=>chip(x==='Pronto'?'Pronti':x,'cTelF',x,c.telF===x)).join('')}</div>
+    <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marchio</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Disattivazione</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
+    ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Pronto'?pill('Pronto','dark'):(x[8]==='Ticket da chiudere'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="lbl" style="margin:0">I ticket arrivano dal portale del cliente; la disattivazione si fa sul loro sistema Habble.</p>`;
+  }
+  return hint(hintTxt)+shell('Corporation',C_NAV,s,'cGo',title,body,'Cerca seriale, modello, lotto');
+}
+
+function autistiApp(){
+  const a=S.a; let inner='';
+  if(a.scr==='lista'){
+    const n=Object.keys(a.done).length;
+    inner=`<div class="pscr">
+      <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Il tuo giro</div>
+        <div class="bar" style="margin-top:12px"><i style="width:${n*20}%"></i></div><div class="lbl" style="margin-top:6px">${n} di 5 fermate fatte</div></div>
+      ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d?'Al traffico':'')}</b></button>`;}).join('')}
+      ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro finito</b><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
+    </div>`;
+  }
+  if(a.scr==='dett'){
+    const s=STOPS[a.cur], extra=a.acc[a.cur]||[];
+    const all=['Sponda','Consegna al piano','Attesa','Facchinaggio','Ritiro imballi'].filter(x=>extra.indexOf(x)<0&&x!==s.nota);
+    inner=`<div class="pscr">
+      <button class="back" data-act="aBack">Giro</button>
+      <div><div class="lbl">Fermata ${a.cur+1} · ${s.fascia}</div><div class="ptitle">${s.cliente}</div><div>${s.ind}</div></div>
+      <div class="pcard stack" style="padding:14px;gap:10px">
+        <div class="row between"><b>${s.colli}</b><span class="lbl">accessori dalla bolla</span></div>
+        <div class="row" style="gap:6px">${pill(s.nota,'dark')}${extra.map(x=>pill(x+' · aggiunto','dark')).join('')}</div>
+        <button class="chipbtn" style="align-self:flex-start;border-style:dashed" data-act="aAccT">+ Aggiungi accessorio</button>
+        ${a.accOpen?`<div class="row" style="gap:6px">${all.map(x=>chip(x,'aAcc',x,false)).join('')}</div><div class="lbl">Finisce da solo in fattura, con ora e posizione.</div>`:''}
+      </div>
+      <div class="pcard row between" style="padding:14px"><div><b>Scansione colli</b><div class="lbl">${a.scanned?'Tutti i colli letti':'Da fare prima di consegnare'}</div></div>${a.scanned?pill('Fatta','ok'):b('Scansiona','aScan','','sm')}</div>
+      <button class="bigbtn ghost" style="font-size:16px" data-act="aNav">Naviga con la mappa camion</button>
+      ${a.nav?`<div class="lbl" style="text-align:center">Nel programma vero si apre la navigazione per camion verso ${s.ind}.</div>`:''}
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="aFirma">Consegnato</button>
+      <button class="bigbtn ghost" data-act="aMancata">Non consegnato</button>
+    </div>`;
+  }
+  if(a.scr==='firma'){
+    inner=`<div class="pscr">
+      <button class="back" data-act="aDett">Indietro</button>
+      <div class="ptitle">Prova di consegna</div>
+      <div class="lbl">Firma del destinatario</div>
+      <div class="pcard" style="height:200px;display:flex;align-items:flex-end;padding:16px"><svg width="230" height="60" viewBox="0 0 220 60" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 45c20-30 30 10 45-10s25-25 30 5 20 0 35-15 20 25 40 5 25-10 55-5"></path></svg></div>
+      <button class="bigbtn ghost" style="font-size:16px" data-act="aDett">Foto della merce consegnata</button>
+      <div class="lbl">Ora e posizione si salvano da sole.</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="aOk">Conferma consegna</button>
+    </div>`;
+  }
+  if(a.scr==='mancata'){
+    inner=`<div class="pscr">
+      <button class="back" data-act="aDett">Indietro</button>
+      <div class="ptitle">Perché non è stata consegnata?</div>
+      <div class="lbl">Un tocco e torna al traffico.</div>
+      ${['Destinatario assente','Indirizzo sbagliato','Merce rifiutata','Chiuso o fuori orario','Altro, lascio una nota vocale'].map(x=>`<button class="bigbtn ghost" style="text-align:left;font-size:17px" data-act="aKo">${x}</button>`).join('')}
+    </div>`;
+  }
+  return `<div class="appsec">
+    <div class="appinfo glass"><h2>App autisti</h2><p class="muted" style="margin:8px 0 0">Il telefono dell’autista. Gli accessori arrivano già dalla bolla.</p>
+      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Conferma consegna».</li><li>Su un’altra fermata prova «Non consegnato».</li></ol></div>
+    <div class="phone"><div class="screen">${inner}</div></div>
+  </div>`;
+}
+
+function caricoApp(){
+  const k=S.k; let inner='';
+  const on='chipbtn on', off='chipbtn';
+  if(k.scr==='scan'){
+    inner=`<div class="pscr">
+      <div><div class="lbl">Lotto L-015 · ${k.n} di 612 caricati</div><div class="ptitle">Carica merce</div></div>
+      <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM 20W0XXXXIX</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N PF3XXXXX</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
+      <button class="bigbtn" data-act="kGo" data-arg="scheda">Fotografa il seriale</button>
+      <button class="bigbtn ghost" style="font-size:16px" data-act="kGo" data-arg="scheda">Seriale illeggibile? Scrivilo a mano</button>
+    </div>`;
+  }
+  if(k.scr==='scheda'){
+    inner=`<div class="pscr">
+      <button class="back" data-act="kGo" data-arg="scan">Rifai la foto</button>
+      <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXXX</b></div>${pill('Verificato su Lenovo','ok')}</div>
+      <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Lavorato da noi')}</div>
+      <div class="ptitle" style="font-size:24px">Lenovo ThinkPad T14 Gen 2</div>
+      <div class="pcard" style="padding:4px 14px">
+        <div class="kvp"><span>Processore</span><b>Intel i5-1135G7</b></div><div class="kvp"><span>RAM</span><b>16 GB</b></div><div class="kvp"><span>Disco</span><b>256 GB SSD</b></div><div class="kvp"><span>Schermo</span><b>14", Full HD</b></div><div class="kvp"><span>Cancellazione Certus</span><b>Completata</b></div><div class="kvp" style="border:0"><span>Batteria dal report</span><b>87%</b></div>
+      </div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kGo" data-arg="grado">Tutto giusto, avanti</button>
+    </div>`;
+  }
+  if(k.scr==='grado'){
+    const dif=['Graffi sul coperchio','Ammaccatura','Tastiera lucida','Segni sullo schermo','Batteria sotto 80%','Manca un tasto'];
+    inner=`<div class="pscr">
+      <button class="back" data-act="kGo" data-arg="scheda">Scheda</button>
+      <div class="ptitle">Com’è messo?</div>
+      <div class="lbl">Il programma propone B dal report. Cambialo con un tocco.</div>
+      <div class="grades">${['A','B','C','D'].map(g=>`<button class="gbtn ${k.grado===g?'on':''}" data-act="kGrado" data-arg="${g}">${g}</button>`).join('')}</div>
+      <div class="lbl">Difetti visti</div>
+      <div class="row" style="gap:8px">${dif.map(x=>`<button class="${k.difetti[x]?on:off}" data-act="kDif" data-arg="${x}">${x}</button>`).join('')}</div>
+      <button class="bigbtn ghost" style="font-size:16px" data-act="kGo" data-arg="grado">Foto per l’annuncio</button>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kGo" data-arg="prezzo">Avanti</button>
+    </div>`;
+  }
+  if(k.scr==='prezzo'){
+    inner=`<div class="pscr">
+      <button class="back" data-act="kGo" data-arg="grado">Grado</button>
+      <div class="ptitle">Prezzo</div>
+      <div class="pcard stack" style="padding:16px;align-items:center;gap:10px">
+        <div class="lbl">Proposto per il grado ${k.grado}</div>
+        <div class="stepper" style="width:100%"><button class="round" data-act="kMeno" aria-label="Meno 10 euro">−</button><div style="font-size:46px;font-weight:800;letter-spacing:-.04em">€ ${k.prezzo}</div><button class="round" data-act="kPiu" aria-label="Più 10 euro">+</button></div>
+        <div class="lbl" style="text-align:center">Back Market oggi tra 259 e 299 euro, eBay tra 230 e 270. Il minimo per questo PC è 190 euro.</div>
+      </div>
+      <div class="lbl">Pubblica su</div>
+      <div class="row" style="gap:8px">${Object.keys(k.canali).map(x=>`<button class="${k.canali[x]?on:off}" data-act="kCan" data-arg="${x}">${x}</button>`).join('')}</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kFatto">Stampa etichetta e pubblica</button>
+    </div>`;
+  }
+  if(k.scr==='fatto'){
+    const att=Object.keys(k.canali).filter(x=>k.canali[x]);
+    inner=`<div class="pscr">
+      <div class="ptitle">Caricato</div>
+      <div class="lbl">Metti il PC sullo scaffale B3. Da ora si riconosce dal QR dell’etichetta.</div>
+      <div class="pcard row" style="padding:16px;gap:14px;flex-wrap:nowrap">
+        <svg width="76" height="76" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges" style="flex:none;background:#ffffff;border-radius:6px"><g fill="#111214"><rect x="0" y="0" width="7" height="7"></rect><rect x="14" y="0" width="7" height="7"></rect><rect x="0" y="14" width="7" height="7"></rect></g><g fill="#ffffff"><rect x="1" y="1" width="5" height="5"></rect><rect x="15" y="1" width="5" height="5"></rect><rect x="1" y="15" width="5" height="5"></rect></g><g fill="#111214"><rect x="2" y="2" width="3" height="3"></rect><rect x="16" y="2" width="3" height="3"></rect><rect x="2" y="16" width="3" height="3"></rect><rect x="9" y="1" width="2" height="2"></rect><rect x="8" y="5" width="3" height="1"></rect><rect x="9" y="8" width="4" height="2"></rect><rect x="14" y="9" width="2" height="3"></rect><rect x="17" y="10" width="3" height="2"></rect><rect x="8" y="12" width="2" height="3"></rect><rect x="11" y="14" width="3" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect><rect x="18" y="17" width="2" height="3"></rect><rect x="9" y="17" width="3" height="3"></rect><rect x="1" y="9" width="3" height="2"></rect></g></svg>
+        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">PF3XXXXX · lotto L-015 · B3</div></div>
+      </div>
+      <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}. Quando si vende su un sito, sparisce dagli altri.</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kGo" data-arg="scan">Fotografa il prossimo</button>
+    </div>`;
+  }
+  return `<div class="appsec">
+    <div class="appinfo glass"><h2>App carico merce</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
+      <ol><li>Premi «Fotografa il seriale».</li><li>Controlla la scheda letta dal sito del marchio.</li><li>Scegli il grado e tocca i difetti che vedi.</li><li>Regola il prezzo con − e +, scegli i siti.</li><li>Premi «Stampa etichetta e pubblica».</li></ol></div>
+    <div class="phone"><div class="screen">${inner}</div></div>
+  </div>`;
+}
+
+function negozio(){
+  const n=S.n; let inner='';
+  const head=`<div class="shophead"><button class="tab" style="font-size:18px;font-weight:800;letter-spacing:-.03em" data-act="nHome">Messina Corporation</button><div class="row" style="gap:4px"><button class="tab" data-act="nHome">Portatili</button><button class="tab" data-act="nHome">Apple</button><button class="tab" data-act="nHome">Per aziende</button></div>${b('Carrello · '+n.cart.length,'nCart','','sm')}</div>`;
+  if(n.view==='home'){
+    const vis=SHOP.map((p,i)=>Object.assign({i:i},p)).filter(p=>n.brand==='Tutti'||p.brand===n.brand);
+    inner=`<div class="shopbody"><h1 class="shoph1">Messina Corporation</h1>
+      <div class="row" style="margin-bottom:18px">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'nBrand',x,n.brand===x)).join('')}<span class="lbl" style="margin-left:auto">${vis.length} modelli</span></div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">${vis.map(p=>`<button class="prod" data-act="nOpen" data-arg="${p.i}"><span class="ph">${LAPTOP}</span><span class="lbl">${p.brand}</span><b style="font-size:19px;letter-spacing:-.02em">${p.name}</b><span class="lbl">${p.spec}</span><span>da <b style="font-size:20px">€ ${p.base-40}</b></span></button>`).join('')}</div></div>`;
+  }
+  if(n.view==='prod'){
+    const p=SHOP[n.pid], price=nPrice(p,n.g,n.ram);
+    inner=`<div class="shopbody"><div style="margin-bottom:14px">${b('Tutti i portatili','nHome','','ghost sm')}</div><div class="pdet">
+      <div class="ph" style="border-radius:24px">${LAPTOP}</div>
+      <div class="stack">
+        <div><div class="lbl">${p.brand}</div><h2 style="font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.04em;line-height:1.05">${p.name}</h2><div class="muted">${p.spec}</div></div>
+        <div style="font-size:42px;font-weight:900;letter-spacing:-.04em">€ ${price}</div>
+        <div><b>Condizioni</b><div class="gradebox" style="margin-top:8px">${['Discreto','Buono','Ottimo'].map(g=>`<button class="gopt ${n.g===g?'on':''}" data-act="nG" data-arg="${g}"><span style="font-weight:700">${g}</span><span style="font-size:18px;font-weight:800">€ ${nPrice(p,g,n.ram)}</span></button>`).join('')}</div><p style="margin:10px 0 0" class="muted">${GDESC[n.g]}</p></div>
+        <div><b>Memoria</b><div class="row" style="margin-top:8px">${[8,16].map(r=>chip(r+' GB RAM · 256 GB SSD','nRam',r,n.ram===r)).join('')}</div></div>
+        <button class="bigbtn" data-act="nAdd">${n.added?'Aggiunto · vai al carrello':'Aggiungi al carrello'}</button>
+        <div class="row">${pill('Dati cancellati con metodo certificato')}${pill('Garanzia [mesi]')}${pill('Reso entro [giorni]')}</div>
+      </div></div></div>`;
+  }
+  if(n.view==='cart'){
+    const tot=n.cart.reduce((a,c)=>a+c.p,0);
+    inner=`<div class="shopbody" style="max-width:760px;margin:0 auto"><h2 style="font-size:34px;font-weight:900;letter-spacing:-.04em;margin-bottom:16px">Carrello</h2>
+      ${n.cart.length?n.cart.map((c,i)=>`<div class="pcard row between" style="padding:16px;margin-bottom:10px"><div><b style="font-size:17px">${c.name}</b><div class="lbl">${c.det}</div></div><div class="row"><b style="font-size:20px">€ ${c.p}</b>${b('Togli','nRemove',i,'ghost sm')}</div></div>`).join('')+`<div class="row between" style="border-top:1px solid var(--line);padding-top:14px;margin-top:6px"><b>Totale</b><b style="font-size:28px">€ ${tot}</b></div><div style="margin-top:14px">${n.payMsg?msg('Questa è una prova: il pagamento non è attivo.'):`<button class="bigbtn" data-act="nPay">Vai al pagamento</button>`}</div>`:`<div class="pcard" style="padding:24px;text-align:center">Il carrello è vuoto. <div style="margin-top:12px">${b('Guarda i portatili','nHome','','ghost sm')}</div></div>`}
+    </div>`;
+  }
+  return hint('apri un computer, cambia condizione e memoria e guarda il prezzo che cambia. Poi aggiungilo al carrello.')+`<div class="glass shop">${head}${inner}</div>`;
+}
+
+function render(){
+  document.getElementById('tabs').innerHTML=tabs();
+  const v=S.view, app=document.getElementById('app');
+  app.innerHTML = v==='intro'?intro():v==='trasp'?trasp():v==='autisti'?autistiApp():v==='corp'?corp():v==='carico'?caricoApp():negozio();
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]'); if(!el) return;
+  const f=A[el.dataset.act]; if(!f) return;
+  e.preventDefault(); f(el.dataset.arg); render();
+});
+render();
+})();
+</script>
+
+</html>
