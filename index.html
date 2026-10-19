@@ -110,6 +110,7 @@ table.t th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;pad
 table.t td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
 table.t tr:last-child td{border-bottom:0}
 table.t tr.click{cursor:pointer}
+table.t.nw td:not(:last-child){white-space:nowrap}
 table.t tr.click:hover td{background:var(--soft)}
 .bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--solid);border-radius:99px}
@@ -298,6 +299,22 @@ const DIP=[
  ['Magazziniere 1','Magazzino','40 h','05:55','—','In magazzino']
 ];
 const PRES_IERI=[['Autista 1','06:04','Uscita non timbrata','Ultima consegna alle 16:40 dall’app autisti'],['Autista 3','05:58','Uscita non timbrata','Rientro in magazzino alle 17:12 dall’app magazzino'],['Magazziniere 2','14:00','Uscita non timbrata','Ultima scansione alle 22:03']];
+const RIEP=[
+ ['Christian',1,6,0,0,'In linea'],
+ ['Gabriele',0,0,1,15,'In linea'],
+ ['Alberto',5,96,2,40,'In peggioramento'],
+ ['Mauro',0,0,0,0,'In linea'],
+ ['Autista 1',2,18,0,0,'In miglioramento'],
+ ['Magazziniere 1',3,25,1,10,'In linea']
+];
+const FERIE=[
+ ['Christian',[20,9,11],[32,6,26],''],
+ ['Gabriele',[20,15,5],[32,12,20],''],
+ ['Alberto',[20,4,16],[32,20,12],'Ha ancora 6 giorni dell’anno scorso da godere entro giugno'],
+ ['Mauro',[20,18,2],[32,8,24],''],
+ ['Autista 1',[20,2,18],[32,0,32],'Meno di 2 settimane godute quest’anno: va pianificato entro dicembre'],
+ ['Magazziniere 1',[20,11,9],[32,16,16],'']
+];
 const PRES_MESE=[
  ['Christian','40 h',128,4,0,0,'—'],
  ['Gabriele','40 h',132,2,0,0,'1 giorno di ferie'],
@@ -726,8 +743,8 @@ function trasp(){
       </div></div>`;
   }
   if(s==='presenze'){
-    title='Presenze'; hintTxt='apri «Da sistemare» e correggi un’uscita non timbrata, poi «Ottobre» e prepara i conteggi.';
-    const tabsP=[['oggi','Oggi'],['fix','Da sistemare'],['mese','Ottobre']];
+    title='Presenze'; hintTxt='apri «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
+    const tabsP=[['oggi','Oggi'],['fix','Da sistemare'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
     const nFix=PRES_IERI.filter((x,i)=>!t.presFix[i]).length;
     let inner='';
     if(t.presTab==='oggi'){
@@ -746,6 +763,19 @@ function trasp(){
       <div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Dipendente</th><th>Entrata</th><th>Problema</th><th>Suggerimento</th><th></th></tr></thead><tbody>
       ${PRES_IERI.map((x,i)=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${t.presFix[i]?pill('Sistemata','ok'):`<span class="miss">${x[2]}</span>`}</td><td class="lbl">${x[3]}</td><td>${t.presFix[i]?'':b('Usa il suggerimento','tPresFix',i,'ghost sm')}</td></tr>`).join('')}
       </tbody></table></div>`;
+    }
+    if(t.presTab==='riep'){
+      inner=`<div class="glass card row between"><span><b>Ottobre</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Lo vedono solo Angela e la Direzione','dark')}</div>
+      <div class="glass tbox"><table class="t nw" style="min-width:820px"><thead><tr><th>Dipendente</th><th>Ritardi</th><th>Minuti di ritardo</th><th>Uscite anticipate</th><th>Minuti in meno</th><th>Rispetto a settembre</th></tr></thead><tbody>
+      ${RIEP.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]} min</td><td>${r[3]}</td><td>${r[4]} min</td><td>${r[5]==='In peggioramento'?pill(r[5],'red'):(r[5]==='In miglioramento'?pill(r[5],'ok'):'<span class="lbl">'+r[5]+'</span>')}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="lbl" style="margin:0">Ogni dipendente vede solo i suoi orari nella sua app, mai quelli dei colleghi. Prima di attivarlo: informativa firmata dai dipendenti e verifica del consulente del lavoro.</p>`;
+    }
+    if(t.presTab==='ferie'){
+      inner=`<div class="glass tbox"><table class="t nw" style="min-width:900px"><thead><tr><th>Dipendente</th><th>Ferie maturate</th><th>Godute</th><th>Restano</th><th>Permessi spettanti</th><th>Usati</th><th>Restano</th><th>Da guardare</th></tr></thead><tbody>
+      ${FERIE.map(f=>`<tr><td><b>${f[0]}</b></td><td>${f[1][0]} gg</td><td>${f[1][1]} gg</td><td><b>${f[1][2]} gg</b></td><td>${f[2][0]} h</td><td>${f[2][1]} h</td><td><b>${f[2][2]} h</b></td><td>${f[3]?`<span class="miss">${f[3]}</span>`:'<span class="lbl">—</span>'}</td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="lbl" style="margin:0">Si aggiorna da solo ogni mese. Per legge almeno 4 settimane di ferie l’anno: 2 da godere nell’anno, le altre entro i 18 mesi dopo. I permessi dipendono dal contratto collettivo: i numeri qui sono di esempio finché non sappiamo quale applicate.</p>`;
     }
     if(t.presTab==='mese'){
       inner=`<div class="glass tbox"><table class="t" style="min-width:860px"><thead><tr><th>Dipendente</th><th>Contratto</th><th>Ore ordinarie</th><th>Straordinari</th><th>Notturne</th><th>Festive</th><th>Assenze</th></tr></thead><tbody>
@@ -1025,11 +1055,12 @@ function presApp(){
     <div class="lbl" style="text-align:center">Avvicina il telefono al lettore all’ingresso</div>
     <button class="bigbtn" data-act="bTimbra">${dentro?'Simula: timbro l’uscita':'Simula: timbro l’entrata'}</button>
     <div class="pcard" style="padding:12px 14px"><b>Oggi</b>${t.length?t.map(x=>`<div class="kvp"><span>${x[0]}</span><b>${x[1]}</b></div>`).join(''):'<div class="lbl" style="margin-top:4px">Nessuna timbratura ancora</div>'}</div>
-    <div class="pcard" style="padding:12px 14px"><b>Ottobre</b><div class="kvp"><span>Ore ordinarie</span><b>128 h</b></div><div class="kvp"><span>Straordinari</span><b>4 h</b></div><div class="kvp" style="border:0"><span>Ferie rimaste</span><b>[giorni]</b></div></div>
+    <div class="pcard" style="padding:12px 14px"><b>Ottobre</b><div class="kvp"><span>Ore ordinarie</span><b>128 h</b></div><div class="kvp"><span>Straordinari</span><b>4 h</b></div><div class="kvp" style="border:0"><span>Ferie</span><b>11 gg</b></div></div>
+    <div class="pcard" style="padding:12px 14px"><b>I miei orari</b><div class="lbl" style="margin-top:2px">Solo tu vedi i tuoi</div><div class="kvp"><span>Ritardi a ottobre</span><b>1 · 6 min</b></div><div class="kvp"><span>Uscite anticipate</span><b>0</b></div><div class="kvp" style="border:0"><span>Permessi</span><b>26 h</b></div></div>
   </div>`;
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App presenze</h2><p class="muted" style="margin:8px 0 0">Il badge virtuale sul telefono di ogni dipendente, al posto della tessera.</p>
-      <ol><li>Guarda il QR: cambia ogni 30 secondi, così una foto mandata a un collega non serve.</li><li>Premi «Simula: timbro l’entrata», poi l’uscita.</li><li>Nel gestionale apri Autotrasporti › Presenze: ore, ritardi, uscite da sistemare e conteggi del mese.</li></ol>
+      <ol><li>Guarda il QR: cambia ogni 30 secondi, così una foto mandata a un collega non serve.</li><li>Premi «Simula: timbro l’entrata», poi l’uscita.</li><li>Più in basso: «I miei orari» e le ferie. Ognuno vede solo i suoi.</li><li>Nel gestionale apri Autotrasporti › Presenze: Riepiloghi e Ferie li vedono solo Angela e la Direzione.</li></ol>
       <p class="lbl" style="margin:10px 0 0">Il lettore all’ingresso lo collegheremo appena sappiamo il modello.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
