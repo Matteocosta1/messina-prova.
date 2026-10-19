@@ -239,7 +239,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
@@ -249,7 +249,7 @@ const S = {
 };
 
 const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
-const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['presenze','Presenze']];
+const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
 const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
@@ -287,18 +287,30 @@ const EXTRA=[
  ['Riconsegna','a consegna','Nuova consegna prenotata dal cliente dopo la giacenza']
 ];
 const DIP=[
- ['Christian','Ufficio bolle','40 h','08:02','—','In ufficio'],
- ['Gabriele','Ufficio bolle','40 h','07:58','—','In ufficio'],
- ['Alberto','Ufficio bolle','40 h','08:31','—','In ritardo di 31 min'],
- ['Mauro','Traffico','40 h','06:00','—','In ufficio'],
- ['Nelson','Traffico','40 h','13:00','—','Turno pomeriggio'],
- ['Angela','Amministrazione','40 h','08:30','—','In ufficio'],
- ['Autista 1','Strada','39 h','06:02','—','In giro'],
- ['Autista 2','Strada','39 h','06:15','—','In giro'],
+ ['Christian','Ufficio bolle','40 h','08:02','—','Presente'],
+ ['Gabriele','Ufficio bolle','40 h','07:58','—','Presente'],
+ ['Alberto','Ufficio bolle','40 h','08:31','—','Ritardo · 31 min'],
+ ['Mauro','Traffico','40 h','06:00','—','Presente'],
+ ['Nelson','Traffico','40 h','13:00','—','Pomeriggio'],
+ ['Angela','Amministrazione','40 h','08:30','—','Presente'],
+ ['Autista 1','Strada','39 h','06:02','—','Partito'],
+ ['Autista 2','Strada','39 h','06:15','—','Partito'],
  ['Autista 4','Strada','39 h','—','—','Ferie'],
- ['Magazziniere 1','Magazzino','40 h','05:55','—','In magazzino']
+ ['Magazziniere 1','Magazzino','40 h','05:55','—','Presente']
 ];
 const PRES_IERI=[['Autista 1','06:04','Uscita non timbrata','Ultima consegna alle 16:40 dall’app autisti'],['Autista 3','05:58','Uscita non timbrata','Rientro in magazzino alle 17:12 dall’app magazzino'],['Magazziniere 2','14:00','Uscita non timbrata','Ultima scansione alle 22:03']];
+const TP=[
+ {aut:'Autista 1',mezzo:'Sprinter [targa]',oggi:'18,40',mese:'412,60',n:96,flag:0},
+ {aut:'Autista 2',mezzo:'Motrice [targa]',oggi:'9,10',mese:'238,20',n:61,flag:0},
+ {aut:'Autista 3',mezzo:'Bilico [targa]',oggi:'64,80',mese:'1.284,50',n:118,flag:2},
+ {aut:'Autista 5',mezzo:'Furgone [targa]',oggi:'0,00',mese:'96,30',n:22,flag:1}
+];
+const TP_MOV={
+ 'Autista 3':[['Oggi','07:12','Milano Sud → Bergamo','14,20','Bilico [targa]',''],['Oggi','11:48','Bergamo → Brescia Ovest','8,60','Bilico [targa]',''],['Sab 17 ottobre','16:35','Milano Sud → Piacenza','7,90','Bilico [targa]','Giorno senza giro'],['Gio 15 ottobre','21:52','Agrate → Milano Est','2,70','Bilico [targa]','Fuori orario'],['Gio 15 ottobre','08:05','Milano Sud → Bergamo','14,20','Bilico [targa]','']],
+ 'Autista 5':[['Dom 18 ottobre','10:20','Pavia → Milano Sud','3,40','Furgone [targa]','Giorno senza giro'],['Ven 16 ottobre','09:14','Milano Sud → Pavia','3,40','Furgone [targa]','']],
+ 'Autista 1':[['Oggi','06:40','Milano Ovest → Rho','1,90','Sprinter [targa]',''],['Oggi','09:30','Rho → Milano Nord','2,10','Sprinter [targa]','']],
+ 'Autista 2':[['Oggi','07:05','Milano Sud → Milano Est','3,30','Motrice [targa]','']]
+};
 const RIEP=[
  ['Christian',1,6,0,0,'In linea'],
  ['Gabriele',0,0,1,15,'In linea'],
@@ -363,18 +375,23 @@ const CLIENTI=[
  {nome:'[Cliente]',cosa:'[cosa spedisce]',ref:'[referente]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['[voce]','[unità]','[zona]']],extra:EXTRA}
 ];
 const MEZZI=[
- ['[targa]','Sprinter','No','Autista 1','Sì','Revisione [data]','In strada'],
- ['[targa]','Motrice','Sì','Autista 2','Sì','Tagliando tra 500 km','In strada'],
- ['[targa]','Bilico','Sì','Autista 3','Sì','Assicurazione [data]','In strada'],
- ['[targa]','Tre assi','Sì','—','Sì','In officina','Fermo'],
- ['[targa]','Furgone','No','Autista 5','Sì','—','In strada']
+ ['[targa]','Sprinter','No','Autista 1','[n. apparato]','Revisione [data]','Partito'],
+ ['[targa]','Sprinter','No','Autista 6','[n. apparato]','—','Partito'],
+ ['[targa]','Furgone','No','Autista 5','[n. apparato]','—','Partito'],
+ ['[targa]','Furgone','Sì','Autista 7','[n. apparato]','Tagliando [data]','Fermo'],
+ ['[targa]','Motrice','Sì','Autista 2','[n. apparato]','Tagliando tra 500 km','Partito'],
+ ['[targa]','Motrice','Sì','Autista 8','[n. apparato]','—','Partito'],
+ ['[targa]','Tre assi','Sì','—','[n. apparato]','In officina','Fermo'],
+ ['[targa]','Tre assi','Sì','Autista 9','[n. apparato]','—','Partito'],
+ ['[targa]','Bilico','Sì','Autista 3','[n. apparato]','Assicurazione [data]','Partito'],
+ ['[targa]','Bilico','No','Autista 10','[n. apparato]','—','Rientrato']
 ];
 const AUTISTI=[
- ['Autista 1','Sprinter [targa]','Ovest','18 di 22 fermate','06:02','Valide','In giro'],
- ['Autista 2','Motrice [targa]','Milano','9 di 14 fermate','06:15','CQC scade il [data]','In giro'],
- ['Autista 3','Bilico [targa]','Lombardia Est','2 di 5 fermate','05:58','Valide','In giro'],
- ['Autista 4','—','—','Ferie','—','Valide','Assenti'],
- ['Autista 5','Furgone [targa]','Pavia','In carico','06:30','Valide','In magazzino']
+ ['Autista 1','Sprinter [targa]','Ovest','18 di 22 fermate','06:02','Valide','Partito'],
+ ['Autista 2','Motrice [targa]','Milano','9 di 14 fermate','06:15','CQC scade il [data]','Partito'],
+ ['Autista 3','Bilico [targa]','Lombardia Est','2 di 5 fermate','05:58','Valide','Partito'],
+ ['Autista 4','—','—','Ferie','—','Valide','Assente'],
+ ['Autista 5','Furgone [targa]','Pavia','In carico','06:30','Valide','Rientrato']
 ];
 const STOPS=[
  {cliente:'Snam',ind:'Via [indirizzo], Milano',fascia:'entro le 12',colli:'4 bancali',nota:'Sponda'},
@@ -451,6 +468,7 @@ const A={
   tGiac:i=>{S.t.giac=+i; S.t.giacMsg='';},
   tMagTab:v=>{S.t.magTab=v;},
   tPresTab:v=>{S.t.presTab=v; S.t.presMsg='';},
+  tTp:i=>{S.t.tpSel=+i;},
   tPresFix:i=>{S.t.presFix[i]=true;},
   tPresExp:()=>{S.t.presMsg='exp';},
   tAllVisto:i=>{S.t.allVisti[i]=true; S.t.allMsg='Messaggio pronto per il dipendente: gli spiega cosa è successo e lo invita a parlarne con Angela.';},
@@ -535,9 +553,9 @@ function hint(text){return `<div class="hint glass"><b>Da provare</b><span>${tex
 
 function intro(){
   const parts=[
-    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi, autisti e presenze.'],
+    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi, autisti, Telepass e presenze.'],
     ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
-    ['magazzino','App magazzino','Entrata, uscita, spostamenti e inventario: ogni collo scansionato con il suo posto.'],
+    ['magazzino','App magazzino','Entrata, uscita, trasferimenti e verifiche: ogni collo scansionato con il suo posto.'],
     ['presenze','App presenze','Il badge virtuale sul telefono: entrata e uscita con un QR che cambia ogni 30 secondi.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
     ['carico','App carico merce','Foto del seriale, grado, prezzo ed etichetta: così un computer entra in magazzino.'],
@@ -567,7 +585,7 @@ function shell(company,navList,cur,act,title,body,searchPh){
       ${navList.map(n=>`<button class="nav ${cur===n[0]?'on':''}" data-act="${act}" data-arg="${n[0]}">${n[1]}</button>`).join('')}
     </nav>
     <div class="content">
-      <div class="chead"><div><div class="lbl">Lunedì 19 ottobre 2026 · ${company}</div><h2>${title}</h2></div><div class="row">${srch(searchPh,'s-'+act)}${pill('Dati di esempio')}</div></div>
+      <div class="chead"><div><div class="lbl">Lunedì 19 ottobre 2026 · ${company}</div><h2>${title}</h2></div><div class="row">${srch('Cerca','s-'+act)}</div></div>
       ${body}
     </div></div>`;
 }
@@ -615,6 +633,7 @@ function trasp(){
         <button class="li" data-act="tGo" data-arg="magazzino"><span class="row between" style="width:100%"><span>Spedizione Apple ferma: manca 1 collo scansionato</span>${pill('Magazzino','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="giacenze"><span class="row between" style="width:100%"><span>2 giacenze con riconsegna da prenotare</span>${pill('Giacenze','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="mezzi"><span class="row between" style="width:100%"><span>Motrice [targa]: tagliando tra 500 km</span>${pill('Mezzi')}</span></button>
+        <button class="li" data-act="tGo" data-arg="telepass"><span class="row between" style="width:100%"><span>3 passaggi Telepass da controllare</span>${pill('Telepass','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="presenze"><span class="row between" style="width:100%"><span>3 uscite non timbrate ieri</span>${pill('Presenze','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="presenze"><span class="row between" style="width:100%"><span>Badge di Alberto passato da un altro telefono</span>${pill('Allarme','red')}</span></button>
       </div></div>
@@ -649,7 +668,7 @@ function trasp(){
       </div></div>`;
   }
   if(s==='traffico'){
-    title='Traffico e giri'; hintTxt='premi «Proponi i giri»: il programma assegna da solo le spedizioni ancora aperte.';
+    title='Traffico'; hintTxt='premi «Proponi i giri»: il programma assegna da solo le spedizioni ancora aperte.';
     const giri=[['Sprinter · Autista 1','Zona Ovest',['Apple · Rho','Apple · Pero','[Cliente] · Arese','Apple · Garbagnate'],'86 km · circa 6 ore'],['Motrice con sponda · Autista 2','Milano',['Snam · ritiro','Snam · consegna entro le 12','Luxiona · 3 bancali'],'54 km · circa 5 ore e mezza'],['Bilico · Autista 3','Lombardia Est',['Apple · Bergamo','Apple · Brescia'],'210 km · circa 7 ore']];
     body=`<div class="glass card row between"><span><b>Domani</b> <span class="lbl">42 spedizioni · 12 mezzi · pronto entro [orario]</span></span><div class="row">${b(t.giriOk?'Giri proposti':'Proponi i giri','tGiri')}</div></div>
     ${t.giriOk?msg('Giri proposti: 38 spedizioni assegnate, 4 spostate sui mezzi liberi. Mauro e Nelson possono cambiare le fermate trascinandole.'):''}
@@ -659,8 +678,8 @@ function trasp(){
     </div>`;
   }
   if(s==='magazzino'){
-    title='Magazzino'; hintTxt='tocca uno scaffale nella pianta, poi apri «Controllo del giorno»: le righe rosse sono colli che non tornano con le bolle.';
-    const tabsM=[['pianta','Pianta'],['controllo','Controllo del giorno'],['mov','Entrate e uscite'],['inv','Inventario']];
+    title='Magazzino'; hintTxt='tocca uno scaffale nella pianta, poi apri «Controllo»: le righe rosse sono colli che non tornano con le bolle.';
+    const tabsM=[['pianta','Pianta'],['controllo','Controllo'],['mov','Movimenti'],['inv','Verifiche']];
     const cliF=t.magCli, match=c=>cliF==='Tutti'||c===cliF;
     const ko=CONTROLLO.filter(r=>r.letti!==r.attesi).length;
     let inner='';
@@ -695,20 +714,19 @@ function trasp(){
     if(t.magTab==='inv'){
       const done=Object.keys(S.m.conta).length, diff=Object.keys(S.m.conta).filter(k=>S.m.conta[k]==='diff');
       inner=`<div class="grid g2">
-        <div class="glass card stack"><b>Inventario in corso · Scaffale S07 (Econocom)</b>
+        <div class="glass card stack"><b>Verifica in corso · Scaffale S07 (Econocom)</b>
           <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div>
           <div class="lbl">${done} di ${CONTA.length} posti controllati · si salva a ogni scansione, anche se il magazziniere esce dall’app</div>
           ${diff.length?msg('Differenza in '+CONTA[+diff[0]][0]+': il programma ha trovato meno pezzi di quelli registrati. Mandare qualcuno a ricontare.'):''}
           <div class="row">${b('Apri l’app magazzino','view','magazzino','ghost')}</div></div>
-        <div class="glass card stack"><b>Lancia un inventario</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
+        <div class="glass card stack"><b>Lancia una verifica</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
           <div class="row">${['Tutto','Zona','Scaffale','Cliente'].map(x=>chip(x,'noop','',x==='Scaffale')).join('')}</div>
           <div class="row">${b('Lancia','tInv')}</div></div>
       </div>
       <p class="lbl" style="margin:0">Il magazziniere scansiona quello che trova senza vedere quanti pezzi dovrebbero esserci: il confronto lo fa il programma.</p>`;
     }
     body=`<div class="row">${tabsM.map(x=>chip(x[1]+(x[0]==='controllo'&&ko?' · '+ko:''),'tMagTab',x[0],t.magTab===x[0])).join('')}</div>
-    <div class="row"><label class="search">${SEARCH}<span class="sr">Cerca</span><input id="s-mag" placeholder="Cerca seriale, bolla o cliente"></label>${b('Cerca','tCerca','x','sm')}<span style="width:6px"></span>${MAGCLI.map(x=>chip(x,'tMagCli',x,cliF===x)).join('')}</div>
-    ${t.cerca?msg('Esempio: la bolla Snam [n. bolla] è nello scaffale S03, piano 2, posto 1 (S03-2-1), dentro da 3 giorni.'):''}
+    <div class="row">${MAGCLI.map(x=>chip(x,'tMagCli',x,cliF===x)).join('')}</div>
     ${inner}`;
   }
   if(s==='giacenze'){
@@ -750,9 +768,28 @@ function trasp(){
         <div class="row">${pren?'':b('Prenota la riconsegna','tGiacPren')}${pren?'':b('Chiedi al cliente quando riconsegnare','tGiacChiedi','','ghost')}${b('Reso al mittente','noop','','ghost')}</div>
       </div></div>`;
   }
+  if(s==='telepass'){
+    title='Telepass'; hintTxt='tocca un autista per vedere tutti i suoi passaggi: in rosso quelli fuori orario o in giorni senza giro.';
+    const cur=TP[t.tpSel], mov=TP_MOV[cur.aut]||[];
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Spesa di oggi</div><div class="big">€ 92,30</div></div>
+      <div class="glass card"><div class="lbl">Spesa di ottobre</div><div class="big">€ 2.031,60</div><div class="lbl">va nei costi dei mezzi</div></div>
+      <div class="glass card"><div class="lbl">Passaggi a ottobre</div><div class="big">297</div></div>
+      <div class="glass card"><div class="lbl">Da controllare</div><div class="big">3</div><div class="lbl">fuori orario o senza giro</div></div>
+    </div>
+    <div class="row" style="align-items:flex-start;gap:16px">
+      <div class="glass tbox" style="flex:1 1 600px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Oggi</th><th>Ottobre</th><th>Passaggi</th><th>Controllo</th></tr></thead><tbody>
+        ${TP.map((r,i)=>`<tr class="click" data-act="tTp" data-arg="${i}" style="${t.tpSel===i?'background:var(--soft)':''}"><td><b>${r.aut}</b></td><td>${r.mezzo}</td><td>€ ${r.oggi}</td><td>€ ${r.mese}</td><td>${r.n}</td><td>${r.flag?pill(String(r.flag),'red'):'<span class="lbl">—</span>'}</td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="glass" style="flex:1 1 600px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Passaggi di ${cur.aut}</div><div class="tbox"><table class="t nw"><thead><tr><th>Giorno</th><th>Ora</th><th>Tratta</th><th>Importo</th><th>Nota</th></tr></thead><tbody>
+        ${mov.map(m=>`<tr class="${m[5]?'korow':''}"><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td><td>€ ${m[3]}</td><td>${m[5]||'<span class="lbl">Nel giro</span>'}</td></tr>`).join('')}
+      </tbody></table></div></div>
+    </div>
+    <p class="lbl" style="margin:0">Ogni apparato Telepass è legato al suo mezzo, e dal giro del giorno il programma sa chi guidava. I passaggi arrivano dall’estratto conto Telepass e finiscono nei costi. Da scrivere nell’informativa e da far vedere al consulente del lavoro prima di usarli per valutare gli autisti.</p>`;
+  }
   if(s==='presenze'){
     title='Presenze'; hintTxt='apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
-    const tabsP=[['oggi','Oggi'],['fix','Da sistemare'],['allarmi','Allarmi'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
+    const tabsP=[['oggi','Oggi'],['fix','Correzioni'],['allarmi','Allarmi'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
     const nFix=PRES_IERI.filter((x,i)=>!t.presFix[i]).length;
     const nAll=(S.b.finto?1:0)+ALLARMI.length-Object.keys(t.allVisti).length;
     let inner='';
@@ -776,7 +813,7 @@ function trasp(){
     if(t.presTab==='allarmi'){
       const live=S.b.finto?[{ora:'Adesso',badge:'Christian',tel:'Telefono non registrato (iPhone)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'}]:[];
       const AL=live.concat(ALLARMI);
-      inner=`<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Lo vedono solo Angela e la Direzione','dark')}</div>
+      inner=`<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Riservato','dark')}</div>
       ${t.allMsg?msg(t.allMsg):''}
       <div class="glass tbox"><table class="t" style="min-width:980px"><thead><tr><th>Quando</th><th>Badge di</th><th>Da quale telefono</th><th>Dove</th><th>Cosa è successo</th><th></th></tr></thead><tbody>
       ${AL.map((a,i)=>`<tr class="${t.allVisti[i]?'':'korow'}"><td>${a.ora}</td><td><b>${a.badge}</b></td><td>${a.tel}</td><td>${a.ingresso}</td><td>${a.tipo}</td><td>${t.allVisti[i]?pill('Gestito','ok'):b('Avvisa il dipendente','tAllVisto',i,'ghost sm')}</td></tr>`).join('')}
@@ -784,7 +821,7 @@ function trasp(){
       <p class="lbl" style="margin:0">Ogni badge è legato a un solo telefono, registrato quando il dipendente attiva l’app. Un badge su un altro telefono, uno screenshot vecchio o un badge chiuso non timbrano: il programma li riconosce sempre e sa a chi appartenevano.</p>`;
     }
     if(t.presTab==='riep'){
-      inner=`<div class="glass card row between"><span><b>Ottobre</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Lo vedono solo Angela e la Direzione','dark')}</div>
+      inner=`<div class="glass card row between"><span><b>Ottobre</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Riservato','dark')}</div>
       <div class="glass tbox"><table class="t nw" style="min-width:820px"><thead><tr><th>Dipendente</th><th>Ritardi</th><th>Minuti di ritardo</th><th>Uscite anticipate</th><th>Minuti in meno</th><th>Rispetto a settembre</th></tr></thead><tbody>
       ${RIEP.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]} min</td><td>${r[3]}</td><td>${r[4]} min</td><td>${r[5]==='In peggioramento'?pill(r[5],'red'):(r[5]==='In miglioramento'?pill(r[5],'ok'):'<span class="lbl">'+r[5]+'</span>')}</td></tr>`).join('')}
       </tbody></table></div>
@@ -809,7 +846,7 @@ function trasp(){
   if(s==='clienti'){
     if(t.cliente===null){
       title='Clienti'; hintTxt='tocca un cliente per aprire la sua scheda con tutte le tariffe, voce per voce.';
-      body=`<div class="row between">${srch('Cerca cliente','s-cli')}${b('Nuovo cliente','noop')}</div>
+      body=`<div class="row between">${b('Nuovo cliente','noop')}</div>
       <div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Cosa spedisce</th><th>Referente interno</th><th>Contratto fino al</th><th>Spedizioni mese</th></tr></thead><tbody>
       ${CLIENTI.map((c,i)=>`<tr class="click" data-act="tCliente" data-arg="${i}"><td><b>${c.nome}</b></td><td>${c.cosa}</td><td>${c.ref}</td><td>${c.val}</td><td>${c.n}</td></tr>`).join('')}
       </tbody></table></div>`;
@@ -837,20 +874,20 @@ function trasp(){
     <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna.</span></div>`;
   }
   if(s==='mezzi'){
-    title='Mezzi'; hintTxt='tocca un tipo di mezzo per filtrare l’elenco.';
-    const tipi=['Tutti','Sprinter','Furgone','Motrice','Tre assi','Bilico','Con sponda'];
-    const list=MEZZI.filter(m=>t.mezzoF==='Tutti'||(t.mezzoF==='Con sponda'?m[2]==='Sì':m[1]===t.mezzoF));
-    body=`<div class="row">${srch('Cerca per targa o tipo','s-mez')}${tipi.map(x=>chip(x,'tMezzoF',x,t.mezzoF===x)).join('')}</div>
-    <div class="glass tbox"><table class="t"><thead><tr><th>Targa</th><th>Tipo</th><th>Sponda</th><th>Autista di solito</th><th>Telepass</th><th>Prossima scadenza</th><th>Oggi</th></tr></thead><tbody>
+    title='Mezzi'; hintTxt='tocca un tipo di mezzo: la colonna Sponda dice se ce l’ha.';
+    const tipi=[['Sprinter','Sprinter'],['Furgone','Furgoni'],['Motrice','Motrici'],['Tre assi','Tre assi'],['Bilico','Bilici']];
+    const list=MEZZI.filter(m=>m[1]===t.mezzoF);
+    body=`<div class="row">${tipi.map(x=>chip(x[1],'tMezzoF',x[0],t.mezzoF===x[0])).join('')}</div>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Targa</th><th>Tipo</th><th>Sponda</th><th>Autista</th><th>Telepass</th><th>Scadenza</th><th>Oggi</th></tr></thead><tbody>
     ${list.length?list.map(m=>`<tr><td><b>${m[0]}</b></td><td>${m[1]}</td><td>${m[2]}</td><td>${m[3]}</td><td>${m[4]}</td><td>${m[5]}</td><td>${m[6]==='Fermo'?pill('Fermo','red'):pill(m[6],'dark')}</td></tr>`).join(''):'<tr><td colspan="7" class="lbl">Nessun mezzo di questo tipo negli esempi.</td></tr>'}
     </tbody></table></div>`;
   }
   if(s==='autisti'){
-    title='Autisti'; hintTxt='tocca «In giro», «In magazzino» o «Assenti» per filtrare.';
-    const f=['Tutti','In giro','In magazzino','Assenti'];
+    title='Autisti'; hintTxt='tocca «Partito», «Rientrato» o «Assente» per filtrare.';
+    const f=['Tutti','Partito','Rientrato','Assente'];
     const list=AUTISTI.filter(a=>t.autF==='Tutti'||a[6]===t.autF);
-    body=`<div class="row">${srch('Cerca per nome','s-aut')}${f.map(x=>chip(x,'tAutF',x,t.autF===x)).join('')}</div>
-    <div class="glass tbox"><table class="t"><thead><tr><th>Autista</th><th>Mezzo di oggi</th><th>Zona</th><th>Giro di oggi</th><th>Entrata</th><th>Patente e CQC</th></tr></thead><tbody>
+    body=`<div class="row">${f.map(x=>chip(x,'tAutF',x,t.autF===x)).join('')}</div>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Autista</th><th>Mezzo</th><th>Zona</th><th>Giro</th><th>Entrata</th><th>Patente</th></tr></thead><tbody>
     ${list.map(a=>`<tr><td><b>${a[0]}</b></td><td>${a[1]}</td><td>${a[2]}</td><td>${a[3]==='Ferie'?pill('Ferie'):a[3]}</td><td>${a[4]}</td><td>${a[5].indexOf('scade')>=0?`<span class="miss">${a[5]}</span>`:a[5]}</td></tr>`).join('')}
     </tbody></table></div>
     <p class="lbl" style="margin:0">Entrate e uscite arrivano dal badge virtuale sul telefono (voce Presenze); Angela le trova già pronte per gli stipendi.</p>`;
@@ -952,7 +989,7 @@ function corp(){
       <div class="glass card"><div class="lbl">Ticket da chiudere sul portale</div><div class="big">${cnt('Ticket da chiudere')}</div></div>
       <div class="glass card"><div class="lbl">Da disattivare su Habble</div><div class="big">${cnt('Da disattivare')}</div></div>
     </div>
-    <div class="row">${srch('Cerca IMEI, modello o ticket','s-tel')}${f.map(x=>chip(x==='Pronto'?'Pronti':x,'cTelF',x,c.telF===x)).join('')}</div>
+    <div class="row">${f.map(x=>chip(x==='Pronto'?'Pronti':x,'cTelF',x,c.telF===x)).join('')}</div>
     <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marchio</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Disattivazione</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
     ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Pronto'?pill('Pronto','dark'):(x[8]==='Ticket da chiudere'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
     </tbody></table></div>
@@ -1094,11 +1131,11 @@ function magApp(){
     const done=Object.keys(m.conta).length;
     inner=`<div class="pscr">
       <div><div class="lbl">Martedì 20 ottobre · Magazziniere 1</div><div class="ptitle">Magazzino</div></div>
-      ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Inventario da fare · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
+      ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Verifica da fare · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
       ${big('Entrata','mGo','entrata','Scarico dal camion e metto a posto',true)}
       ${big('Uscita','mGo','uscita','Preparo e carico una spedizione')}
-      ${big('Sposta','mGo','sposta','Cambio posto a un collo o a un bancale')}
-      ${big('Conta','mGo','conta','Inventario: scansiono quello che trovo')}
+      ${big('Trasferisci','mGo','sposta','Cambio posto a un collo o a un bancale')}
+      ${big('Verifica','mGo','conta','Controllo uno scaffale: scansiono quello che trovo')}
     </div>`;
   }
   if(m.scr==='entrata'){
@@ -1124,22 +1161,22 @@ function magApp(){
   }
   if(m.scr==='sposta'){
     inner=`<div class="pscr">${back}
-      <div class="ptitle">Sposta</div>
-      ${m.mvStep===2?`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Spostato</b><div style="font-size:14px;margin-top:4px">Bancale Luxiona da S05-1-2 a S06-3-1.</div></div>${b('Sposta un altro','mMvReset','','ghost')}`
-      :`<div class="scanbox"><b style="font-size:18px">${m.mvStep===0?'1. Scansiona cosa sposti':'2. Scansiona il posto nuovo'}</b><span class="lbl">${m.mvStep===0?'Collo o bancale':'Bancale Luxiona, adesso in S05-1-2'}</span></div><button class="bigbtn" data-act="mMv">${m.mvStep===0?'Scansiona collo':'Scansiona posto'}</button>`}
+      <div class="ptitle">Trasferisci</div>
+      ${m.mvStep===2?`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Trasferito</b><div style="font-size:14px;margin-top:4px">Bancale Luxiona da S05-1-2 a S06-3-1.</div></div>${b('Trasferisci un altro','mMvReset','','ghost')}`
+      :`<div class="scanbox"><b style="font-size:18px">${m.mvStep===0?'1. Scansiona cosa trasferisci':'2. Scansiona il posto nuovo'}</b><span class="lbl">${m.mvStep===0?'Collo o bancale':'Bancale Luxiona, adesso in S05-1-2'}</span></div><button class="bigbtn" data-act="mMv">${m.mvStep===0?'Scansiona collo':'Scansiona posto'}</button>`}
     </div>`;
   }
   if(m.scr==='conta'){
     const done=Object.keys(m.conta).length;
     if(m.contaCur===null){
       inner=`<div class="pscr">${back}
-        <div><div class="lbl">Compito obbligatorio dall’ufficio</div><div class="ptitle">Inventario · Scaffale S07</div></div>
+        <div><div class="lbl">Compito obbligatorio dall’ufficio</div><div class="ptitle">Verifica · Scaffale S07</div></div>
         <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div><div class="lbl">${done} di ${CONTA.length} posti · salvato a ogni scansione</div>
         ${CONTA.map((c,i)=>`<button class="stop ${m.conta[i]?'done':''}" data-act="mConta" data-arg="${i}"><span class="n">${i+1}</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${c[0]}</b><span class="lbl">${c[1]}</span></span><b style="font-size:12px">${m.conta[i]?'Fatto':''}</b></button>`).join('')}
-        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Inventario finito</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
+        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Verifica finita</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
       </div>`;
     } else {
-      inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Inventario</button>
+      inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Verifica</button>
         <div class="ptitle">${CONTA[m.contaCur][0]}</div>
         <div class="scanbox"><b style="font-size:18px">Scansiona tutto quello che c’è in questo posto</b><span class="lbl">Uno per uno. Il confronto con quello che dovrebbe esserci lo fa il programma.</span></div>
         <div style="flex:1"></div>
@@ -1148,8 +1185,8 @@ function magApp(){
     }
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste.</p>
-      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso dell’inventario, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
+    <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste. I tasti sono Entrata, Uscita, Trasferisci e Verifica.</p>
+      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso della verifica, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
