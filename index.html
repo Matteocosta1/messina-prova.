@@ -221,15 +221,15 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti'},
-  a:{scr:'lista', cur:0, done:{}, scanned:false, acc:{}, accOpen:false, nav:false},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}},
+  a:{scr:'lista', cur:0, done:{}, why:{}, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
 const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['corp','Corporation'],['carico','App carico merce'],['negozio','Negozio online']];
-const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti']];
+const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
 const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
@@ -263,7 +263,14 @@ const EXTRA=[
  ['Attesa','ogni [minuti]','Oltre [minuti] di attesa allo scarico'],
  ['Fascia oraria','a consegna','Se il cliente chiede un orario preciso'],
  ['Sabato','a consegna','Consegne di sabato'],
- ['Seconda consegna','a consegna','Dopo una mancata consegna']
+ ['Giacenza','[a spedizione o al giorno]','La merce non consegnata torna in magazzino e resta in deposito'],
+ ['Riconsegna','a consegna','Nuova consegna prenotata dal cliente dopo la giacenza']
+];
+const GIACENZE=[
+ {sped:'[n. spedizione]',cliente:'Apple',dest:'[Destinatario], Rozzano',motivo:'Destinatario assente',dal:'Ven 16 ottobre',gg:3,rico:'Da prenotare'},
+ {sped:'[n. spedizione]',cliente:'Snam',dest:'[Destinatario], Milano',motivo:'Chiuso o fuori orario',dal:'Gio 15 ottobre',gg:4,rico:'Prenotata · gio 22 ottobre'},
+ {sped:'[n. spedizione]',cliente:'Luxiona',dest:'[Destinatario], Assago',motivo:'Merce rifiutata',dal:'Lun 12 ottobre',gg:7,rico:'Il cliente decide: riconsegna o reso'},
+ {sped:'[n. spedizione]',cliente:'[Cliente]',dest:'[Destinatario], Opera',motivo:'Indirizzo sbagliato',dal:'Ieri',gg:1,rico:'Da prenotare'}
 ];
 const CLIENTI=[
  {nome:'Apple',cosa:'Distribuzione Nord',ref:'[da chiarire]',val:'[data]',n:'[n]',esig:'[da chiarire]',base:[['Consegna','a collo','Milano'],['Consegna','a collo','Lombardia'],['Consegna','a collo','Nord Italia']],extra:EXTRA},
@@ -357,6 +364,9 @@ const A={
   tFatt:()=>{S.t.fattOk=true;},
   tMezzoF:f=>{S.t.mezzoF=f;},
   tAutF:f=>{S.t.autF=f;},
+  tGiac:i=>{S.t.giac=+i; S.t.giacMsg='';},
+  tGiacChiedi:()=>{S.t.giacMsg='chiesto';},
+  tGiacPren:()=>{S.t.giacPren[S.t.giac]=true; S.t.giacMsg='prenotata';},
   /* autisti */
   aOpen:i=>{S.a.cur=+i; S.a.scr='dett'; S.a.scanned=false; S.a.accOpen=false; S.a.nav=false;},
   aBack:()=>{S.a.scr='lista';},
@@ -367,9 +377,11 @@ const A={
   aAcc:l=>{const e=S.a.acc[S.a.cur]||[]; S.a.acc[S.a.cur]=e.concat([l]); S.a.accOpen=false;},
   aFirma:()=>{S.a.scr='firma';},
   aMancata:()=>{S.a.scr='mancata';},
+  aWhy:w=>{S.a.why[S.a.cur]=w; S.a.scr='merce';},
+  aMerce:m=>{S.a.esito=m; S.a.scr='esito';},
+  aEsitoOk:()=>{S.a.done[S.a.cur]=S.a.esito; S.a.scr='lista';},
   aOk:()=>{S.a.done[S.a.cur]='ok'; S.a.scr='lista';},
-  aKo:()=>{S.a.done[S.a.cur]='ko'; S.a.scr='lista';},
-  aReset:()=>{S.a={scr:'lista',cur:0,done:{},scanned:false,acc:{},accOpen:false,nav:false};},
+  aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},scanned:false,acc:{},accOpen:false,nav:false};},
   /* corporation */
   cCart:c=>{S.c.cart=c; S.c.mailMsg=''; S.c.reply=false; const f=C_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.c.mail=f;},
   cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false;},
@@ -416,8 +428,8 @@ function hint(text){return `<div class="hint glass"><b>Da provare</b><span>${tex
 
 function intro(){
   const parts=[
-    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, clienti con le tariffe, fatture, mezzi e autisti.'],
-    ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne.'],
+    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, giacenze, clienti con le tariffe, fatture, mezzi e autisti.'],
+    ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
     ['carico','App carico merce','Foto del seriale, grado, prezzo ed etichetta: così un computer entra in magazzino.'],
     ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.']
@@ -491,6 +503,7 @@ function trasp(){
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
         <button class="li" data-act="tGo" data-arg="bolle"><span class="row between" style="width:100%"><span>Bolla Snam senza piano di consegna</span>${pill('Bolle','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="traffico"><span class="row between" style="width:100%"><span>2 mancate consegne da rimettere in giro</span>${pill('Traffico')}</span></button>
+        <button class="li" data-act="tGo" data-arg="giacenze"><span class="row between" style="width:100%"><span>2 giacenze con riconsegna da prenotare</span>${pill('Giacenze','red')}</span></button>
         <button class="li" data-act="tGo" data-arg="mezzi"><span class="row between" style="width:100%"><span>Motrice [targa]: tagliando tra 500 km</span>${pill('Mezzi')}</span></button>
         <button class="li" data-act="tGo" data-arg="autisti"><span class="row between" style="width:100%"><span>3 autisti senza timbratura di uscita</span>${pill('Autisti')}</span></button>
       </div></div>
@@ -531,8 +544,47 @@ function trasp(){
     ${t.giriOk?msg('Giri proposti: 38 spedizioni assegnate, 4 spostate sui mezzi liberi. Mauro e Nelson possono cambiare le fermate trascinandole.'):''}
     <div class="grid g4">
       ${giri.map(g=>`<div class="glass card"><div class="row between"><b>${g[0]}</b>${pill(g[1])}</div><ol style="margin:12px 0 0;padding-left:20px;line-height:1.9">${g[2].map(x=>`<li>${x}</li>`).join('')}${t.giriOk&&g[1]==='Milano'?'<li>[Cliente] · consegna sabato</li>':''}</ol><div class="lbl" style="margin-top:8px">${g[3]}</div></div>`).join('')}
-      <div class="glass card" style="border-style:dashed"><b>Da assegnare</b>${t.giriOk?'<p class="lbl" style="margin:10px 0 0">Tutto assegnato.</p>':'<ul style="margin:12px 0 0;padding-left:20px;line-height:1.9"><li>[Cliente] · consegna sabato</li><li>Rimessa in giro · destinatario assente</li><li>Rimessa in giro · orario chiuso</li></ul>'}</div>
+      <div class="glass card" style="border-style:dashed"><b>Da assegnare</b>${t.giriOk?'<p class="lbl" style="margin:10px 0 0">Tutto assegnato.</p>':'<ul style="margin:12px 0 0;padding-left:20px;line-height:1.9"><li>[Cliente] · consegna sabato</li><li>Rimessa in giro · destinatario assente</li><li>Rimessa in giro · orario chiuso</li><li>Riconsegna da giacenza · Snam, gio 22</li></ul>'}</div>
     </div>`;
+  }
+  if(s==='giacenze'){
+    title='Giacenze'; hintTxt='scegli una giacenza e premi «Chiedi al cliente quando riconsegnare» oppure «Prenota la riconsegna».';
+    const live=Object.keys(S.a.done).filter(k=>S.a.done[k]==='giac').map(k=>({sped:'[n. spedizione]',cliente:STOPS[k].cliente,dest:STOPS[k].ind,motivo:S.a.why[k]||'—',dal:'Oggi, dall’app autisti',gg:0,rico:'Da prenotare'}));
+    const G=live.concat(GIACENZE); if(t.giac>=G.length) t.giac=0;
+    const cur=G[t.giac], pren=t.giacPren[t.giac]||cur.rico.indexOf('Prenotata')===0;
+    const daPren=G.filter((g,i)=>!t.giacPren[i]&&g.rico==='Da prenotare').length;
+    body=`<div class="grid g4">
+      <div class="glass card"><div class="lbl">Spedizioni in giacenza</div><div class="big">${G.length}</div><div class="lbl">merce tornata a Lacchiarella</div></div>
+      <div class="glass card"><div class="lbl">Riconsegne da prenotare</div><div class="big">${daPren}</div><div class="lbl">aspettano una data dal cliente</div></div>
+      <div class="glass card"><div class="lbl">Giorni medi in giacenza</div><div class="big">${(G.reduce((a,g)=>a+g.gg,0)/G.length).toFixed(1).replace('.',',')}</div></div>
+      <div class="glass card"><div class="lbl">Giacenze da fatturare a ottobre</div><div class="big">€ [importo]</div><div class="lbl">con la tariffa di ogni cliente</div></div>
+    </div>
+    <div class="row" style="align-items:flex-start;gap:16px">
+      <div class="glass" style="flex:1 1 280px;padding:8px;min-width:0"><div class="row between" style="padding:8px 10px"><b>In magazzino</b><span class="lbl">${G.length} spedizioni</span></div><div class="list">
+        ${G.map((g,i)=>{const p=t.giacPren[i]||g.rico.indexOf('Prenotata')===0;return `<button class="li ${t.giac===i?'on':''}" data-act="tGiac" data-arg="${i}"><span class="row between" style="width:100%"><b>${g.cliente}</b>${p?pill('Riconsegna prenotata','ok'):(g.rico==='Da prenotare'?pill('Da prenotare','red'):pill('Decide il cliente'))}</span><span class="lbl">${g.motivo} · ${g.dal}</span></button>`;}).join('')}
+      </div></div>
+      <div class="glass card stack" style="flex:2 1 420px;min-width:0">
+        <div class="row between"><h3 style="font-size:22px;letter-spacing:-.02em">${cur.cliente} · giacenza</h3><span class="lbl">Spedizione ${cur.sped}</span></div>
+        <div class="kv">
+          <div><div class="lbl">Destinatario</div><b>${cur.dest}</b></div>
+          <div><div class="lbl">Motivo della mancata consegna</div><b>${cur.motivo}</b></div>
+          <div><div class="lbl">In giacenza dal</div><b>${cur.dal}</b></div>
+          <div><div class="lbl">Giorni</div><b>${cur.gg}</b></div>
+          <div><div class="lbl">Riconsegna</div><b>${t.giacPren[t.giac]?'Prenotata · data scelta dal cliente':cur.rico}</b></div>
+        </div>
+        <div style="border-top:1px solid var(--line);padding-top:12px">
+          <div class="lbl" style="margin-bottom:6px">Cosa paga il cliente, con la sua tariffa</div>
+          <table class="t"><tbody>
+            <tr><td>Consegna tentata</td><td>€ [tariffa]</td></tr>
+            <tr><td>Giacenza</td><td>€ [tariffa]</td></tr>
+            <tr><td>Riconsegna, quando la prenota</td><td>€ [tariffa]</td></tr>
+          </tbody></table>
+          <div class="lbl" style="margin-top:6px">Le tre voci vanno da sole in Fatturazione, collegate a questa spedizione.</div>
+        </div>
+        ${t.giacMsg==='chiesto'?msg('Mail al cliente pronta in Mail: avvisa della giacenza, del costo e chiede la data per la riconsegna.'):''}
+        ${t.giacMsg==='prenotata'?msg('Riconsegna prenotata: la spedizione è nei giri del giorno scelto e la riconsegna è già in fattura.','Vai al Traffico','tGo','traffico'):''}
+        <div class="row">${pren?'':b('Prenota la riconsegna','tGiacPren')}${pren?'':b('Chiedi al cliente quando riconsegnare','tGiacChiedi','','ghost')}${b('Reso al mittente','noop','','ghost')}</div>
+      </div></div>`;
   }
   if(s==='clienti'){
     if(t.cliente===null){
@@ -557,7 +609,7 @@ function trasp(){
   }
   if(s==='fatture'){
     title='Fatturazione'; hintTxt='premi «Approva e invia le pronte»: nessuna fattura parte senza questo passaggio.';
-    const rows=[['Apple','[n]','Sabato ×3','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
+    const rows=[['Apple','[n]','Sabato ×3 · Giacenza ×1','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio · Giacenza ×1 · Riconsegna ×1','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
     body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th></tr></thead><tbody>
     ${rows.map(r=>{const st=r[3]==='Pronta'?(t.fattOk?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td></tr>`;}).join('')}
     </tbody></table></div>
@@ -696,7 +748,7 @@ function autistiApp(){
     inner=`<div class="pscr">
       <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Il tuo giro</div>
         <div class="bar" style="margin-top:12px"><i style="width:${n*20}%"></i></div><div class="lbl" style="margin-top:6px">${n} di 5 fermate fatte</div></div>
-      ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d?'Al traffico':'')}</b></button>`;}).join('')}
+      ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d==='giac'?'Giacenza':(d==='rico'?'Riconsegna fissata':(d==='dopo'?'Riprovo dopo':'')))}</b></button>`;}).join('')}
       ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro finito</b><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
     </div>`;
   }
@@ -735,14 +787,39 @@ function autistiApp(){
   if(a.scr==='mancata'){
     inner=`<div class="pscr">
       <button class="back" data-act="aDett">Indietro</button>
+      <div class="lbl">Passo 1 di 2</div>
       <div class="ptitle">Perché non è stata consegnata?</div>
-      <div class="lbl">Un tocco e torna al traffico.</div>
-      ${['Destinatario assente','Indirizzo sbagliato','Merce rifiutata','Chiuso o fuori orario','Altro, lascio una nota vocale'].map(x=>`<button class="bigbtn ghost" style="text-align:left;font-size:17px" data-act="aKo">${x}</button>`).join('')}
+      ${['Destinatario assente','Indirizzo sbagliato','Merce rifiutata','Chiuso o fuori orario','Altro, lascio una nota vocale'].map(x=>`<button class="bigbtn ghost" style="text-align:left;font-size:17px" data-act="aWhy" data-arg="${x}">${x}</button>`).join('')}
+    </div>`;
+  }
+  if(a.scr==='merce'){
+    inner=`<div class="pscr">
+      <button class="back" data-act="aMancata">Indietro</button>
+      <div class="lbl">Passo 2 di 2 · ${a.why[a.cur]}</div>
+      <div class="ptitle">E adesso la merce?</div>
+      <button class="bigbtn ghost" style="text-align:left;font-size:17px" data-act="aMerce" data-arg="rico">C’è già una nuova consegna fissata<span class="lbl" style="display:block;font-weight:500;margin-top:2px">Il cliente ha dato un’altra data</span></button>
+      <button class="bigbtn ghost" style="text-align:left;font-size:17px" data-act="aMerce" data-arg="dopo">Riprovo più tardi in questo giro<span class="lbl" style="display:block;font-weight:500;margin-top:2px">Resta sul mezzo</span></button>
+      <button class="bigbtn" style="text-align:left;font-size:17px" data-act="aMerce" data-arg="giac">Torna in magazzino: giacenza<span style="display:block;font-weight:500;font-size:13px;opacity:.75;margin-top:2px">Deposito a pagamento per il cliente</span></button>
+    </div>`;
+  }
+  if(a.scr==='esito'){
+    const s=STOPS[a.cur], e=a.esito;
+    const txt={rico:['Nuova consegna fissata','La spedizione torna al traffico con la nuova data. In fattura va anche la riconsegna.'],
+               dopo:['Riprovi più tardi','La fermata resta nel tuo giro, spostata in fondo.'],
+               giac:['Merce in giacenza','Riporta la merce a Lacchiarella e scansiona i colli all’entrata. In ufficio la trovano in Giacenze: il cliente paga la giacenza e la riconsegna quando la prenota.']}[e];
+    inner=`<div class="pscr">
+      <button class="back" data-act="aMancata">Indietro</button>
+      <div class="ptitle">${txt[0]}</div>
+      <div class="pcard" style="padding:14px"><b>${s.cliente}</b><div class="lbl">${s.ind}</div><div style="margin-top:8px">${pill(a.why[a.cur],'red')}</div></div>
+      <p style="margin:0;line-height:1.5">${txt[1]}</p>
+      <div class="lbl">Ora, posizione e foto del luogo si salvano da sole.</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="aEsitoOk">Conferma</button>
     </div>`;
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App autisti</h2><p class="muted" style="margin:8px 0 0">Il telefono dell’autista. Gli accessori arrivano già dalla bolla.</p>
-      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Conferma consegna».</li><li>Su un’altra fermata prova «Non consegnato».</li></ol></div>
+      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Conferma consegna».</li><li>Su un’altra fermata prova «Non consegnato» e poi «Torna in magazzino: giacenza».</li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.</li></ol></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
@@ -865,5 +942,6 @@ document.addEventListener('click',e=>{
 render();
 })();
 </script>
+
 
 </html>
