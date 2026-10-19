@@ -222,7 +222,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, cliente:null, mezzoF:'Tutti', autF:'Tutti', giac:0, giacMsg:'', giacPren:{}},
-  a:{scr:'lista', cur:0, done:{}, why:{}, scanned:false, acc:{}, accOpen:false, nav:false},
+  a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
@@ -380,8 +380,9 @@ const A={
   aWhy:w=>{S.a.why[S.a.cur]=w; S.a.scr='merce';},
   aMerce:m=>{S.a.esito=m; S.a.scr='esito';},
   aEsitoOk:()=>{S.a.done[S.a.cur]=S.a.esito; S.a.scr='lista';},
-  aOk:()=>{S.a.done[S.a.cur]='ok'; S.a.scr='lista';},
-  aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},scanned:false,acc:{},accOpen:false,nav:false};},
+  aFoto:()=>{const f=S.a.foto[S.a.cur]||0; S.a.foto[S.a.cur]=f===0?1:2;},
+  aOk:()=>{ if(S.a.foto[S.a.cur]!==2) return; S.a.done[S.a.cur]='ok'; S.a.scr='lista';},
+  aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},foto:{},scanned:false,acc:{},accOpen:false,nav:false};},
   /* corporation */
   cCart:c=>{S.c.cart=c; S.c.mailMsg=''; S.c.reply=false; const f=C_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.c.mail=f;},
   cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false;},
@@ -749,7 +750,7 @@ function autistiApp(){
       <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Il tuo giro</div>
         <div class="bar" style="margin-top:12px"><i style="width:${n*20}%"></i></div><div class="lbl" style="margin-top:6px">${n} di 5 fermate fatte</div></div>
       ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d==='giac'?'Giacenza':(d==='rico'?'Riconsegna fissata':(d==='dopo'?'Riprovo dopo':'')))}</b></button>`;}).join('')}
-      ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro finito</b><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
+      ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro chiuso</b><div class="lbl" style="margin-top:4px">Ogni consegna ha la sua bolla fotografata e leggibile: in ufficio non serve la chiusura a fine giornata.</div><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
     </div>`;
   }
   if(a.scr==='dett'){
@@ -773,15 +774,21 @@ function autistiApp(){
     </div>`;
   }
   if(a.scr==='firma'){
+    const f=a.foto[a.cur]||0;
+    const fotoBox=f===0
+      ?`<button class="bigbtn ghost" style="font-size:16px" data-act="aFoto">Fotografa la bolla firmata</button><div class="lbl">Obbligatoria: senza una foto nitida la consegna non si chiude.</div>`
+      :(f===1
+        ?`<div class="pcard" style="padding:14px;border:2px solid var(--alert);background:var(--alert-soft)"><b style="color:var(--alert)">Foto sfocata: la bolla non si legge</b><div style="margin-top:4px;font-size:14px">Appoggia la bolla su un piano, tieni fermo il telefono e inquadrala tutta.</div></div><button class="bigbtn ghost" style="font-size:16px" data-act="aFoto">Rifai la foto</button>`
+        :`<div class="pcard" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Foto nitida, bolla controllata</b><div style="margin-top:4px;font-size:14px">Numero della bolla letto e uguale alla spedizione · firma presente.</div></div>`);
     inner=`<div class="pscr">
       <button class="back" data-act="aDett">Indietro</button>
       <div class="ptitle">Prova di consegna</div>
       <div class="lbl">Firma del destinatario</div>
-      <div class="pcard" style="height:200px;display:flex;align-items:flex-end;padding:16px"><svg width="230" height="60" viewBox="0 0 220 60" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 45c20-30 30 10 45-10s25-25 30 5 20 0 35-15 20 25 40 5 25-10 55-5"></path></svg></div>
-      <button class="bigbtn ghost" style="font-size:16px" data-act="aDett">Foto della merce consegnata</button>
+      <div class="pcard" style="height:150px;display:flex;align-items:flex-end;padding:16px"><svg width="230" height="60" viewBox="0 0 220 60" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 45c20-30 30 10 45-10s25-25 30 5 20 0 35-15 20 25 40 5 25-10 55-5"></path></svg></div>
+      ${fotoBox}
       <div class="lbl">Ora e posizione si salvano da sole.</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="aOk">Conferma consegna</button>
+      <button class="bigbtn" data-act="aOk" ${f===2?'':'disabled style="opacity:.35;cursor:not-allowed"'}>${f===2?'Conferma consegna':'Prima la foto della bolla'}</button>
     </div>`;
   }
   if(a.scr==='mancata'){
@@ -819,7 +826,7 @@ function autistiApp(){
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App autisti</h2><p class="muted" style="margin:8px 0 0">Il telefono dell’autista. Gli accessori arrivano già dalla bolla.</p>
-      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Conferma consegna».</li><li>Su un’altra fermata prova «Non consegnato» e poi «Torna in magazzino: giacenza».</li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.</li></ol></div>
+      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Fotografa la bolla firmata»: la prima foto è sfocata e la consegna non si chiude. Rifalla e poi «Conferma consegna».</li><li>Su un’altra fermata prova «Non consegnato» e poi «Torna in magazzino: giacenza».</li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.</li></ol></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
