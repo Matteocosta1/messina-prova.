@@ -124,7 +124,7 @@ table.t tr.click:hover td{background:var(--soft)}
 .scaf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 .sc{border:0;border-radius:12px;padding:10px 6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;gap:6px;align-items:center;background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
 .sc.on{box-shadow:inset 0 0 0 2px var(--ink)}
-.sc .lv{display:grid;grid-template-rows:repeat(4,8px);gap:3px;width:100%}
+.sc .lv{display:grid;grid-template-rows:repeat(6,7px);gap:3px;width:100%}
 .sc .lv span{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .sc .lv i{display:block;border-radius:2px;background:var(--soft)}
 .sc .lv i.f{background:var(--solid)}
@@ -686,11 +686,11 @@ function trasp(){
     if(t.magTab==='pianta'){
       const sel=t.scaf, cli=SC_CLI[sel];
       const rows=[];
-      for(let pi=4;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); rows.push(`<tr><td><b>S${String(sel+1).padStart(2,'0')}-${pi}-${po}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_CONT[cli]:'—'}</td><td>${full?((sel+pi+po)%9+1)+' giorni':'—'}</td></tr>`); }
+      for(let pi=6;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); rows.push(`<tr><td><b>S${String(sel+1).padStart(2,'0')}-${pi}-${po}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_CONT[cli]:'—'}</td><td>${full?((sel+pi+po)%9+1)+' giorni':'—'}</td></tr>`); }
       inner=`<div class="row" style="align-items:flex-start;gap:16px">
         <div class="glass card" style="flex:1 1 420px;min-width:0">
-          <div class="row between"><b>Pianta del capannone</b><span class="lbl">12 scaffali · 4 piani · 3 posti</span></div>
-          <div class="scaf" style="margin-top:12px">${SC_CLI.map((c,i)=>`<button class="sc ${sel===i?'on':''}" data-act="tScaf" data-arg="${i}" aria-label="Scaffale ${i+1}"><span>S${String(i+1).padStart(2,'0')}</span><span class="lv">${[4,3,2,1].map(pi=>`<span>${[1,2,3].map(po=>`<i class="${scCell(i,pi,po)?(match(c)?'f':'dim'):''}"></i>`).join('')}</span>`).join('')}</span><span class="lbl" style="font-size:11px">${c}</span></button>`).join('')}</div>
+          <div class="row between"><b>Pianta del capannone</b><span class="lbl">12 scaffali · 6 piani · 3 posti</span></div>
+          <div class="scaf" style="margin-top:12px">${SC_CLI.map((c,i)=>`<button class="sc ${sel===i?'on':''}" data-act="tScaf" data-arg="${i}" aria-label="Scaffale ${i+1}"><span>S${String(i+1).padStart(2,'0')}</span><span class="lv">${[6,5,4,3,2,1].map(pi=>`<span>${[1,2,3].map(po=>`<i class="${scCell(i,pi,po)?(match(c)?'f':'dim'):''}"></i>`).join('')}</span>`).join('')}</span><span class="lbl" style="font-size:11px">${c}</span></button>`).join('')}</div>
           <div class="lbl" style="margin:14px 0 8px">Zone a terra</div>
           <div class="zone"><div><b>Ricevimento</b><br>3 bancali da sistemare</div><div><b>Passaggio Apple</b><br>entra ed esce in giornata</div><div><b>Giacenze</b><br>4 spedizioni</div><div><b>Resi</b><br>2 colli</div></div>
         </div>
@@ -785,7 +785,7 @@ function trasp(){
         ${mov.map(m=>`<tr class="${m[5]?'korow':''}"><td>${m[0]}</td><td>${m[1]}</td><td>${m[2]}</td><td>€ ${m[3]}</td><td>${m[5]||'<span class="lbl">Nel giro</span>'}</td></tr>`).join('')}
       </tbody></table></div></div>
     </div>
-    <p class="lbl" style="margin:0">Ogni apparato Telepass è legato al suo mezzo, e dal giro del giorno il programma sa chi guidava. I passaggi arrivano dall’estratto conto Telepass e finiscono nei costi. Da scrivere nell’informativa e da far vedere al consulente del lavoro prima di usarli per valutare gli autisti.</p>`;
+    <p class="lbl" style="margin:0">Ogni apparato Telepass è legato al suo mezzo, e dal giro del giorno il programma sa chi guidava. I passaggi arrivano da Telepass (collegamento da chiedere al referente Telepass Business, almeno ogni mezz’ora) e finiscono nei costi. Da scrivere nell’informativa e da far vedere al consulente del lavoro prima di usarli per valutare gli autisti.</p>`;
   }
   if(s==='presenze'){
     title='Presenze'; hintTxt='apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
