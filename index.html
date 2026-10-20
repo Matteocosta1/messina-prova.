@@ -241,6 +241,16 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 .bbar .dots{display:flex;gap:6px;flex:none}.bbar .dots i{width:10px;height:10px;border-radius:99px;background:rgba(17,18,20,.16)}
 .bbar .url{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--muted);background:var(--soft);border-radius:99px;padding:6px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sitoframe{display:block;width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:520px;border:0;background:#f2f3f5}
+.gruppo-tit{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 12px}
+.g-prog{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sitocard{padding:20px}
+.sitocard h3{font-size:24px;letter-spacing:-.025em}
+.minibar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:var(--soft);margin-bottom:8px}
+.minibar i{width:8px;height:8px;border-radius:99px;background:rgba(17,18,20,.18);flex:none}
+.minibar span{flex:1;min-width:0;text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:1000px){.g-prog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.g-siti{grid-template-columns:1fr}}
 .portbar{display:flex;flex-direction:column;gap:12px;padding:14px 16px;margin-bottom:14px}
 @media (max-width:760px){.sitoframe{height:calc(100dvh - 190px);min-height:460px}}
 </style>
@@ -267,7 +277,7 @@ const S = {
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
-const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App Corporation'],['negozio','Negozio online'],['sitoT','Sito Trasporti'],['sitoC','Sito Corporation']];
+const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App Corporation'],['negozio','Negozio online'],['sitoT','Sito Autotrasporti'],['sitoC','Sito Corporation']];
 const T_NAV=[['home','Home'],['anomalie','Anomalie'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['portale','Portale'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze'],['j7','J7']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
@@ -884,7 +894,8 @@ function intro(){
     ['carico','App Corporation','Entrate: foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
     ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.'],
     ['portale','Portale clienti','Dentro Autotrasporti: quello che vedono Snam ed Econocom. Spedizioni, magazzino con i seriali, giacenze e fatture.','pGo','home'],
-    ['sitoT','Siti','Il sito di Messina Autotrasporti e quello di Messina Corporation. Il modulo dei preventivi arriva dritto nella Mail.']
+    ['sitoT','Sito Autotrasporti','Il sito pubblico di Messina Autotrasporti: servizi, flotta, traccia, preventivi e candidature che arrivano nella Mail.'],
+    ['sitoC','Sito Corporation','Il sito pubblico di Messina Corporation: cancellazione dei dati, valutazione dei lotti, gradi e il tasto Negozio.']
   ];
   const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['view','magazzino','La merce entra in magazzino ed esce sul camion, sempre scansionata','App magazzino'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
   const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','Entrate'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
@@ -894,8 +905,13 @@ function intro(){
     <h1>Il nuovo programma Messina</h1>
     <p>Questa è una prova da toccare: tutti i tasti funzionano e i dati sono di esempio, quindi niente arriva davvero a clienti o colleghi. Messina Autotrasporti e Messina Corporation hanno due programmi separati.</p>
   </section>
-  <div class="grid g4" style="margin-bottom:16px">
-    ${parts.map(p=>`<button class="part glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+  <h2 class="gruppo-tit">Programmi</h2>
+  <div class="grid g-prog" style="margin-bottom:22px">
+    ${parts.filter(p=>p[0].indexOf('sito')!==0).map(p=>`<button class="part glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+  </div>
+  <h2 class="gruppo-tit">Siti pubblici</h2>
+  <div class="grid g-siti" style="margin-bottom:16px">
+    ${parts.filter(p=>p[0].indexOf('sito')===0).map(p=>`<button class="part sitocard glass" data-act="view" data-arg="${p[0]}"><span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>${p[0]==='sitoT'?'www.messina-autotrasporti.it':'www.[dominio-corporation]'}</span></span><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
   </div>
   <div class="grid g2">
     <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di una consegna</h3>${steps(consegna)}</div>
