@@ -241,8 +241,8 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
-  a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
+  a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
@@ -476,7 +476,7 @@ const BANCO_TXT={fin:'Cancellazione finita, report pronto',run:'Cancellazione in
 const A={
   noop:()=>{},
   view:v=>{S.view=v; window.scrollTo(0,0);},
-  tGo:s=>{S.view='trasp'; S.t.sec=s; S.t.mailMsg=''; S.t.reply=false; S.t.bollaMsg=''; if(s==='clienti') S.t.cliente=null; window.scrollTo(0,0);},
+  tGo:s=>{S.view='trasp'; S.t.sec=s; S.t.mailMsg=''; S.t.reply=false; S.t.bollaMsg=''; if(s==='clienti') S.t.cliente=null; if(s==='anomalie') S.t.anSez=null; window.scrollTo(0,0);},
   cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; window.scrollTo(0,0);},
   /* trasporti */
   tCart:c=>{S.t.cart=c; S.t.mailMsg=''; S.t.reply=false; const f=T_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.t.mail=f;},
@@ -517,6 +517,7 @@ const A={
   tCerca:v=>{S.t.cerca=v;},
   tInv:()=>{S.t.invOn=true; S.m.conta={}; S.m.cs={}; S.m.blocchi={}; S.m.contaMsg='';},
   tSblocca:i=>{const el=document.getElementById('sbl-'+i); const v=el?el.value.trim():''; if(!v){S.m.sblErr=i; return;} S.m.sblErr=null; S.m.blocchi[i].ok=v; S.m.conta[i]='sbl'; S.t.log.unshift([ora(),'Ufficio','Sblocco',v,CONTA[i][0],'Manuale']);},
+  tAnSez:v=>{S.t.anSez=v||null; window.scrollTo(0,0);},
   tAnGo:v=>{const x=v.split('|'); S.t.sec=x[0]; if(x[0]==='magazzino')S.t.magTab=x[1]; if(x[0]==='presenze')S.t.presTab=x[1]; window.scrollTo(0,0);},
   /* app magazzino */
   mGo:v=>{S.m.scr=v; S.m.inStep=0; S.m.mvStep=0; S.m.contaCur=null; window.scrollTo(0,0);},
@@ -537,20 +538,22 @@ const A={
   tGiacChiedi:()=>{S.t.giacMsg='chiesto';},
   tGiacPren:()=>{S.t.giacPren[S.t.giac]=true; S.t.giacMsg='prenotata';},
   /* autisti */
-  aOpen:i=>{S.a.cur=+i; S.a.scr='dett'; S.a.scanned=false; S.a.accOpen=false; S.a.nav=false;},
+  aOpen:i=>{S.a.cur=+i; S.a.scr='dett'; S.a.scanned=false; S.a.accOpen=false; S.a.nav=false; S.a.accOk={}; S.a.firmata=false; window.scrollTo(0,0);},
+  aAccOk:x=>{S.a.accOk[x]=!S.a.accOk[x];},
+  aFirmata:()=>{S.a.firmata=true;},
   aBack:()=>{S.a.scr='lista';},
   aDett:()=>{S.a.scr='dett';},
   aScan:()=>{S.a.scanned=true;},
   aNav:()=>{S.a.nav=!S.a.nav;},
   aAccT:()=>{S.a.accOpen=!S.a.accOpen;},
   aAcc:l=>{const e=S.a.acc[S.a.cur]||[]; S.a.acc[S.a.cur]=e.concat([l]); S.a.accOpen=false;},
-  aFirma:()=>{S.a.scr='firma';},
-  aMancata:()=>{S.a.scr='mancata';},
+  aFirma:()=>{if(!S.a.pronto)return; S.a.scr='firma';},
+  aMancata:()=>{if(!S.a.scanned&&S.a.scr==='dett')return; S.a.scr='mancata';},
   aWhy:w=>{S.a.why[S.a.cur]=w; S.a.scr='merce';},
   aMerce:m=>{S.a.esito=m; S.a.scr='esito';},
   aEsitoOk:()=>{S.a.done[S.a.cur]=S.a.esito; S.a.scr='lista';},
   aOk:()=>{ if(S.a.foto[S.a.cur]!==2) return; S.a.done[S.a.cur]='ok'; S.a.scr='lista';},
-  aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},foto:{},fotoInfo:{},soglia:S.a.soglia,analisi:false,scanned:false,acc:{},accOpen:false,nav:false};},
+  aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},foto:{},fotoInfo:{},soglia:S.a.soglia,analisi:false,scanned:false,acc:{},accOpen:false,nav:false,accOk:{},firmata:false};},
   /* corporation */
   cCart:c=>{S.c.cart=c; S.c.mailMsg=''; S.c.reply=false; const f=C_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.c.mail=f;},
   cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false;},
@@ -996,12 +999,23 @@ function trasp(){
     <p class="lbl" style="margin:0">Entrate e uscite arrivano dal badge virtuale sul telefono (voce Presenze); Angela le trova già pronte per gli stipendi.</p>`;
   }
   if(s==='anomalie'){
-    title='Anomalie'; hintTxt='tocca «Apri» per andare dove si risolve. Si chiudono solo quando i numeri tornano.';
-    body=`${AN.length?warnW('Aperte',AN.length):msg('Nessuna anomalia aperta.')}
-    <div class="glass tbox"><table class="t" style="min-width:820px"><thead><tr><th>Sezione</th><th>Cosa non torna</th><th>Chi risolve</th><th>Da</th><th></th></tr></thead><tbody>
-    ${AN.map(a=>`<tr><td>${pill(a[0],'red')}</td><td><b>${a[1]}</b></td><td>${a[2]}</td><td class="lbl">${a[3]}</td><td>${b('Apri','tAnGo',a[4],'ghost sm')}</td></tr>`).join('')}
-    </tbody></table></div>
-    <p class="lbl" style="margin:0">Ogni sezione tiene i suoi problemi; qui si vedono tutti insieme. Nessuna chiusura passa se le cose non tornano. Da decidere: un riassunto al giorno per la Direzione, a orario fisso.</p>`;
+    title='Anomalie';
+    const SEZ=['Magazzino','Missioni','Bolle','Presenze','Fatturazione','Telepass'];
+    const cnt=x=>AN.filter(r=>r[0]===x).length;
+    if(!t.anSez){
+      hintTxt='tocca una sezione per entrare e risolvere le anomalie una per una.';
+      body=`<div class="row" style="align-items:stretch;gap:14px">
+        <div class="glass card" style="flex:0 0 auto;min-width:180px;${AN.length?'border:2px solid var(--alert)':''}"><div class="lbl">Totale</div><div class="big" style="${AN.length?'color:var(--alert)':''}">${AN.length}</div><div class="lbl">${AN.length?'da risolvere':'tutto torna'}</div></div>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))">${SEZ.map(x=>{const n=cnt(x);return `<button class="glass card" data-act="tAnSez" data-arg="${x}" style="text-align:left;cursor:pointer;font:inherit;${n?'':'opacity:.6'}"><div class="row between"><b style="font-size:18px">${x}</b>${n?badge(n):pill('Ok','ok')}</div><div class="lbl" style="margin-top:6px">${n?(n===1?'1 anomalia':n+' anomalie'):'Nessuna'}</div></button>`;}).join('')}</div>
+      <p class="lbl" style="margin:0">Nessuna chiusura passa se le cose non tornano. Quando un’anomalia si risolve sparisce da sola. Da decidere: un riassunto al giorno per la Direzione, a orario fisso.</p>`;
+    } else {
+      const L=AN.filter(r=>r[0]===t.anSez);
+      hintTxt='premi «Apri» per andare dove si risolve.';
+      title=t.anSez;
+      body=`<div class="row">${b('← Anomalie','tAnSez','','ghost sm')}</div>
+      ${L.length?`<div class="list">${L.map(r=>`<div class="glass card row between" style="gap:12px"><div><b style="font-size:17px">${r[1]}</b><div class="lbl" style="margin-top:4px">Chi risolve: ${r[2]} · ${r[3]}</div></div>${b('Apri','tAnGo',r[4],'sm')}</div>`).join('')}</div>`:msg('Nessuna anomalia in questa sezione.')}`;
+    }
   }
   return hint(hintTxt)+shell('Autotrasporti',T_NAV.map(n=>n[0]==='anomalie'?[n[0],n[1]+badge(AN.length)]:n),s,'tGo',title,body,'Cerca cliente, bolla, targa');
 }
@@ -1128,41 +1142,48 @@ function autistiApp(){
   }
   if(a.scr==='dett'){
     const s=STOPS[a.cur], extra=a.acc[a.cur]||[];
-    const all=['Sponda','Consegna al piano','Attesa','Facchinaggio','Ritiro imballi'].filter(x=>extra.indexOf(x)<0&&x!==s.nota);
+    const ACC=['Sponda','Piano terra','Consegna al piano','Attesa','Facchinaggio','Ritiro imballi'];
+    const accs=(ACC.indexOf(s.nota)>=0?[s.nota]:[]).concat(extra), nota=ACC.indexOf(s.nota)<0?s.nota:'';
+    const all=ACC.filter(x=>accs.indexOf(x)<0);
+    const d1=a.scanned, d2=d1&&accs.every(x=>a.accOk[x]), d3=d2&&a.firmata; a.pronto=d3;
+    const cam=KI.cam.replace(/width="22" height="22"/,'width="30" height="30"');
+    const pin=`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5a7 7 0 0114 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`;
+    const blk=(n,t,done,on,body)=>`<div class="pcard stack" style="padding:14px;gap:10px;${done?'border:2px solid var(--ok);background:var(--ok-soft);':(on?'border:2px solid var(--solid);':'opacity:.4;pointer-events:none;')}">
+      <div class="row" style="gap:10px;flex-wrap:nowrap"><span style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;${done?'background:var(--ok);color:#fff':'border:2px solid currentColor'}">${done?'✓':n}</span><b style="font-size:20px;${done?'color:var(--ok)':''}">${t}</b></div>${body}</div>`;
+    const off='disabled style="opacity:.35;cursor:not-allowed"';
     inner=`<div class="pscr">
-      <button class="back" data-act="aBack">Giro</button>
-      <div><div class="lbl">Fermata ${a.cur+1} · ${s.fascia}</div><div class="ptitle">${s.cliente}</div><div>${s.ind}</div></div>
-      <div class="pcard stack" style="padding:14px;gap:10px">
-        <div class="row between"><b>${s.colli}</b><span class="lbl">accessori dalla bolla</span></div>
-        <div class="row" style="gap:6px">${pill(s.nota,'dark')}${extra.map(x=>pill(x+' · aggiunto','dark')).join('')}</div>
-        <button class="chipbtn" style="align-self:flex-start;border-style:dashed" data-act="aAccT">+ Aggiungi accessorio</button>
-        ${a.accOpen?`<div class="row" style="gap:6px">${all.map(x=>chip(x,'aAcc',x,false)).join('')}</div><div class="lbl">Finisce da solo in fattura, con ora e posizione.</div>`:''}
-      </div>
-      <div class="pcard row between" style="padding:14px"><div><b>Scansione colli</b><div class="lbl">${a.scanned?'Tutti i colli letti':'Da fare prima di consegnare'}</div></div>${a.scanned?pill('Fatta','ok'):b('Scansiona','aScan','','sm')}</div>
-      <button class="bigbtn ghost" style="font-size:16px" data-act="aNav">Naviga con la mappa camion</button>
-      ${a.nav?`<div class="lbl" style="text-align:center">Nel programma vero si apre la navigazione per camion verso ${s.ind}.</div>`:''}
+      <button class="back" data-act="aBack">Consegne</button>
+      <div><div class="lbl">Fermata ${a.cur+1} · ${s.fascia}</div><div class="ptitle">${s.cliente}</div>
+        <div class="row between" style="flex-wrap:nowrap;gap:10px;margin-top:4px"><span style="font-size:16px">${s.ind}</span><button class="round" data-act="aNav" aria-label="Navigatore per camion" style="flex:none;display:flex;align-items:center;justify-content:center">${pin}</button></div>
+        ${a.nav?`<div class="lbl">Si apre il navigatore per camion verso ${s.ind}.</div>`:''}
+        ${nota?`<div style="margin-top:6px">${pill(nota,'dark')}</div>`:''}</div>
+      ${blk(1,'Colli',d1,true,d1?`<div style="font-size:17px">${s.colli} · tutti scansionati</div>`:`<div style="font-size:17px">${s.colli} da scaricare. Scansiona ogni collo.</div><button class="bigbtn" data-act="aScan" aria-label="Scansiona i colli" style="display:flex;align-items:center;justify-content:center">${cam}</button>`)}
+      ${blk(2,'Accessori',d2,d1,(accs.length?accs.map(x=>`<button class="pcard row between" data-act="aAccOk" data-arg="${x}" style="padding:12px 14px;font:inherit;font-size:17px;cursor:pointer;text-align:left;${a.accOk[x]?'border-color:var(--ok)':''}"><span>${x}</span><b style="${a.accOk[x]?'color:var(--ok)':''}">${a.accOk[x]?'✓':'Tocca'}</b></button>`).join(''):'<div class="lbl">Nessuno sulla bolla.</div>')+
+        `<button class="chipbtn" style="align-self:flex-start;border-style:dashed" data-act="aAccT">+ Aggiungi</button>${a.accOpen?`<div class="row" style="gap:6px">${all.map(x=>chip(x,'aAcc',x,false)).join('')}</div><div class="lbl">Va da solo in fattura.</div>`:''}`)}
+      ${blk(3,'Firma',d3,d2,d3?`<div style="font-size:17px">Bolla firmata dal cliente</div>`:`<div style="font-size:17px">Fai firmare la bolla al cliente.</div><button class="bigbtn" data-act="aFirmata" aria-label="Firmata" style="display:flex;align-items:center;justify-content:center">${KI.pen.replace(/width="22" height="22"/,'width="30" height="30"')}</button>`)}
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="aFirma">Consegnato</button>
-      <button class="bigbtn ghost" data-act="aMancata">Non consegnato</button>
+      <button class="bigbtn" data-act="aFirma" ${d3?'':off}>Consegnato</button>
+      <button class="bigbtn ghost" data-act="aMancata" ${d1?'':off}>Non consegnato</button>
     </div>`;
   }
   if(a.scr==='firma'){
     const f=a.foto[a.cur]||0, inf=a.fotoInfo[a.cur]||{};
-    const scatta=(label)=>`<label class="bigbtn ghost" style="font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;box-sizing:border-box">${label}<input id="fotoBolla" type="file" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0"></label>`;
+    const scatta=(label)=>`<label class="bigbtn" aria-label="Fotografa la bolla" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;position:relative;box-sizing:border-box">${KI.cam.replace(/width="22" height="22"/,'width="30" height="30"')}${label}<input id="fotoBolla" type="file" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0"></label>`;
     const prev=inf.url?`<img src="${inf.url}" alt="Foto della bolla" style="width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none">`:'';
     const misura=inf.score!==undefined?`<div class="lbl" style="margin-top:4px">Nitidezza ${inf.score} · minimo ${a.soglia} · luce ${inf.luce}</div>`:'';
     let fotoBox;
     if(a.analisi) fotoBox=`<div class="pcard" style="padding:14px"><b>Controllo la foto…</b></div>`;
-    else if(f===0) fotoBox=scatta('Fotografa la bolla firmata')+`<div class="lbl">Si apre la fotocamera del telefono. Obbligatoria: senza una foto nitida la consegna non si chiude.</div>`;
-    else if(f===1) fotoBox=`<div class="pcard row" style="padding:12px;gap:12px;flex-wrap:nowrap;border:2px solid var(--alert);background:var(--alert-soft)">${prev}<div><b style="color:var(--alert)">${inf.titolo}</b><div style="font-size:14px;margin-top:2px">${inf.consiglio}</div>${misura}</div></div>`+scatta('Rifai la foto');
-    else fotoBox=`<div class="pcard row" style="padding:12px;gap:12px;flex-wrap:nowrap;border:2px solid var(--ok);background:var(--ok-soft)">${prev}<div><b style="color:var(--ok)">Foto nitida, bolla accettata</b><div style="font-size:14px;margin-top:2px">Salvata con ora e posizione.</div>${misura}</div></div>`;
+    else if(f===0) fotoBox=scatta('');
+    else if(f===1) fotoBox=`<div class="pcard row" style="padding:12px;gap:12px;flex-wrap:nowrap;border:2px solid var(--alert);background:var(--alert-soft)">${prev}<div><b style="color:var(--alert);font-size:18px">Rifai</b><div style="font-weight:600">${inf.titolo}</div><div style="font-size:14px;margin-top:2px">${inf.consiglio}</div>${misura}</div></div>`+scatta('');
+    else fotoBox=`<div class="pcard row" style="padding:12px;gap:12px;flex-wrap:nowrap;border:2px solid var(--ok);background:var(--ok-soft)">${prev}<div><b style="color:var(--ok);font-size:18px">✓ Foto buona</b><div style="font-size:14px;margin-top:2px">Salvata con ora e posizione.</div>${misura}</div></div>`;
     inner=`<div class="pscr">
       <button class="back" data-act="aDett">Indietro</button>
-      <div class="ptitle">Prova di consegna</div>
-      <div class="lbl">Firma del destinatario sulla bolla, poi la foto</div>
+      <div class="row" style="gap:10px;flex-wrap:nowrap"><span style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;${f===2?'background:var(--ok);color:#fff':'border:2px solid currentColor'}">${f===2?'✓':'4'}</span><div class="ptitle">Bolla</div></div>
+      <div style="font-size:18px">Fai la foto alla bolla firmata.</div>
       ${fotoBox}
+      <div class="lbl">Se la foto è sfocata o buia diventa rossa: rifalla. Poi premi Conferma.</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="aOk" ${f===2?'':'disabled style="opacity:.35;cursor:not-allowed"'}>${f===2?'Conferma consegna':'Prima la foto della bolla'}</button>
+      <button class="bigbtn" data-act="aOk" ${f===2?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Conferma</button>
     </div>`;
   }
   if(a.scr==='mancata'){
@@ -1200,7 +1221,7 @@ function autistiApp(){
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App autisti</h2><p class="muted" style="margin:8px 0 0">Il telefono dell’autista. Gli accessori arrivano già dalla bolla.</p>
-      <ol><li>Tocca la prima fermata, Snam.</li><li>Premi «Scansiona» per leggere i colli.</li><li>Prova «+ Aggiungi accessorio».</li><li>Premi «Consegnato», poi «Fotografa la bolla firmata»: si apre la fotocamera vera. Fai una foto mossa e poi una ferma: la prima viene rifiutata, la seconda accettata.</li><li>Su un’altra fermata prova «Non consegnato» e poi «Torna in magazzino: giacenza».</li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.</li></ol>
+      <ol><li>Tocca la prima fermata, Snam. La pagina si legge dall’alto: 1 Colli, 2 Accessori, 3 Firma. Ogni blocco si accende quando hai finito quello sopra.</li><li>Premi il tasto con la fotocamera per scansionare i colli, spunta la sponda, poi il tasto con la penna quando il cliente ha firmato. Prova anche «+ Aggiungi».</li><li>Premi «Consegnato»: nella pagina Bolla premi la fotocamera e si apre quella vera. Fai una foto mossa e poi una ferma: la prima viene rifiutata, la seconda accettata.</li><li>Su un’altra fermata prova «Non consegnato» e poi «Torna in magazzino: giacenza».</li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.</li></ol>
       <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px"><label for="soglia"><b>Severità del controllo</b> <span class="lbl">(la regola l’ufficio)</span></label>
       <input id="soglia" type="range" min="10" max="120" step="5" value="${S.a.soglia}" style="width:100%;margin-top:8px">
       <div class="row between lbl"><span>Morbido</span><span>minimo ${S.a.soglia}</span><span>Severo</span></div>
