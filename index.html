@@ -242,14 +242,15 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 .bbar .url{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--muted);background:var(--soft);border-radius:99px;padding:6px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sitoframe{display:block;width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:520px;border:0;background:#f2f3f5}
 .gruppo-tit{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 12px}
-.g-prog{grid-template-columns:repeat(4,minmax(0,1fr))}
-.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-prog{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-siti{grid-template-columns:repeat(4,minmax(0,1fr))}
 .sitocard{padding:20px}
-.sitocard h3{font-size:24px;letter-spacing:-.025em}
+.sitocard h3{font-size:20px;letter-spacing:-.02em}
 .minibar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:var(--soft);margin-bottom:8px}
 .minibar i{width:8px;height:8px;border-radius:99px;background:rgba(17,18,20,.18);flex:none}
 .minibar span{flex:1;min-width:0;text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:1000px){.g-prog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.g-siti{grid-template-columns:1fr}}
 .portbar{display:flex;flex-direction:column;gap:12px;padding:14px 16px;margin-bottom:14px}
 @media (max-width:760px){.sitoframe{height:calc(100dvh - 190px);min-height:460px}}
@@ -885,6 +886,7 @@ function tabs(){
 function hint(text){return `<div class="hint glass"><b>Da provare</b><span>${text}</span></div>`;}
 
 function intro(){
+  const WEB=['negozio','portale','sitoT','sitoC'];
   const parts=[
     ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi, autisti, Telepass e presenze.'],
     ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
@@ -907,11 +909,11 @@ function intro(){
   </section>
   <h2 class="gruppo-tit">Programmi</h2>
   <div class="grid g-prog" style="margin-bottom:22px">
-    ${parts.filter(p=>p[0].indexOf('sito')!==0).map(p=>`<button class="part glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+    ${parts.filter(p=>WEB.indexOf(p[0])<0).map(p=>`<button class="part glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
   </div>
-  <h2 class="gruppo-tit">Siti pubblici</h2>
+  <h2 class="gruppo-tit">Siti web</h2>
   <div class="grid g-siti" style="margin-bottom:16px">
-    ${parts.filter(p=>p[0].indexOf('sito')===0).map(p=>`<button class="part sitocard glass" data-act="view" data-arg="${p[0]}"><span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>${p[0]==='sitoT'?'www.messina-autotrasporti.it':'www.[dominio-corporation]'}</span></span><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+    ${WEB.map(k=>parts.find(p=>p[0]===k)).map(p=>`<button class="part sitocard glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>${({negozio:'negozio.[dominio]',portale:'portale.[dominio]',sitoT:'www.messina-autotrasporti.it',sitoC:'www.[dominio-corporation]'})[p[0]]}</span></span><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
   </div>
   <div class="grid g2">
     <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di una consegna</h3>${steps(consegna)}</div>
