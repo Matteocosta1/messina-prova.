@@ -250,7 +250,7 @@ const S = {
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
-const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','Entrate'],['negozio','Negozio online']];
+const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App Corporation'],['negozio','Negozio online']];
 const T_NAV=[['home','Home'],['anomalie','Anomalie'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
@@ -580,7 +580,10 @@ const A={
   kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
   kPiu:()=>{S.k.prezzo+=10;},
   kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.n+=1;},
-  kBanc:v=>{S.k.banc=v;},
+  kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto='S11-2-1';},
+  kNbStampa:()=>{S.k.nb.stampata=true;},
+  kNbPosto:()=>{if(S.k.nb.stampata)S.k.nb.posto='S11-3-2';},
+  kNbFatto:()=>{if(!S.k.nb.posto)return; S.k.banc='B-0147'; S.k.bancPosto=S.k.nb.posto; S.k.scr='bancale';},
   /* negozio */
   nHome:()=>{S.n.view='home'; S.n.payMsg=false;},
   nCart:()=>{S.n.view='cart'; S.n.payMsg=false;},
@@ -607,7 +610,7 @@ function intro(){
     ['magazzino','App magazzino','Entrata, uscita, trasferimenti e missioni: ogni collo scansionato con il suo posto.'],
     ['presenze','App presenze','Il badge virtuale sul telefono: entrata e uscita con un QR che cambia ogni 30 secondi.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
-    ['carico','Entrate','Foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
+    ['carico','App Corporation','Entrate: foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
     ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.']
   ];
   const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['view','magazzino','La merce entra in magazzino ed esce sul camion, sempre scansionata','App magazzino'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
@@ -1393,19 +1396,36 @@ function caricoApp(){
   if(k.scr==='bancale'){
     inner=`<div class="pscr">
       ${kSteps('bancale')}
-      <div class="lbl">Su quale bancale lo metti? Spara l’etichetta del bancale, oppure creane uno nuovo.</div>
-      ${k.banc?`<div class="pcard row between" style="padding:14px"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.banc==='B-0142'?'S11-2-1':'Ricevimento'} · ${k.banc==='B-0142'?'14 computer':'nuovo, etichetta stampata'}</div></div>${pill('Letto','ok')}</div>`
+      <div style="font-size:17px">Su quale bancale lo metti? Scansiona l’etichetta del bancale, oppure premi «Nuovo».</div>
+      ${k.banc?`<div class="pcard row between" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.bancPosto} · ${k.banc==='B-0142'?'14 computer':'nuovo'}</div></div><b style="color:var(--ok);font-size:20px">✓</b></div>`
       :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
-      <div class="row" style="gap:8px">${b('Scansiona','kBanc','B-0142','ghost')}${b('Nuovo','kBanc','B-0147','ghost')}</div>
       <div style="flex:1"></div>
+      <button class="bigbtn ghost" data-act="kBanc" data-arg="B-0142" style="display:flex;align-items:center;justify-content:center;gap:10px">${KI.cam}Scansiona</button>
+      <button class="bigbtn ghost" data-act="kBanc" data-arg="nuovo" style="display:flex;align-items:center;justify-content:center;gap:10px">${KI.pal}Nuovo</button>
       <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Conferma</button>
+    </div>`;
+  }
+  if(k.scr==='nuovoB'){
+    const nb=k.nb, st=(done,on)=>done?'border:2px solid var(--ok);background:var(--ok-soft);':(on?'border:2px solid var(--solid);':'opacity:.4;pointer-events:none;');
+    const num=(n,done)=>`<span style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;${done?'background:var(--ok);color:#fff':'border:2px solid currentColor'}">${done?'✓':n}</span>`;
+    inner=`<div class="pscr">
+      <button class="back" data-act="kGo" data-arg="bancale">Indietro</button>
+      <div><div class="lbl">Bancale nuovo</div><div class="ptitle">B-0147</div></div>
+      <div class="pcard stack" style="padding:14px;gap:10px;${st(nb.stampata,true)}"><div class="row" style="gap:10px;flex-wrap:nowrap">${num(1,nb.stampata)}<b style="font-size:20px">Etichetta</b></div>
+        <div style="font-size:17px">${nb.stampata?'Stampata: attaccala sul bancale.':'Stampa l’etichetta con il QR e attaccala sul bancale.'}</div>
+        ${nb.stampata?'':`<button class="bigbtn" data-act="kNbStampa">Stampa</button>`}</div>
+      <div class="pcard stack" style="padding:14px;gap:10px;${st(!!nb.posto,nb.stampata)}"><div class="row" style="gap:10px;flex-wrap:nowrap">${num(2,!!nb.posto)}<b style="font-size:20px">Posto</b></div>
+        <div style="font-size:17px">${nb.posto?'Messo in '+nb.posto+': è già nella pianta del magazzino.':'Porta il bancale nel posto libero proposto, <b>S11-3-2</b>, e scansiona l’etichetta dello scaffale.'}</div>
+        ${nb.posto?'':`<button class="bigbtn" data-act="kNbPosto" aria-label="Scansiona il posto" style="display:flex;align-items:center;justify-content:center">${KI.cam}</button>`}</div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kNbFatto" ${nb.posto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Fatto</button>
     </div>`;
   }
   if(k.scr==='fatto'){
     const att=Object.keys(k.canali).filter(x=>k.canali[x]);
     inner=`<div class="pscr">
       <div class="pcard" style="padding:12px 14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Caricato</b></div>
-      <div class="lbl">Mettilo sul bancale ${k.banc}${k.banc==='B-0142'?', posto S11-2-1':', in ricevimento'}. È già nell’inventario della Corporation e nell’Excel.</div>
+      <div class="lbl">Mettilo sul bancale ${k.banc}, posto ${k.bancPosto}. È già nell’inventario della Corporation e nell’Excel.</div>
       <div class="pcard row" style="padding:16px;gap:14px;flex-wrap:nowrap">
         <svg width="76" height="76" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges" style="flex:none;background:#ffffff;border-radius:6px"><g fill="#111214"><rect x="0" y="0" width="7" height="7"></rect><rect x="14" y="0" width="7" height="7"></rect><rect x="0" y="14" width="7" height="7"></rect></g><g fill="#ffffff"><rect x="1" y="1" width="5" height="5"></rect><rect x="15" y="1" width="5" height="5"></rect><rect x="1" y="15" width="5" height="5"></rect></g><g fill="#111214"><rect x="2" y="2" width="3" height="3"></rect><rect x="16" y="2" width="3" height="3"></rect><rect x="2" y="16" width="3" height="3"></rect><rect x="9" y="1" width="2" height="2"></rect><rect x="8" y="5" width="3" height="1"></rect><rect x="9" y="8" width="4" height="2"></rect><rect x="14" y="9" width="2" height="3"></rect><rect x="17" y="10" width="3" height="2"></rect><rect x="8" y="12" width="2" height="3"></rect><rect x="11" y="14" width="3" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect><rect x="18" y="17" width="2" height="3"></rect><rect x="9" y="17" width="3" height="3"></rect><rect x="1" y="9" width="3" height="2"></rect></g></svg>
         <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">PF3XXXXX · lotto L-015 · ${k.banc}</div></div>
@@ -1416,7 +1436,7 @@ function caricoApp(){
     </div>`;
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>Entrate</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
+    <div class="appinfo glass"><h2>App Corporation</h2><p style="margin:8px 0 0"><b>Entrate</b>: caricare un computer o un telefono in magazzino.</p><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
       <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Conferma»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
