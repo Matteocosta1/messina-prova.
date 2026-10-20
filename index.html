@@ -243,7 +243,7 @@ const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
@@ -262,6 +262,7 @@ const b=(label,act,arg,cls)=>`<button class="btn ${cls||''}" data-act="${act}" d
 const chip=(label,act,arg,on)=>`<button class="chipbtn ${on?'on':''}" data-act="${act}" data-arg="${arg}">${label}</button>`;
 const badge=n=>n>0?`<span class="badge">${n}</span>`:'';
 const warn=t=>`<div class="warn">${t}</div>`;
+const warnW=(w,n)=>`<div class="warn row" style="gap:0">${w}${badge(n)}</div>`;
 const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
 const srch=(ph,id)=>`<label class="search">${SEARCH}<span class="sr">Cerca</span><input id="${id}" placeholder="${ph}"></label>`;
 const msg=(text,btnLabel,act,arg)=>`<div class="msg"><span>${text}</span>${btnLabel?b(btnLabel,act,arg,'sm'):''}</div>`;
@@ -427,12 +428,12 @@ const C_MAILS=[
  {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0142.',azGo:'ordini'}
 ];
 const DEVICES=[
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'S11-2-1',banc:'B-0142',costo:'€ 61',price:'€ 249',status:'In vendita su 4 siti',gg:9},
- {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'S11-3-2',banc:'B-0139',costo:'€ 61',price:'€ 329',status:'Venduto su eBay',gg:3},
- {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'S12-1-1',banc:'B-0121',costo:'€ 61',price:'€ 179',status:'Fermo da 64 giorni',gg:64},
- {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'S11-1-3',banc:'B-0145',costo:'€ 61',price:'€ 449',status:'In vendita su 3 siti',gg:12},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'S11-2-3',banc:'B-0144',costo:'€ 61',price:'€ 399',status:'In vendita su 4 siti',gg:5},
- {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'Ricevimento',banc:'B-0146',costo:'€ 61',price:'€ 219',status:'Da fotografare',gg:1}
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'S11-2-1',banc:'B-0142',costo:'€ 61',price:'€ 249',stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Subito',gpu:'Intel Iris Xe',gg:9},
+ {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'S11-3-2',banc:'B-0139',costo:'€ 61',price:'€ 329',stato:'Venduto',siti:'eBay',gpu:'Intel Iris Xe',gg:3},
+ {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'S12-1-1',banc:'B-0121',costo:'€ 61',price:'€ 179',stato:'Fermo',siti:'Back Market, eBay, Subito',gpu:'Intel Iris Xe',gg:64},
+ {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'S11-1-3',banc:'B-0145',costo:'€ 61',price:'€ 449',stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gpu:'Apple M1 7 core',gg:12},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'S11-2-3',banc:'B-0144',costo:'€ 61',price:'€ 399',stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon',gpu:'Intel Iris Xe',gg:5},
+ {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'Ricevimento',banc:'B-0146',costo:'€ 61',price:'€ 219',stato:'Reso',siti:'—',gpu:'Intel UHD',gg:1}
 ];
 const ORDINI=[
  ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
@@ -543,6 +544,7 @@ const A={
   cFwd:()=>{S.c.mailMsg='inoltrata'; S.c.reply=false;},
   cAssign:()=>{S.c.mailMsg='assegnata'; S.c.reply=false;},
   cVista:v=>{S.c.vista=v;},
+  cPer:v=>{S.c.per=v;},
   cBrand:v=>{S.c.brand=v;},
   cGrado:v=>{S.c.grado=v;},
   cLic:()=>{S.c.licOk=true;},
@@ -582,7 +584,7 @@ function intro(){
   const parts=[
     ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi, autisti, Telepass e presenze.'],
     ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
-    ['magazzino','App magazzino','Entrata, uscita, trasferimenti e verifiche: ogni collo scansionato con il suo posto.'],
+    ['magazzino','App magazzino','Entrata, uscita, trasferimenti e missioni: ogni collo scansionato con il suo posto.'],
     ['presenze','App presenze','Il badge virtuale sul telefono: entrata e uscita con un QR che cambia ogni 30 secondi.'],
     ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
     ['carico','Entrate','Foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
@@ -706,7 +708,7 @@ function trasp(){
   }
   if(s==='magazzino'){
     title='Magazzino'; hintTxt='tocca uno scaffale e poi un posto per vedere il Contenuto; apri «Storico» per tutte le operazioni di tutti.';
-    const tabsM=[['pianta','Pianta'],['controllo','Controllo'],['mov','Movimenti'],['inv','Verifiche'],['storico','Storico']];
+    const tabsM=[['pianta','Pianta'],['controllo','Controllo'],['mov','Movimenti'],['inv','Missioni'],['storico','Storico']];
     const cliF=t.magCli, match=c=>cliF==='Tutti'||c===cliF;
     const ko=CONTROLLO.filter(r=>r.letti!==r.attesi).length;
     let inner='';
@@ -737,7 +739,7 @@ function trasp(){
     }
     if(t.magTab==='controllo'){
       const list=CONTROLLO.filter(r=>match(r.cli));
-      inner=`${ko?warn(ko+' bolle da controllare: i colli scansionati non tornano con la bolla'):msg('Tutto torna: ogni collo delle bolle di oggi è stato scansionato.')}
+      inner=`${ko?warnW('Colli',ko):msg('Tutto torna.')}
       <div class="glass tbox"><table class="t" style="min-width:820px"><thead><tr><th>Ora</th><th>Bolla</th><th>Cliente</th><th>Movimento</th><th>Colli in bolla</th><th>Scansionati</th><th>Chi</th><th>Esito</th></tr></thead><tbody>
       ${list.map(r=>{const ok=r.letti===r.attesi;return `<tr class="${ok?'okrow':'korow'}"><td>${r.ora}</td><td>${r.bolla}</td><td><b>${r.cli}</b></td><td>${r.tipo}</td><td>${r.attesi.toLocaleString('it-IT')}</td><td>${r.letti.toLocaleString('it-IT')}</td><td>${r.chi}</td><td>${ok?'Torna':r.manca}</td></tr>`;}).join('')}
       </tbody></table></div>
@@ -751,7 +753,7 @@ function trasp(){
     }
     if(t.magTab==='storico'){
       const all=t.log.concat(STORICO).filter(r=>t.stF==='Tutto'||r[5]===t.stF);
-      inner=`${warn('2 cose strane da guardare')}
+      inner=`${warnW('Anomalie',2)}
       <div class="grid g2">
         <div class="glass card stack" style="gap:6px"><b>Collo Apple mancante</b><div>Bolla [n. bolla]: 12 colli, 11 caricati alle 09:02. L’ultimo a toccarlo è stato Magazziniere 3 in uscita; dopo, nessuna scansione.</div><div class="lbl">Da chiarire con la persona: può essere un errore.</div></div>
         <div class="glass card stack" style="gap:6px"><b>Modifiche a mano</b><div>Magazziniere 2 oggi ha fatto 2 modifiche a mano, entrambe in calo di quantità. Di solito ne fa una a settimana.</div><div class="lbl">Da chiarire con la persona: può essere un errore.</div></div>
@@ -765,12 +767,12 @@ function trasp(){
     if(t.magTab==='inv'){
       const done=Object.keys(S.m.conta).length, diff=Object.keys(S.m.conta).filter(k=>S.m.conta[k]==='diff');
       inner=`<div class="grid g2">
-        <div class="glass card stack"><b>Verifica in corso · Scaffale S07 (Econocom)</b>
+        <div class="glass card stack"><b>Missione in corso · Scaffale S07 (Econocom)</b>
           <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div>
           <div class="lbl">${done} di ${CONTA.length} posti controllati · si salva a ogni scansione, anche se il magazziniere esce dall’app</div>
           ${diff.length?msg('Differenza in '+CONTA[+diff[0]][0]+': il programma ha trovato meno pezzi di quelli registrati. Mandare qualcuno a ricontare.'):''}
           <div class="row">${b('Apri l’app magazzino','view','magazzino','ghost')}</div></div>
-        <div class="glass card stack"><b>Lancia una verifica</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
+        <div class="glass card stack"><b>Nuova missione</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
           <div class="row">${['Tutto','Zona','Scaffale','Cliente'].map(x=>chip(x,'noop','',x==='Scaffale')).join('')}</div>
           <div class="row">${b('Lancia','tInv')}</div></div>
       </div>
@@ -856,15 +858,15 @@ function trasp(){
       </tbody></table></div>`;
     }
     if(t.presTab==='fix'){
-      inner=`${nFix?warn(nFix+' uscite da correggere'):msg('Nessuna timbratura da correggere.')}<p class="lbl" style="margin:0">Il programma suggerisce l’orario guardando l’ultima attività nelle app. Angela conferma o corregge.</p>
-      <div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Dipendente</th><th>Entrata</th><th>Problema</th><th>Suggerimento</th><th></th></tr></thead><tbody>
-      ${PRES_IERI.map((x,i)=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${t.presFix[i]?pill('Sistemata','ok'):`<span class="miss">${x[2]}</span>`}</td><td class="lbl">${x[3]}</td><td>${t.presFix[i]?'':b('Usa il suggerimento','tPresFix',i,'ghost sm')}</td></tr>`).join('')}
+      inner=`${nFix?warnW('Uscite',nFix):msg('Tutto a posto.')}<p class="lbl" style="margin:0">Il programma suggerisce l’orario guardando l’ultima attività nelle app. Angela conferma o corregge.</p>
+      <div class="glass tbox"><table class="t" style="min-width:760px"><thead><tr><th>Dipendente</th><th>Entrata</th><th>Manca</th><th>Suggerimento</th><th></th></tr></thead><tbody>
+      ${PRES_IERI.map((x,i)=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${t.presFix[i]?pill('Sistemata','ok'):`<span class="miss">Uscita</span>`}</td><td class="lbl">${x[3]}</td><td>${t.presFix[i]?'':b('Sistema','tPresFix',i,'ghost sm')}</td></tr>`).join('')}
       </tbody></table></div>`;
     }
     if(t.presTab==='allarmi'){
       const live=S.b.finto?[{ora:'Adesso',badge:'Christian',tel:'Telefono non registrato (iPhone)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'}]:[];
       const AL=live.concat(ALLARMI);
-      inner=`${nAll>0?warn(nAll+' tentativi di timbratura bloccati da guardare'):''}<div class="glass card row between"><span><b>Tentativi bloccati</b> <span class="lbl">il lettore non ha timbrato, ma ha registrato di chi era il badge</span></span>${pill('Riservato','dark')}</div>
+      inner=`${nAll>0?warnW('Sospette',nAll):''}<div class="row between"><span class="lbl">Timbrature rifiutate: il lettore non ha timbrato, ma ha registrato di chi era il badge.</span>${pill('Riservato','dark')}</div>
       ${t.allMsg?msg(t.allMsg):''}
       <div class="glass tbox"><table class="t" style="min-width:980px"><thead><tr><th>Quando</th><th>Badge di</th><th>Da quale telefono</th><th>Dove</th><th>Cosa è successo</th><th></th></tr></thead><tbody>
       ${AL.map((a,i)=>`<tr class="${t.allVisti[i]?'':'korow'}"><td>${a.ora}</td><td><b>${a.badge}</b></td><td>${a.tel}</td><td>${a.ingresso}</td><td>${a.tipo}</td><td>${t.allVisti[i]?pill('Gestito','ok'):b('Avvisa il dipendente','tAllVisto',i,'ghost sm')}</td></tr>`).join('')}
@@ -970,6 +972,10 @@ function corp(){
       <div class="glass card"><div class="lbl">Ordini da spedire</div><div class="big">9</div><div class="lbl">entro le 16:00</div></div>
       <div class="glass card"><div class="lbl">Incassato ottobre</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
     </div>
+    <div class="glass card stack">
+      <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
+      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti','430'],['Formattati','412'],['In corso','16'],['Falliti','2'],['In vendita','38']]:[['Ricevuti','8.640'],['Formattati','8.512'],['In corso','16'],['Falliti','41'],['In vendita','612']]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Falliti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
+    </div>
     <div class="grid g2">
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
         <button class="li" data-act="cGo" data-arg="inv"><span class="row between" style="width:100%"><span>11 PC fermi da oltre 60 giorni</span>${pill('Inventario','red')}</span></button>
@@ -1009,9 +1015,9 @@ function corp(){
     const filters=`<div class="row">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'cBrand',x,c.brand===x)).join('')}<span style="width:8px"></span>${['Tutti','A','B','C'].map(x=>chip(x==='Tutti'?'Tutti i gradi':'Grado '+x,'cGrado',x,c.grado===x)).join('')}${toggle}</div>`;
     const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
     if(c.vista==='schede'){
-      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.status}</span></div></div>`).join('')}</div>`:empty);
+      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.stato}</span></div><div class="lbl">${d.siti}</div></div>`).join('')}</div>`:empty);
     } else {
-      body=filters+(list.length?`<div class="glass tbox"><table class="t" style="min-width:1400px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Bancale</th><th>Posto</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.banc}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td class="lbl">${d.status}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
+      body=filters+(list.length?`<div class="glass tbox"><table class="t nw" style="min-width:1700px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>Scheda video</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Bancale</th><th>Posto</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Siti</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.gpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.banc}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td>${d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato))}</td><td class="lbl">${d.siti}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
     }
   }
   if(s==='ordini'){
@@ -1195,11 +1201,11 @@ function magApp(){
     const done=Object.keys(m.conta).length;
     inner=`<div class="pscr">
       <div><div class="lbl">Martedì 20 ottobre · Magazziniere 1</div><div class="ptitle">Magazzino</div></div>
-      ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Verifica da fare · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
+      ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Missione · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
       ${big('Entrata','mGo','entrata','Scarico dal camion e metto a posto',true)}
       ${big('Uscita','mGo','uscita','Preparo e carico una spedizione')}
       ${big('Trasferisci','mGo','sposta','Cambio posto a un collo o a un bancale')}
-      ${big('Verifica','mGo','conta','Controllo uno scaffale: scansiono quello che trovo')}
+      ${big('Missioni','mGo','conta','Controlli mandati dall’ufficio')}
     </div>`;
   }
   if(m.scr==='entrata'){
@@ -1234,13 +1240,13 @@ function magApp(){
     const done=Object.keys(m.conta).length;
     if(m.contaCur===null){
       inner=`<div class="pscr">${back}
-        <div><div class="lbl">Compito obbligatorio dall’ufficio</div><div class="ptitle">Verifica · Scaffale S07</div></div>
+        <div><div class="lbl">Mandata dall’ufficio</div><div class="ptitle">Missione · S07</div></div>
         <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div><div class="lbl">${done} di ${CONTA.length} posti · salvato a ogni scansione</div>
         ${CONTA.map((c,i)=>`<button class="stop ${m.conta[i]?'done':''}" data-act="mConta" data-arg="${i}"><span class="n">${i+1}</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${c[0]}</b><span class="lbl">${c[1]}</span></span><b style="font-size:12px">${m.conta[i]?'Fatto':''}</b></button>`).join('')}
-        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Verifica finita</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
+        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Missione finita</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
       </div>`;
     } else {
-      inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Verifica</button>
+      inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Missione</button>
         <div class="ptitle">${CONTA[m.contaCur][0]}</div>
         <div class="scanbox"><b style="font-size:18px">Scansiona tutto quello che c’è in questo posto</b><span class="lbl">Uno per uno. Il confronto con quello che dovrebbe esserci lo fa il programma.</span></div>
         <div style="flex:1"></div>
@@ -1249,8 +1255,8 @@ function magApp(){
     }
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste. I tasti sono Entrata, Uscita, Trasferisci e Verifica.</p>
-      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso della verifica, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
+    <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste. I tasti sono Entrata, Uscita, Trasferisci e Missioni.</p>
+      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso della missione, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
@@ -1269,8 +1275,7 @@ function caricoApp(){
       ${kSteps('scan')}
       <div class="lbl">Lotto L-015 · ${k.n} di 612 caricati</div>
       <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM 20W0XXXXIX</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N PF3XXXXX</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
-      <button class="bigbtn" data-act="kGo" data-arg="scheda">Fotografa il seriale</button>
-      <button class="bigbtn ghost" style="font-size:16px" data-act="kGo" data-arg="scheda">Seriale illeggibile? Scrivilo a mano</button>
+      <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="bigbtn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.cam}Foto</button><button class="bigbtn ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.pen}Manuale</button></div>
     </div>`;
   }
   if(k.scr==='scheda'){
@@ -1283,7 +1288,7 @@ function caricoApp(){
         <div class="kvp"><span>Processore</span><b>Intel i5-1135G7</b></div><div class="kvp"><span>RAM</span><b>16 GB</b></div><div class="kvp"><span>Disco</span><b>256 GB SSD</b></div><div class="kvp"><span>Schermo</span><b>14", Full HD</b></div><div class="kvp"><span>Cancellazione Certus</span><b>Completata</b></div><div class="kvp" style="border:0"><span>Batteria dal report</span><b>87%</b></div>
       </div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="kGo" data-arg="grado">Tutto giusto, avanti</button>
+      <button class="bigbtn" data-act="kGo" data-arg="grado">Avanti</button>
     </div>`;
   }
   if(k.scr==='grado'){
@@ -1294,7 +1299,6 @@ function caricoApp(){
       <div class="grades">${['A','B','C','D'].map(g=>`<button class="gbtn ${k.grado===g?'on':''}" data-act="kGrado" data-arg="${g}">${g}</button>`).join('')}</div>
       <div class="lbl">Difetti visti</div>
       <div class="row" style="gap:8px">${dif.map(x=>`<button class="${k.difetti[x]?on:off}" data-act="kDif" data-arg="${x}">${x}</button>`).join('')}</div>
-      <button class="bigbtn ghost" style="font-size:16px" data-act="kGo" data-arg="grado">Foto per l’annuncio</button>
       <div style="flex:1"></div>
       <button class="bigbtn" data-act="kGo" data-arg="prezzo">Avanti</button>
     </div>`;
@@ -1319,9 +1323,9 @@ function caricoApp(){
       <div class="lbl">Su quale bancale lo metti? Spara l’etichetta del bancale, oppure creane uno nuovo.</div>
       ${k.banc?`<div class="pcard row between" style="padding:14px"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.banc==='B-0142'?'S11-2-1':'Ricevimento'} · ${k.banc==='B-0142'?'14 computer':'nuovo, etichetta stampata'}</div></div>${pill('Letto','ok')}</div>`
       :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
-      <div class="row" style="gap:8px">${b('Spara il bancale','kBanc','B-0142','ghost')}${b('Nuovo bancale','kBanc','B-0147','ghost')}</div>
+      <div class="row" style="gap:8px">${b('Scansiona','kBanc','B-0142','ghost')}${b('Nuovo','kBanc','B-0147','ghost')}</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Stampa etichetta e pubblica</button>
+      <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Pubblica</button>
     </div>`;
   }
   if(k.scr==='fatto'){
@@ -1335,12 +1339,12 @@ function caricoApp(){
       </div>
       <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}. Quando si vende su un sito, sparisce dagli altri.</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="kGo" data-arg="scan">Fotografa il prossimo</button>
+      <button class="bigbtn" data-act="kGo" data-arg="scan">Prossimo</button>
     </div>`;
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>Entrate</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
-      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Fotografa il seriale» e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Spara il bancale o creane uno nuovo.</li><li>Premi «Stampa etichetta e pubblica»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
+      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Pubblica»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
