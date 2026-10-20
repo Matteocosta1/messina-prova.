@@ -245,13 +245,13 @@ const S = {
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
-  m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null},
+  m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
 const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','Entrate'],['negozio','Negozio online']];
-const T_NAV=[['home','Home'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze']];
+const T_NAV=[['home','Home'],['anomalie','Anomalie'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['presenze','Presenze']];
 const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari']];
 
 const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
@@ -260,6 +260,7 @@ const CLIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="
 
 const b=(label,act,arg,cls)=>`<button class="btn ${cls||''}" data-act="${act}" data-arg="${arg===undefined?'':arg}">${label}</button>`;
 const chip=(label,act,arg,on)=>`<button class="chipbtn ${on?'on':''}" data-act="${act}" data-arg="${arg}">${label}</button>`;
+const ora=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
 const badge=n=>n>0?`<span class="badge">${n}</span>`:'';
 const warn=t=>`<div class="warn">${t}</div>`;
 const warnW=(w,n)=>`<div class="warn row" style="gap:0">${w}${badge(n)}</div>`;
@@ -377,6 +378,15 @@ const MOVIMENTI=[
  ['07:40','Entrata','Snam','40 colli','Ricevimento → S04-2-3','Magazziniere 1']
 ];
 const CONTA=[['S07-1-1','Econocom'],['S07-1-2','Econocom'],['S07-2-1','Econocom'],['S07-2-2','Econocom'],['S07-3-1','Econocom'],['S07-3-2','Econocom']];
+const CONTA_IT=[
+ ['Notebook Lenovo T14','Notebook Lenovo T14','Docking Lenovo'],
+ ['Monitor Dell 24″','Monitor Dell 24″','Monitor Dell 24″'],
+ ['Notebook HP EliteBook','Alimentatore HP','Notebook HP EliteBook'],
+ ['Notebook Dell Latitude','Notebook Dell Latitude','Docking Dell','Notebook Dell Latitude'],
+ ['Scatola tastiere ×10','Scatola mouse ×10'],
+ ['Notebook Lenovo T14','Notebook Lenovo T14','Notebook Lenovo T14']];
+const CONTA_EXTRA='Notebook HP ProBook';
+const CONTA_PLAN=i=>i===3?[1,'X',0,3]:CONTA_IT[i].map((x,j)=>j).reverse();
 const USCITA=[['Collo 1 di 4','S03-2-1'],['Collo 2 di 4','S03-2-1'],['Collo 3 di 4','S03-2-2'],['Collo 4 di 4','S03-2-2']];
 const GIACENZE=[
  {sped:'[n. spedizione]',cliente:'Apple',dest:'[Destinatario], Rozzano',motivo:'Destinatario assente',dal:'Ven 16 ottobre',gg:3,rico:'Da prenotare'},
@@ -505,7 +515,9 @@ const A={
   tContMan:()=>{const c=S.t.posto; const now=new Date(); const h=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'); S.t.contMan=(S.t.contMan||{}); S.t.contMan[c]=true; S.t.log.unshift([h,'Tu','Modifica','Quantità cambiata a mano',c,'Manuale']);},
   tStF:v=>{S.t.stF=v;},
   tCerca:v=>{S.t.cerca=v;},
-  tInv:()=>{S.t.invOn=true; S.m.conta={};},
+  tInv:()=>{S.t.invOn=true; S.m.conta={}; S.m.cs={}; S.m.blocchi={}; S.m.contaMsg='';},
+  tSblocca:i=>{const el=document.getElementById('sbl-'+i); const v=el?el.value.trim():''; if(!v){S.m.sblErr=i; return;} S.m.sblErr=null; S.m.blocchi[i].ok=v; S.m.conta[i]='sbl'; S.t.log.unshift([ora(),'Ufficio','Sblocco',v,CONTA[i][0],'Manuale']);},
+  tAnGo:v=>{const x=v.split('|'); S.t.sec=x[0]; if(x[0]==='magazzino')S.t.magTab=x[1]; if(x[0]==='presenze')S.t.presTab=x[1]; window.scrollTo(0,0);},
   /* app magazzino */
   mGo:v=>{S.m.scr=v; S.m.inStep=0; S.m.mvStep=0; S.m.contaCur=null; window.scrollTo(0,0);},
   mHome:()=>{S.m.scr='home'; S.m.contaCur=null;},
@@ -516,8 +528,12 @@ const A={
   mOutReset:()=>{S.m.outN=0; S.m.outErr=false; S.m.errShown=false; S.m.outGo=false;},
   mMv:()=>{S.m.mvStep=Math.min(2,S.m.mvStep+1);},
   mMvReset:()=>{S.m.mvStep=0;},
-  mConta:i=>{S.m.contaCur=+i;},
-  mContaScan:()=>{const i=S.m.contaCur; S.m.conta[i]=(i===3)?'diff':'ok'; S.m.contaCur=null;},
+  mConta:i=>{i=+i; if(S.m.conta[i])return; S.m.contaCur=i; S.m.contaMsg=''; if(!S.m.cs[i])S.m.cs[i]={seen:[],extra:false,step:0};},
+  mContaScan:()=>{const i=S.m.contaCur, c=S.m.cs[i], pl=CONTA_PLAN(i); if(c.step>=pl.length)return; const x=pl[c.step++]; if(x==='X')c.extra=true; else c.seen.push(x);
+    if(c.seen.length===CONTA_IT[i].length&&!c.extra){S.m.conta[i]='ok'; S.m.contaCur=null; S.m.contaMsg=CONTA[i][0]+': tutto torna, posto chiuso.';}},
+  mContaBlocca:()=>{const i=S.m.contaCur, c=S.m.cs[i]; const manca=CONTA_IT[i].filter((x,j)=>c.seen.indexOf(j)<0); const extra=c.extra?[CONTA_EXTRA]:[];
+    S.m.conta[i]='blocco'; S.m.blocchi[i]={manca:manca,extra:extra,ok:''}; S.m.contaCur=null; S.m.contaMsg='';
+    S.t.log.unshift([ora(),'Magazziniere 1','Blocco',(manca.length?'Manca: '+manca.join(', '):'')+(manca.length&&extra.length?' · ':'')+(extra.length?'In più: '+extra.join(', '):''),CONTA[i][0],'Pistola']);},
   tGiacChiedi:()=>{S.t.giacMsg='chiesto';},
   tGiacPren:()=>{S.t.giacPren[S.t.giac]=true; S.t.giacMsg='prenotata';},
   /* autisti */
@@ -645,8 +661,19 @@ function mailView(mails,st,pre,actionBtn,cartNames){
     </div></div>`;
 }
 
+function anomalie(){
+  const t=S.t, A=[];
+  CONTROLLO.filter(r=>r.letti!==r.attesi).forEach(r=>A.push(['Magazzino',`${r.cli} · ${r.tipo.toLowerCase()} ${r.letti} di ${r.attesi} colli`,'Magazzino',r.ora,'magazzino|controllo']));
+  Object.keys(S.m.blocchi).filter(k=>!S.m.blocchi[k].ok).forEach(k=>A.push(['Missioni',`${CONTA[k][0]} bloccato: ${S.m.blocchi[k].manca.concat(S.m.blocchi[k].extra).length} pezzi non tornano`,'Ufficio','Oggi','magazzino|inv']));
+  BOLLE.forEach((x,i)=>{if(x.manca&&!t.bolleOk[i])A.push(['Bolle',`${x.cliente} · manca ${x.manca.toLowerCase()}`,x.chi,x.ora,'bolle|']);});
+  const nFix=PRES_IERI.filter((x,i)=>!t.presFix[i]).length; if(nFix)A.push(['Presenze',`${nFix} uscite non timbrate ieri`,'Angela','Ieri','presenze|fix']);
+  const nAll=(S.b.finto?1:0)+ALLARMI.length-Object.keys(t.allVisti).length; if(nAll>0)A.push(['Presenze',`${nAll} timbrature sospette`,'Direzione','Oggi','presenze|allarmi']);
+  A.push(['Fatturazione','Snam · fattura da controllare','Angela','Oggi','fatture|']);
+  A.push(['Telepass','3 passaggi fuori orario o senza giro','Direzione','Ieri','telepass|']);
+  return A;
+}
 function trasp(){
-  const t=S.t, s=t.sec; let body='', title='', hintTxt='';
+  const t=S.t, s=t.sec; let body='', title='', hintTxt=''; const AN=anomalie();
   if(s==='home'){
     title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare dritta alla pagina giusta.';
     body=`<div class="grid g4">
@@ -679,7 +706,7 @@ function trasp(){
     body=mailView(T_MAILS,t,'t',ab,['In arrivo','Ordini','Clienti','Inviate']);
   }
   if(s==='bolle'){
-    title='Bolle'; hintTxt='scegli una bolla, controlla i dati e premi «Conferma bolla». I dati mancanti sono in rosso.';
+    title='Bolle'; hintTxt='scegli una bolla e premi «Conferma». Se manca un dato non si può confermare: premi «Chiedi».';
     const cur=BOLLE[t.bolla], ok=t.bolleOk[t.bolla];
     body=`<div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass" style="flex:1 1 280px;padding:8px;min-width:0"><div class="row between" style="padding:8px 10px"><b>Da confermare</b><span class="lbl">${18-Object.keys(t.bolleOk).length} bolle</span></div><div class="lbl" style="padding:0 10px 8px">Divise in automatico tra Christian, Gabriele e Alberto in base al carico; i clienti girano, così tutti sanno gestire tutti. Se uno è assente, il suo lavoro va agli altri.</div><div class="list">
@@ -698,7 +725,8 @@ function trasp(){
         <div style="border-top:1px solid var(--line);padding-top:12px"><div class="lbl">Tariffa applicata dal contratto</div><div>Base del cliente + accessori · totale <b>€ [importo]</b></div></div>
         ${t.bollaMsg==='ok'||ok?msg('Bolla confermata: è nei giri di domani e gli accessori sono già sull’app dell’autista. Al cliente parte la mail di conferma.','Vai al Traffico','tGo','traffico'):''}
         ${t.bollaMsg==='chiesto'?msg('Mail al cliente pronta in Mail, con la domanda sul dato mancante.'):''}
-        <div class="row">${ok?'':b('Conferma bolla','tConferma')}${cur.manca?b('Chiedi il dato al cliente','tChiedi','','ghost'):''}</div>
+        ${!ok&&cur.manca?warn('Bloccata'):''}
+        <div class="row">${ok?'':(cur.manca?'<button class="btn" disabled style="opacity:.35;cursor:not-allowed">Conferma</button>':b('Conferma','tConferma'))}${cur.manca?b('Chiedi','tChiedi','','ghost'):''}</div>
       </div></div>`;
   }
   if(s==='traffico'){
@@ -770,18 +798,21 @@ function trasp(){
       <p class="lbl" style="margin:0">Ogni scansione, modifica e cancellazione resta registrata e non si può cancellare. Il programma indica dove guardare; chi ha sbagliato lo decidete voi dopo aver parlato con la persona. Da scrivere nell’informativa e da far vedere al consulente.</p>`;
     }
     if(t.magTab==='inv'){
-      const done=Object.keys(S.m.conta).length, diff=Object.keys(S.m.conta).filter(k=>S.m.conta[k]==='diff');
+      const done=Object.keys(S.m.conta).length;
       inner=`<div class="grid g2">
         <div class="glass card stack"><b>Missione in corso · Scaffale S07 (Econocom)</b>
           <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div>
           <div class="lbl">${done} di ${CONTA.length} posti controllati · si salva a ogni scansione, anche se il magazziniere esce dall’app</div>
-          ${diff.length?msg('Differenza in '+CONTA[+diff[0]][0]+': il programma ha trovato meno pezzi di quelli registrati. Mandare qualcuno a ricontare.'):''}
+          ${Object.keys(S.m.blocchi).filter(k=>!S.m.blocchi[k].ok).length?warnW('Bloccati',Object.keys(S.m.blocchi).filter(k=>!S.m.blocchi[k].ok).length):''}
           <div class="row">${b('Apri l’app magazzino','view','magazzino','ghost')}</div></div>
         <div class="glass card stack"><b>Nuova missione</b><div class="lbl">Tutto il magazzino, una zona, uno scaffale o un cliente. Al magazziniere arriva come compito obbligatorio.</div>
           <div class="row">${['Tutto','Zona','Scaffale','Cliente'].map(x=>chip(x,'noop','',x==='Scaffale')).join('')}</div>
           <div class="row">${b('Lancia','tInv')}</div></div>
       </div>
-      <p class="lbl" style="margin:0">Il magazziniere scansiona quello che trova senza vedere quanti pezzi dovrebbero esserci: il confronto lo fa il programma.</p>`;
+      ${Object.keys(S.m.blocchi).map(k=>{const x=S.m.blocchi[k];return `<div class="glass card stack" style="${x.ok?'':'border:2px solid var(--alert)'}"><div class="row between"><b>${CONTA[k][0]} · Econocom</b>${x.ok?pill('Sbloccato','ok'):pill('Bloccato','red')}</div>
+        ${x.manca.length?`<div><span class="lbl">Manca</span> <b class="miss">${x.manca.join(', ')}</b></div>`:''}${x.extra.length?`<div><span class="lbl">In più</span> <b class="miss">${x.extra.join(', ')}</b></div>`:''}
+        ${x.ok?`<div class="lbl">Motivo: ${x.ok}</div>`:`<textarea id="sbl-${k}" rows="2" placeholder="Cosa è successo" style="font:inherit;padding:10px;border-radius:12px;border:1px solid var(--line);width:100%;box-sizing:border-box"></textarea>${S.m.sblErr==k?'<div class="miss">Scrivi cosa è successo prima di sbloccare.</div>':''}<div class="row">${b('Sblocca','tSblocca',k)}</div>`}</div>`;}).join('')}
+      <p class="lbl" style="margin:0">Il magazziniere vede l’elenco di quello che dovrebbe esserci e lo scansiona nell’ordine che vuole. Se qualcosa manca o è in più il posto non si chiude: resta bloccato finché l’ufficio non scrive cosa è successo. Tutto resta nello Storico.</p>`;
     }
     body=`<div class="row">${tabsM.map(x=>chip(x[1]+(x[0]==='controllo'?badge(ko):''),'tMagTab',x[0],t.magTab===x[0])).join('')}</div>
     <div class="row">${MAGCLI.map(x=>chip(x,'tMagCli',x,cliF===x)).join('')}</div>
@@ -896,7 +927,8 @@ function trasp(){
       ${PRES_MESE.map(x=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]} h</td><td>${x[3]} h</td><td>${x[4]} h</td><td>${x[5]} h</td><td class="lbl">${x[6]}</td></tr>`).join('')}
       </tbody></table></div>
       ${t.presMsg==='exp'?msg('Conteggi di ottobre pronti per Angela e per il consulente del lavoro, divisi secondo il contratto di ognuno.'):''}
-      <div class="row">${t.presMsg==='exp'?'':b('Prepara i conteggi del mese','tPresExp')}<span class="lbl">Contributi e tasse: da decidere con la Direzione se li prepara il programma o il consulente.</span></div>`;
+      ${nFix&&t.presMsg!=='exp'?warnW('Uscite',nFix):''}
+      <div class="row">${t.presMsg==='exp'?'':(nFix?'<button class="btn" disabled style="opacity:.35;cursor:not-allowed">Prepara</button><span class="lbl">Si sblocca quando le uscite sono corrette.</span>':b('Prepara','tPresExp'))}<span class="lbl">Contributi e tasse: da decidere con la Direzione se li prepara il programma o il consulente.</span></div>`;
     }
     body=`<div class="row">${tabsP.map(x=>chip(x[1]+(x[0]==='fix'?badge(nFix):'')+(x[0]==='allarmi'?badge(nAll):''),'tPresTab',x[0],t.presTab===x[0])).join('')}</div>${inner}
     <p class="lbl" style="margin:0">Ognuno timbra con il badge virtuale sul suo telefono, passandolo sul lettore all’ingresso. Il QR cambia ogni 30 secondi, così una foto o uno screenshot non servono a timbrare per un collega.</p>`;
@@ -923,13 +955,13 @@ function trasp(){
     }
   }
   if(s==='fatture'){
-    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte», poi «Pagata» quando il cliente paga; «Nuova fattura» per farne una a mano.';
+    title='Fatturazione'; hintTxt='premi «Invia», poi «Pagata» quando il cliente paga; «Nuova» per farne una a mano.';
     const rows=[['Apple','[n]','Sabato ×3 · Giacenza ×1','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio · Giacenza ×1 · Riconsegna ×1','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
     body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th><th>Incasso</th></tr></thead><tbody>
     ${rows.map((r,i)=>{const inv=r[3]==='Pronta'&&t.fattOk;const st=r[3]==='Pronta'?(inv?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');const inc=t.pagate[i]?pill('Pagata','ok'):(inv?b('Pagata','tPagata',i,'ghost sm'):'<span class="lbl">—</span>');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td><td>${inc}</td></tr>`;}).join('')}
     </tbody></table></div>
     ${t.fattOk?msg('Fatture approvate da Angela e inviate a Fatture in Cloud. Quella di Snam aspetta un controllo.'):''}
-    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}${b(t.nuovaF?'Chiudi':'Nuova fattura','tNuovaF','','ghost')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna. Quando il cliente paga, premi «Pagata»: sale l’Incassato in Home.</span></div>
+    <div class="row">${t.fattOk?'':b('Invia','tFatt')}${b(t.nuovaF?'Chiudi':'Nuova','tNuovaF','','ghost')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna. Quando il cliente paga, premi «Pagata»: sale l’Incassato in Home.</span></div>
     ${t.nfMsg?msg('Fattura inviata a Fatture in Cloud, che la manda allo SdI. Resta registrata qui con cliente, bolle e incasso.'):''}
     ${t.nuovaF?`<div class="glass card stack">
       <div class="row between"><h3 style="font-size:20px">Nuova fattura</h3><span class="lbl">Numero e data li assegna Fatture in Cloud</span></div>
@@ -941,7 +973,7 @@ function trasp(){
         <tr><td><b>Giacenza</b></td><td>1</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
       </tbody></table></div>
       <div class="row between"><span class="lbl">Righe già compilate dalle bolle e dalle tariffe del cliente: si possono cambiare o aggiungere.</span><b>Totale € [importo] + IVA</b></div>
-      <div class="row">${b('Invia a Fatture in Cloud','tInviaF')}${b('Salva in bozza','noop','','ghost')}</div>
+      <div class="row">${b('Invia','tInviaF')}${b('Bozza','noop','','ghost')}</div>
     </div>`:''}`;
   }
   if(s==='mezzi'){
@@ -963,7 +995,15 @@ function trasp(){
     </tbody></table></div>
     <p class="lbl" style="margin:0">Entrate e uscite arrivano dal badge virtuale sul telefono (voce Presenze); Angela le trova già pronte per gli stipendi.</p>`;
   }
-  return hint(hintTxt)+shell('Autotrasporti',T_NAV,s,'tGo',title,body,'Cerca cliente, bolla, targa');
+  if(s==='anomalie'){
+    title='Anomalie'; hintTxt='tocca «Apri» per andare dove si risolve. Si chiudono solo quando i numeri tornano.';
+    body=`${AN.length?warnW('Aperte',AN.length):msg('Nessuna anomalia aperta.')}
+    <div class="glass tbox"><table class="t" style="min-width:820px"><thead><tr><th>Sezione</th><th>Cosa non torna</th><th>Chi risolve</th><th>Da</th><th></th></tr></thead><tbody>
+    ${AN.map(a=>`<tr><td>${pill(a[0],'red')}</td><td><b>${a[1]}</b></td><td>${a[2]}</td><td class="lbl">${a[3]}</td><td>${b('Apri','tAnGo',a[4],'ghost sm')}</td></tr>`).join('')}
+    </tbody></table></div>
+    <p class="lbl" style="margin:0">Ogni sezione tiene i suoi problemi; qui si vedono tutti insieme. Nessuna chiusura passa se le cose non tornano. Da decidere: un riassunto al giorno per la Direzione, a orario fisso.</p>`;
+  }
+  return hint(hintTxt)+shell('Autotrasporti',T_NAV.map(n=>n[0]==='anomalie'?[n[0],n[1]+badge(AN.length)]:n),s,'tGo',title,body,'Cerca cliente, bolla, targa');
 }
 
 function corp(){
@@ -1249,21 +1289,26 @@ function magApp(){
       inner=`<div class="pscr">${back}
         <div><div class="lbl">Mandata dall’ufficio</div><div class="ptitle">Missione · S07</div></div>
         <div class="bar"><i style="width:${Math.round(done/CONTA.length*100)}%"></i></div><div class="lbl">${done} di ${CONTA.length} posti · salvato a ogni scansione</div>
-        ${CONTA.map((c,i)=>`<button class="stop ${m.conta[i]?'done':''}" data-act="mConta" data-arg="${i}"><span class="n">${i+1}</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${c[0]}</b><span class="lbl">${c[1]}</span></span><b style="font-size:12px">${m.conta[i]?'Fatto':''}</b></button>`).join('')}
-        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Missione finita</b><div class="lbl" style="margin-top:4px">Le differenze le controlla l’ufficio.</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
+        ${m.contaMsg?`<div class="pcard" style="padding:12px 14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">${m.contaMsg}</b></div>`:''}
+        ${CONTA.map((c,i)=>{const st=m.conta[i];return `<button class="stop ${st==='ok'||st==='sbl'?'done':''}" ${st==='blocco'?'style="border:2px solid var(--alert);background:var(--alert-soft)"':''} data-act="mConta" data-arg="${i}"><span class="n">${i+1}</span><span style="flex:1;display:flex;flex-direction:column;gap:2px"><b style="font-size:16px">${c[0]}</b><span class="lbl">${CONTA_IT[i].length} pezzi · ${c[1]}</span></span><b style="font-size:12px;${st==='blocco'?'color:var(--alert)':''}">${st==='ok'?'Fatto':(st==='blocco'?'Bloccato':(st==='sbl'?'Sbloccato':''))}</b></button>`;}).join('')}
+        ${done===CONTA.length?`<div class="pcard" style="padding:14px;text-align:center"><b>Missione finita</b><div class="lbl" style="margin-top:4px">${Object.keys(m.conta).filter(k=>m.conta[k]==='blocco').length?'I posti bloccati li sblocca l’ufficio.':'Tutto torna.'}</div></div>`:`<div class="lbl">Se arriva un camion puoi uscire: quando torni riparti da qui.</div>`}
       </div>`;
     } else {
       inner=`<div class="pscr"><button class="back" data-act="mGo" data-arg="conta">Missione</button>
-        <div class="ptitle">${CONTA[m.contaCur][0]}</div>
-        <div class="scanbox"><b style="font-size:18px">Scansiona tutto quello che c’è in questo posto</b><span class="lbl">Uno per uno. Il confronto con quello che dovrebbe esserci lo fa il programma.</span></div>
+        ${(()=>{const i=m.contaCur, c=m.cs[i], it=CONTA_IT[i], fine=c.step>=CONTA_PLAN(i).length;return `
+        <div><div class="lbl">Scansiona i pezzi nell’ordine che vuoi</div><div class="ptitle">${CONTA[i][0]}</div></div>
+        <div class="lbl">${c.seen.length} di ${it.length}</div>
+        ${it.map((x,j)=>{const ok=c.seen.indexOf(j)>=0;return `<div class="pcard row between" style="padding:12px 14px;${ok?'opacity:.5':''}"><span>${x}</span><b style="font-size:13px">${ok?'✓':''}</b></div>`;}).join('')}
+        ${c.extra?`<div class="pcard row between" style="padding:12px 14px;border:2px solid var(--alert);background:var(--alert-soft)"><span>${CONTA_EXTRA}</span><b style="font-size:13px;color:var(--alert)">Extra</b></div>`:''}
         <div style="flex:1"></div>
-        <button class="bigbtn" data-act="mContaScan">Fatto, posto finito</button>
+        ${fine?`<div class="pcard" style="padding:14px;border:2px solid var(--alert);background:var(--alert-soft)"><b style="color:var(--alert)">Non torna</b><div style="font-size:14px;margin-top:4px">${it.length-c.seen.length?'Manca: '+it.filter((x,j)=>c.seen.indexOf(j)<0).join(', ')+'. ':''}${c.extra?'In più: '+CONTA_EXTRA+'. ':''}Il posto non si chiude: va all’ufficio.</div></div>`:`<button class="bigbtn" data-act="mContaScan">Scansiona</button>`}
+        <button class="bigbtn ghost" data-act="mContaBlocca">Segnala</button>`;})()}
       </div>`;
     }
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App magazzino</h2><p class="muted" style="margin:8px 0 0">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste. I tasti sono Entrata, Uscita, Trasferisci e Missioni.</p>
-      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso della missione, controlla qualche posto, esci e rientra: riparte da dove eri.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
+      <ol><li>«Entrata»: scansiona il bancale, poi il posto proposto. Quattro volte.</li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.</li><li>La spedizione non può partire finché non sono 4 su 4.</li><li>Tocca il riquadro rosso della missione e apri un posto: scansiona finché si spunta tutto e si chiude da solo. Nel quarto posto manca un pezzo e ce n’è uno in più: non si chiude, premi «Segnala» e va all’ufficio.</li><li>Poi apri Autotrasporti › Magazzino.</li></ol></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
