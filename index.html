@@ -241,9 +241,9 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 (function(){
 const S = {
   view:'intro',
-  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
+  t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'schede', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
@@ -443,11 +443,11 @@ const ORDINI=[
  ['Ieri','Sito proprio','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','S11-2-3','Consegnato']
 ];
 const TELEFONI=[
- ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Pronto'],
- ['35XXXXXXXXXXXX2','Samsung','Galaxy S21','Accenture','[n. ticket]','Fatto','Da fare','Manuel','Da disattivare'],
- ['35XXXXXXXXXXXX3','Apple','iPhone 12','Accenture','[n. ticket]','Da fare','Da fare','—','Da resettare'],
- ['35XXXXXXXXXXXX4','Apple','iPhone SE','Accenture','Aperto','Fatto','Fatta','Manuel','Ticket da chiudere'],
- ['35XXXXXXXXXXXX5','Samsung','Galaxy A52','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Pronto']
+ ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Chiuso'],
+ ['35XXXXXXXXXXXX2','Samsung','Galaxy S21','Accenture','[n. ticket]','Fatto','Da fare','Manuel','Sblocco'],
+ ['35XXXXXXXXXXXX3','Apple','iPhone 12','Accenture','[n. ticket]','Da fare','Da fare','—','Reset'],
+ ['35XXXXXXXXXXXX4','Apple','iPhone SE','Accenture','Aperto','Fatto','Fatta','Manuel','Ticket'],
+ ['35XXXXXXXXXXXX5','Samsung','Galaxy A52','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Chiuso']
 ];
 const SHOP=[
  {brand:'Lenovo',name:'ThinkPad T14 Gen 2',spec:'Intel i5 · 14" Full HD',base:249},
@@ -484,6 +484,7 @@ const A={
   tCliente:i=>{S.t.cliente=+i; window.scrollTo(0,0);},
   tClienteNo:()=>{S.t.cliente=null;},
   tFatt:()=>{S.t.fattOk=true;},
+  tPagata:i=>{S.t.pagate[i]=true;},
   tNuovaF:()=>{S.t.nuovaF=!S.t.nuovaF; S.t.nfMsg='';},
   tInviaF:()=>{S.t.nfMsg='ok'; S.t.nuovaF=false;},
   tMezzoF:f=>{S.t.mezzoF=f;},
@@ -652,7 +653,11 @@ function trasp(){
       <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">1.240</div><div class="lbl">1.168 consegnate</div></div>
       <div class="glass card"><div class="lbl">Consegnate al primo tentativo</div><div class="big">94%</div><div class="lbl">obiettivo 97%</div></div>
       <div class="glass card"><div class="lbl">Bolle da confermare</div><div class="big">${18-Object.keys(t.bolleOk).length}</div><div class="lbl">3 con dati mancanti</div></div>
-      <div class="glass card"><div class="lbl">Fatturabile ottobre</div><div class="big">€ [importo]</div><div class="lbl">si aggiorna a ogni consegna</div></div>
+    </div>
+    <div class="grid g4">
+      <div class="glass card"><div class="lbl">Fatturato oggi</div><div class="big">€ [importo]</div><div class="lbl">bolle di oggi × tariffe</div></div>
+      <div class="glass card"><div class="lbl">Fatturato ottobre</div><div class="big">€ [importo]</div><div class="lbl">dal 1° ottobre</div></div>
+      <div class="glass card"><div class="lbl">Incassato</div><div class="big">€ [importo]</div><div class="lbl">${(n=>n===1?'1 fattura pagata':n+' fatture pagate')(Object.keys(t.pagate).length)}</div></div>
     </div>
     <div class="grid g2">
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Resoconto del mattino</h3><p style="margin:0 0 8px">Ieri 1.198 consegne, costo medio per consegna in linea con la settimana. Due mezzi della zona Est hanno consumato più gasolio del solito: conviene guardare i loro giri.</p><p class="lbl" style="margin:0">Arriva ogni mattina alle 7:00 a Direzione e Amministrazione.</p></div>
@@ -918,13 +923,13 @@ function trasp(){
     }
   }
   if(s==='fatture'){
-    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte», oppure «Nuova fattura» per farne una a mano senza aprire Fatture in Cloud.';
+    title='Fatturazione'; hintTxt='premi «Approva e invia le pronte», poi «Pagata» quando il cliente paga; «Nuova fattura» per farne una a mano.';
     const rows=[['Apple','[n]','Sabato ×3 · Giacenza ×1','Pronta'],['Snam','[n]','Sponda ×12 · Stoccaggio · Giacenza ×1 · Riconsegna ×1','Da controllare'],['Luxiona','[n]','Attesa ×2','Pronta']];
-    body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th></tr></thead><tbody>
-    ${rows.map(r=>{const st=r[3]==='Pronta'?(t.fattOk?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td></tr>`;}).join('')}
+    body=`<div class="glass tbox"><table class="t"><thead><tr><th>Cliente</th><th>Consegne</th><th>Accessori ed extra</th><th>Totale</th><th>Stato</th><th>Incasso</th></tr></thead><tbody>
+    ${rows.map((r,i)=>{const inv=r[3]==='Pronta'&&t.fattOk;const st=r[3]==='Pronta'?(inv?pill('Inviata','ok'):pill('Pronta','dark')):pill(r[3],'red');const inc=t.pagate[i]?pill('Pagata','ok'):(inv?b('Pagata','tPagata',i,'ghost sm'):'<span class="lbl">—</span>');return `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>€ [importo]</td><td>${st}</td><td>${inc}</td></tr>`;}).join('')}
     </tbody></table></div>
     ${t.fattOk?msg('Fatture approvate da Angela e inviate a Fatture in Cloud. Quella di Snam aspetta un controllo.'):''}
-    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}${b(t.nuovaF?'Chiudi':'Nuova fattura','tNuovaF','','ghost')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna.</span></div>
+    <div class="row">${t.fattOk?'':b('Approva e invia le pronte','tFatt')}${b(t.nuovaF?'Chiudi':'Nuova fattura','tNuovaF','','ghost')}<span class="lbl">Ogni voce della fattura rimanda alla sua consegna. Quando il cliente paga, premi «Pagata»: sale l’Incassato in Home.</span></div>
     ${t.nfMsg?msg('Fattura inviata a Fatture in Cloud, che la manda allo SdI. Resta registrata qui con cliente, bolle e incasso.'):''}
     ${t.nuovaF?`<div class="glass card stack">
       <div class="row between"><h3 style="font-size:20px">Nuova fattura</h3><span class="lbl">Numero e data li assegna Fatture in Cloud</span></div>
@@ -970,6 +975,7 @@ function corp(){
       <div class="glass card"><div class="lbl">Dispositivi in magazzino</div><div class="big">3.120</div><div class="lbl">1.840 in vendita</div></div>
       <div class="glass card"><div class="lbl">Venduti questo mese</div><div class="big">214</div><div class="lbl">online 168 · di persona 46</div></div>
       <div class="glass card"><div class="lbl">Ordini da spedire</div><div class="big">9</div><div class="lbl">entro le 16:00</div></div>
+      <div class="glass card"><div class="lbl">Incassato oggi</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
       <div class="glass card"><div class="lbl">Incassato ottobre</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
     </div>
     <div class="glass card stack">
@@ -1049,21 +1055,22 @@ function corp(){
       </div></div>`;
   }
   if(s==='stageTel'){
-    title='Stage Cellulari'; hintTxt='tocca un filtro, ad esempio «Da disattivare», per vedere solo quei telefoni.';
-    const f=['Tutti','Da resettare','Ticket da chiudere','Da disattivare','Pronto'];
+    title='Stage Cellulari'; hintTxt='tocca un filtro, ad esempio «Sblocco», per vedere solo quei telefoni.';
+    const f=['Tutti','Reset','Sblocco','Ticket','Chiuso'];
     const list=TELEFONI.filter(x=>c.telF==='Tutti'||x[8]===c.telF);
     const cnt=st=>TELEFONI.filter(x=>x[8]===st).length;
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Ricevuti oggi</div><div class="big">${TELEFONI.length}</div></div>
-      <div class="glass card"><div class="lbl">Da resettare</div><div class="big">${cnt('Da resettare')}</div></div>
-      <div class="glass card"><div class="lbl">Ticket da chiudere sul portale</div><div class="big">${cnt('Ticket da chiudere')}</div></div>
-      <div class="glass card"><div class="lbl">Da disattivare su Habble</div><div class="big">${cnt('Da disattivare')}</div></div>
+      <div class="glass card"><div class="lbl">Reset</div><div class="big">${cnt('Reset')}</div><div class="lbl">da resettare</div></div>
+      <div class="glass card"><div class="lbl">Sblocco</div><div class="big">${cnt('Sblocco')}</div><div class="lbl">account iCloud/Google e MDM da togliere</div></div>
+      <div class="glass card"><div class="lbl">Ticket</div><div class="big">${cnt('Ticket')}</div><div class="lbl">da chiudere sul portale</div></div>
+      <div class="glass card"><div class="lbl">Chiuso</div><div class="big">${cnt('Chiuso')}</div><div class="lbl">pronti da riconsegnare</div></div>
     </div>
-    <div class="row">${f.map(x=>chip(x==='Pronto'?'Pronti':x,'cTelF',x,c.telF===x)).join('')}</div>
-    <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marchio</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Disattivazione</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
-    ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Pronto'?pill('Pronto','dark'):(x[8]==='Ticket da chiudere'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
+    <div class="row">${f.map(x=>chip(x,'cTelF',x,c.telF===x)).join('')}</div>
+    <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marchio</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Sblocco</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
+    ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Chiuso'?pill('Chiuso','dark'):(x[8]==='Ticket'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
     </tbody></table></div>
-    <p class="lbl" style="margin:0">I ticket arrivano dal portale del cliente; la disattivazione si fa sul loro sistema Habble.</p>`;
+    <p class="lbl" style="margin:0">I ticket arrivano dal portale del cliente; lo sblocco (account iCloud/Google e MDM) si fa sul loro sistema Habble.</p>`;
   }
   return hint(hintTxt)+shell('Corporation',C_NAV,s,'cGo',title,body,'Cerca seriale, modello, lotto');
 }
@@ -1073,7 +1080,7 @@ function autistiApp(){
   if(a.scr==='lista'){
     const n=Object.keys(a.done).length;
     inner=`<div class="pscr">
-      <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Il tuo giro</div>
+      <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Consegne</div>
         <div class="bar" style="margin-top:12px"><i style="width:${n*20}%"></i></div><div class="lbl" style="margin-top:6px">${n} di 5 fermate fatte</div></div>
       ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d==='giac'?'Giacenza':(d==='rico'?'Riconsegna fissata':(d==='dopo'?'Riprovo dopo':'')))}</b></button>`;}).join('')}
       ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro chiuso</b><div class="lbl" style="margin-top:4px">Ogni consegna ha la sua bolla fotografata e leggibile: in ufficio non serve la chiusura a fine giornata.</div><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
@@ -1325,7 +1332,7 @@ function caricoApp(){
       :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
       <div class="row" style="gap:8px">${b('Scansiona','kBanc','B-0142','ghost')}${b('Nuovo','kBanc','B-0147','ghost')}</div>
       <div style="flex:1"></div>
-      <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Pubblica</button>
+      <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Conferma</button>
     </div>`;
   }
   if(k.scr==='fatto'){
@@ -1344,7 +1351,7 @@ function caricoApp(){
   }
   return `<div class="appsec">
     <div class="appinfo glass"><h2>Entrate</h2><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
-      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Pubblica»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
+      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Conferma»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
 }
@@ -1424,6 +1431,4 @@ setInterval(()=>{
 render();
 })();
 </script>
-
-
 </html>
