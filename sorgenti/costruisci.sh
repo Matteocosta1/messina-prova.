@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ricostruisce index.html («Prova programma Messina») dal codice VERO di messina-sistema.
+# Ricostruisce codice/index.html («Prova programma Messina») dal codice VERO di messina-sistema.
 # Costruisce gestionale, app, portale e negozio (modalità Prova, senza config.js), genera i due siti,
 # poi li mette tutti dentro sorgenti/pagina.html.
 # Uso: bash sorgenti/costruisci.sh /percorso/di/messina-sistema
@@ -11,5 +11,5 @@ for a in gestionale app portale negozio; do
 done
 ( cd "$SIS" && node siti/genera.mjs >/dev/null )
 for a in gestionale app portale negozio; do ( cd "$SIS" && node "apps/$a/build.mjs" >/dev/null 2>&1 ) || { echo "Build di $a non riuscita" >&2; exit 1; }; done
-python3 -I "$QUI/componi.py" "$SIS" "$QUI/../index.html"
+python3 -I "$QUI/componi.py" "$SIS" "$QUI/../codice/index.html"
 echo "Codice: messina-sistema $(git -C "$SIS" rev-parse --short HEAD)$(git -C "$SIS" diff --quiet || echo ' con modifiche non ancora su GitHub')"
