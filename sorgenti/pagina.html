@@ -3,211 +3,489 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f2f3f5">
-<meta name="color-scheme" content="light only">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Prova programma Messina</title>
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#f2f3f5">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
 <!--
-  Prova programma Messina: dentro ogni pannello gira il programma VERO di messina-sistema (stesso codice
-  della produzione) in modalità Prova. Un solo database di esempio condiviso da tutti i pannelli:
-  ogni programma, dopo una modifica, manda la sua copia dei dati a questa pagina, che la gira agli altri.
-  Questo file non si modifica a mano: si ricostruisce con  bash sorgenti/costruisci.sh <percorso di messina-sistema>
+  Prova programma Messina: la stessa pagina del mockup approvato (stesso CSS, stesse 10 parti, stessa Introduzione),
+  ma dentro ogni parte gira il programma VERO di messina-sistema in modalità Prova, con un solo database di esempio
+  condiviso da tutte le parti. Questo file non si modifica a mano: si ricostruisce con
+  bash sorgenti/costruisci.sh <percorso di messina-sistema>
 -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+/* Layout: barra in alto con le parti del programma; sotto, una parte alla volta. Gestionali con menu laterale (in riga sul telefono), app dentro la cornice di un telefono. Bianco e nero con vetro leggero. */
 :root{
-  --bg:#f2f3f5;--halo1:#e0e4eb;--halo2:#e9e9ee;--ink:#111214;--muted:#5b5e66;--line:rgba(17,18,20,.09);
-  --glass:rgba(255,255,255,.72);--glass-edge:rgba(255,255,255,.95);--solid:#111214;--on-solid:#fff;--soft:rgba(17,18,20,.05);
-  --frame:#1b1c20;--shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
-  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+  --bg:#f2f3f5; --halo1:#e0e4eb; --halo2:#e9e9ee;
+  --ink:#111214; --muted:#5b5e66; --line:rgba(17,18,20,.09);
+  --glass:rgba(255,255,255,.72); --glass-edge:rgba(255,255,255,.95); --glass-strong:rgba(255,255,255,.92);
+  --solid:#111214; --on-solid:#ffffff; --soft:rgba(17,18,20,.05);
+  --alert:#b42318; --alert-soft:#fdecea; --ok:#146c43; --ok-soft:#e7f5ec;
+  --frame:#1b1c20; --screen1:#eceef3; --screen2:#f6f7f9;
+  --shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);min-height:100vh;
-  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);background-color:var(--bg)}
+body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);
+  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);
+  background-color:var(--bg);background-attachment:fixed;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 button{font-family:inherit;color:inherit;touch-action:manipulation}
-button:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
-h1,h2,h3{margin:0;text-wrap:balance}
+button:focus-visible,input:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+
 .glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-edge);box-shadow:var(--shadow);border-radius:20px}
+.card{padding:18px}
 .muted{color:var(--muted)}
-.wrap{max-width:1380px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:16px;padding:10px 12px;display:flex;align-items:center;gap:14px}
+.lbl{font-size:13px;color:var(--muted);font-weight:500}
+.big{font-size:30px;font-weight:800;letter-spacing:-.025em;margin-top:4px;font-variant-numeric:tabular-nums}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);white-space:nowrap}
+.pill.dark{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.pill.red{color:var(--alert);border-color:var(--alert);background:var(--alert-soft)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.btn{font-size:15px;font-weight:700;padding:11px 18px;border-radius:999px;border:1px solid var(--solid);background:var(--solid);color:var(--on-solid);cursor:pointer;min-height:44px}
+.btn.ghost{background:var(--glass-strong);color:var(--ink);border-color:var(--line)}
+.btn.sm{font-size:13px;padding:7px 12px;min-height:36px}
+.chipbtn{font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);cursor:pointer;min-height:40px}
+.chipbtn.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.msg{border-radius:14px;padding:12px 14px;font-weight:600;background:var(--solid);color:var(--on-solid);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.msg .btn{background:var(--on-solid);color:var(--solid);border-color:var(--on-solid)}
+.miss{color:var(--alert);font-weight:700}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--glass-strong);border-radius:999px;padding:0 14px;min-height:42px;max-width:100%}
+.search input{border:0;outline:none;background:transparent;font:inherit;font-size:14px;color:var(--ink);width:220px;max-width:100%}
+.sr{position:absolute;left:-9999px}
+
+/* barra in alto */
+.wrap{max-width:1380px;margin:0 auto;padding-block:14px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:18px;padding:10px 12px;display:flex;align-items:center;gap:14px}
 .brand{font-weight:800;letter-spacing:-.03em;font-size:19px;white-space:nowrap;padding:0 6px}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
 .tabs::-webkit-scrollbar{display:none}
 .tab{border:0;background:transparent;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;min-height:40px}
 .tab.on{background:var(--solid);color:var(--on-solid)}
-.hint{padding:12px 16px;margin-bottom:14px;border-radius:16px;font-size:14px}
-.pannello[hidden]{display:none!important}
-/* introduzione */
-.hero{padding:26px 24px;margin-bottom:22px}
-.hero h1{font-size:34px;letter-spacing:-.035em;font-weight:800;margin-bottom:8px}
-.hero p{margin:0;max-width:72ch;color:var(--muted);font-size:16px}
-.gruppo-tit{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 12px}
-.grid{display:grid;gap:14px}
-.g-prog{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:22px}
-.g-siti{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
-.part{display:flex;flex-direction:column;gap:8px;text-align:left;cursor:pointer;padding:18px;font-size:14px}
+.hint{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;margin-bottom:16px;border-radius:16px;font-size:14px}
+.hint b{white-space:nowrap}
+
+/* intro */
+.hero{padding:28px 26px;margin-bottom:16px}
+.hero h1{font-size:clamp(28px,4.4vw,44px);font-weight:800;letter-spacing:-.035em;line-height:1.05}
+.hero p{max-width:62ch;margin:12px 0 0;font-size:16px;color:var(--muted)}
+.part{display:flex;flex-direction:column;gap:8px;text-align:left;cursor:pointer;border:1px solid var(--glass-edge);padding:18px}
 .part h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
-.part .go{margin-top:auto;font-weight:700}
-.minibar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:var(--soft)}
-.minibar i{width:8px;height:8px;border-radius:99px;background:rgba(17,18,20,.18);flex:none}
-.minibar span{flex:1;min-width:0;text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.riga{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{border:0;background:var(--solid);color:var(--on-solid);font-weight:700;font-size:15px;padding:11px 18px;border-radius:999px;cursor:pointer;min-height:44px}
-.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
-/* finestra del browser */
+.part .go{margin-top:auto;font-weight:700;font-size:14px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.step{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:transparent;padding:10px;border-radius:14px;cursor:pointer}
+.step:hover{background:var(--soft)}
+.num{flex:none;width:30px;height:30px;border-radius:99px;background:var(--solid);color:var(--on-solid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+
+/* gestionale */
+.gest{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.side{flex:0 0 232px;padding:18px 12px;display:flex;flex-direction:column;gap:3px}
+.side .co{padding:0 10px 14px}
+.side .co b{font-size:20px;letter-spacing:-.03em;font-weight:800;display:block}
+.nav{border:0;background:transparent;text-align:left;font-size:15px;font-weight:600;padding:10px 12px;border-radius:12px;cursor:pointer;min-height:42px;white-space:nowrap}
+.nav.on{background:var(--solid);color:var(--on-solid)}
+.content{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.chead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.chead h2{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.list{display:flex;flex-direction:column;gap:2px}
+.li{border:0;background:transparent;text-align:left;padding:12px;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;width:100%}
+.li.on{background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kv div{background:var(--soft);border-radius:14px;padding:10px 12px}
+.kv .bad{background:var(--alert-soft);box-shadow:inset 0 0 0 1px var(--alert)}
+.tbox{overflow-x:auto;border-radius:16px}
+table.t{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+table.t th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:12px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle;font-variant-numeric:tabular-nums}
+table.t tr:last-child td{border-bottom:0}
+table.t tr.click{cursor:pointer}
+table.t.nw td:not(:last-child){white-space:nowrap}
+table.t tr.click:hover td{background:var(--soft)}
+.bar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--solid);border-radius:99px}
+.banchi{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.banco{height:36px;border-radius:9px;font-size:11px;font-weight:700;border:0;cursor:pointer}
+.banco.fin{background:var(--solid);color:var(--on-solid)}
+.banco.run{background:var(--muted);color:var(--on-solid)}
+.banco.free{background:var(--glass-strong);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.banco.err{background:var(--alert-soft);color:var(--alert);box-shadow:inset 0 0 0 2px var(--alert)}
+.sq{width:13px;height:13px;border-radius:4px;display:inline-block}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:99px;background:var(--alert);color:#fff;font-size:12px;font-weight:700;line-height:1}
+.warn{border-radius:14px;padding:12px 14px;font-weight:700;color:var(--alert);background:var(--alert-soft);box-shadow:inset 0 0 0 1px var(--alert)}
+.scaf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.sc{border:0;border-radius:12px;padding:10px 6px;cursor:pointer;font-weight:700;font-size:13px;display:flex;flex-direction:column;gap:6px;align-items:center;background:var(--glass-strong);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.sc.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.sc .lv{display:grid;grid-template-rows:repeat(6,7px);gap:3px;width:100%}
+.sc .lv span{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.sc .lv i{display:block;border-radius:2px;background:var(--soft)}
+.sc .lv i.f{background:var(--solid)}
+.sc .lv i.h{background:var(--ink)}
+.sc .lv i.dim{background:var(--muted);opacity:.35}
+.zone{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.zone div{border-radius:12px;padding:10px 12px;background:var(--soft);font-size:13px}
+.okrow td:last-child{color:var(--ok);font-weight:700}
+.korow td{background:var(--alert-soft)}
+.korow td:last-child{color:var(--alert);font-weight:700}
+.scanbox{border:2px dashed var(--muted);border-radius:18px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px}
+
+textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-radius:14px;border:1px solid var(--line);background:var(--glass-strong);color:var(--ink);padding:12px;resize:vertical;width:100%}
+
+/* app su telefono */
+.appsec{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+.appinfo{flex:1 1 300px;max-width:440px;padding:22px}
+.appinfo h2{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.appinfo ol{margin:12px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.phone{flex:none;width:390px;max-width:100%;height:800px;border-radius:48px;padding:10px;background:var(--frame);box-shadow:var(--shadow)}
+.screen{height:100%;border-radius:38px;overflow:hidden;position:relative;background:linear-gradient(180deg,var(--screen1),var(--screen2) 55%,var(--screen1))}
+.pscr{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px;padding:22px 16px 16px;overflow-y:auto}
+.pcard{background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--glass-edge);border-radius:18px;box-shadow:var(--shadow)}
+.bigbtn{width:100%;font-size:18px;font-weight:800;padding:16px;border-radius:18px;border:2px solid var(--solid);background:var(--solid);color:var(--on-solid);cursor:pointer;min-height:56px}
+.bigbtn.ghost{background:var(--glass-strong);color:var(--ink)}
+.back{align-self:flex-start;border:0;background:var(--glass-strong);border-radius:999px;font-size:14px;font-weight:600;padding:9px 14px;cursor:pointer;min-height:40px}
+.ptitle{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.stop{border:1px solid var(--glass-edge);background:var(--glass);border-radius:16px;padding:12px;display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;width:100%;min-height:68px}
+.stop .n{flex:none;width:32px;height:32px;border-radius:99px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800}
+.stop.done{opacity:.5}
+.cam{flex:1;min-height:300px;border-radius:22px;background:#1d1e22;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:18px}
+.label{width:100%;max-width:270px;background:#e9e8ee;color:#2b2a31;border-radius:14px;padding:16px;outline:3px solid #ffffff;outline-offset:8px}
+.camtxt{color:#e6e6ea;font-size:14px;text-align:center;max-width:280px}
+.kvp{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px;gap:10px}
+.grades{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.gbtn{font-size:24px;font-weight:800;border-radius:16px;border:2px solid var(--solid);padding:14px 0;cursor:pointer;background:var(--glass-strong);color:var(--ink)}
+.gbtn.on{background:var(--solid);color:var(--on-solid)}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.round{width:52px;height:52px;border-radius:99px;border:2px solid var(--solid);background:var(--glass-strong);font-size:22px;font-weight:800;cursor:pointer}
+
+/* negozio */
+.shop{padding:0;overflow:hidden}
+.shophead{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line)}
+.shopbody{padding:22px 18px 30px}
+.shoph1{font-size:clamp(34px,6vw,64px);font-weight:900;letter-spacing:-.05em;line-height:1;margin:16px 0 24px}
+.prod{border:1px solid var(--glass-edge);background:var(--glass);border-radius:22px;padding:14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.ph{aspect-ratio:4/3;max-width:100%;border-radius:16px;background:var(--soft);display:flex;align-items:center;justify-content:center}
+.pdet{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.pdet > *{flex:1 1 360px;min-width:0}
+.gradebox{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gopt{border-radius:16px;padding:12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px;border:2px solid var(--line);background:var(--glass-strong)}
+.gopt.on{border-color:var(--solid);background:var(--solid);color:var(--on-solid)}
+
+@media (max-width:760px){
+  .side{flex:1 1 100%;flex-direction:row;overflow-x:auto;padding:8px;gap:4px;align-items:center}
+  .side .co{display:none}
+  .nav{padding:9px 12px}
+  .chead h2{font-size:24px}
+  .hero{padding:22px 18px}
+}
+@media (max-width:520px){
+  .brand{display:none}
+  .phone{width:100%;height:760px;padding:0;border-radius:30px;background:transparent;box-shadow:none}
+  .screen{border-radius:28px;box-shadow:inset 0 0 0 1px var(--line)}
+  .banchi{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .scaf{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .hint b{display:none}
+}
+@media (max-width:760px){
+  body{background-attachment:scroll}
+  .search input,textarea{font-size:16px}
+  .top{padding:8px;gap:8px;border-radius:18px}
+  .tab{padding:8px 12px;font-size:14px}
+  .hint{font-size:13px;padding:10px 12px}
+  .appsec{flex-direction:column;align-items:stretch;gap:14px}
+  .appinfo{order:2;max-width:none;padding:16px}
+  .appinfo h2{font-size:20px}
+  .phone{order:1;align-self:center}
+  .chead .row{width:100%}
+  .chead .search{flex:1}
+  .chead .search input{width:100%}
+  .big{font-size:26px}
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card{padding:14px}
+  .gradebox{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .shopbody{padding:16px 14px 24px}
+  .shophead{padding:10px 12px}
+}
+@media (max-width:520px){
+  .phone{height:calc(100svh - 150px);min-height:600px;max-height:860px}
+  .pscr{padding:16px 12px 12px}
+  .g4{grid-template-columns:1fr 1fr}
+  .kv{grid-template-columns:1fr 1fr}
+  .gopt{padding:10px}
+  .ptitle{font-size:23px}
+}
+@media (max-width:360px){
+  .g4,.kv{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+/* vita del sistema: notifiche, presentazione, punto evidenziato */
+#toasts{position:fixed;z-index:60;right:max(16px,env(safe-area-inset-right,0px));top:calc(78px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:8px;width:min(380px,calc(100vw - 32px));pointer-events:none}
+.toast{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;font-size:14px;line-height:1.4;animation:tin .35s ease}
+.toast .pill{flex:none}
+@keyframes tin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media (max-width:760px){
+  #toasts{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));right:12px;left:12px;width:auto}
+}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+.g4b{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media (max-width:520px){.g4b{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.schedat{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:0 24px;margin-top:10px}
+.schedat>div{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--line)}
+.giro{display:flex;flex-direction:column;align-items:stretch;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.giro:hover{background:rgba(255,255,255,.9)}
+.ferm{display:flex;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.ferm:first-child{border-top:0;padding-top:0}
+.fn{width:30px;height:30px;border-radius:99px;background:var(--solid);color:var(--on-solid);display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+.seg{display:flex;padding:4px;border-radius:14px;background:var(--soft);gap:4px}
+.seg button{flex:1;font:inherit;font-weight:700;font-size:16px;padding:10px;border:0;border-radius:10px;background:transparent;cursor:pointer;color:var(--ink)}
+.seg button.on{background:var(--solid);color:var(--on-solid)}
+.camgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tcam{display:block;width:100%;min-height:0;position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:0;padding:0;cursor:pointer;background:#1b1d21;color:#fff;font:inherit;text-align:left}
+.tcam.on{outline:3px solid var(--solid);outline-offset:3px}
+.cam-img{position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 20%,rgba(255,255,255,.16),transparent 60%),linear-gradient(160deg,#2a2d33,#121316)}
+.cam-img::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 2px,transparent 2px 4px)}
+.cam-top{position:absolute;left:10px;top:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.cam-top .dot{width:8px;height:8px;border-radius:99px;background:#e5484d}
+.cam-nome{position:absolute;left:10px;bottom:8px;font-weight:700;font-size:14px}
+.cam-ora{position:absolute;right:10px;bottom:8px;font-size:12px;opacity:.8}
+.big-cam{aspect-ratio:16/8;cursor:default}
+.cam-mini{display:inline-block;width:46px;height:28px;border-radius:6px;background:linear-gradient(160deg,#2a2d33,#121316);vertical-align:middle}
+@media (max-width:760px){.camgrid{grid-template-columns:1fr 1fr}}
 .browser{border-radius:22px;overflow:hidden;padding:0}
 .bbar{display:flex;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
 .bbar .dots{display:flex;gap:6px;flex:none}.bbar .dots i{width:10px;height:10px;border-radius:99px;background:rgba(17,18,20,.16)}
 .bbar .url{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--muted);background:var(--soft);border-radius:99px;padding:6px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.schermo{display:block;width:100%;height:calc(100vh - 200px);height:calc(100dvh - 200px);min-height:560px;border:0;background:#f2f3f5}
-/* telefono */
-.telefono{width:414px;max-width:100%;margin:0 auto;padding:12px;border-radius:52px;background:var(--frame);box-shadow:var(--shadow)}
-.telefono .schermo{height:844px;max-height:calc(100dvh - 200px);min-height:620px;border-radius:40px}
-@media (max-width:1100px){.g-prog,.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:760px){
-  .brand{display:none}.top{padding:8px;gap:8px;border-radius:18px}.tab{padding:8px 12px}
-  .hint{font-size:13px;padding:10px 12px}.hero h1{font-size:27px}.hero{padding:20px 18px}
-  .schermo{height:calc(100dvh - 150px);min-height:480px}
-}
-@media (max-width:640px){.g-siti,.g-prog{grid-template-columns:1fr}}
-@media (max-width:500px){.telefono{padding:0;border-radius:24px;background:transparent;box-shadow:none}.telefono .schermo{height:calc(100dvh - 150px);max-height:none;min-height:480px;border-radius:24px}}
-.avviso{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--solid);color:var(--on-solid);
-  padding:12px 18px;border-radius:16px;font-size:14px;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
-.avviso[hidden]{display:none}
+.sitoframe{display:block;width:100%;height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:520px;border:0;background:#f2f3f5}
+.gruppo-tit{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 12px}
+.g-prog{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-siti{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sitocard{padding:20px}
+.sitocard h3{font-size:20px;letter-spacing:-.02em}
+.minibar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:var(--soft);margin-bottom:8px}
+.minibar i{width:8px;height:8px;border-radius:99px;background:rgba(17,18,20,.18);flex:none}
+.minibar span{flex:1;min-width:0;text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:1000px){.g-prog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.g-siti{grid-template-columns:1fr}}
+.portbar{display:flex;flex-direction:column;gap:12px;padding:14px 16px;margin-bottom:14px}
+@media (max-width:760px){.sitoframe{height:calc(100dvh - 190px);min-height:460px}}
+
+/* prova dal codice: i programmi veri dentro le parti del mockup */
+.gframe{display:block;width:calc(100% + 2*max(16px,env(safe-area-inset-left,0px)));margin:-14px calc(-1*max(16px,env(safe-area-inset-left,0px))) -56px;border:0;background:transparent;min-height:640px}
+.screen iframe{display:block;width:100%;height:100%;border:0;background:transparent}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top glass"><div class="brand">Messina</div><nav class="tabs" id="tabs" aria-label="Parti del programma"></nav></header>
-  <main id="pannelli"></main>
+  <header class="top glass">
+    <div class="brand">Messina</div>
+    <nav class="tabs" id="tabs" aria-label="Parti del programma"></nav>
+  </header>
+  <main id="app"></main>
 </div>
-<div class="avviso" id="avviso" role="status" hidden></div>
+<div id="toasts" aria-live="polite"></div>
 <script>
 /*@@PROGRAMMI@@*/
 (function () {
   'use strict';
-  // pannelli: [chiave, nome, programma, indirizzo, spiegazione]
-  var P = [
-    ['intro', 'Introduzione'],
-    ['trasp', 'Autotrasporti', 'gestionale', 'gestionale.[dominio]', 'Il gestionale di Messina Autotrasporti. Scegli chi sei (direzione, amministrazione, bolle, traffico, magazzino): ognuno vede solo le sue sezioni.'],
-    ['app', 'App', 'app', '', 'L’app Messina sul telefono: entra come Autista per il giro e le consegne, come Magazziniere per entrate e missioni, come Vendite o Manuel per le Entrate della Corporation.'],
-    ['corp', 'Corporation', 'gestionale', 'corporation.[dominio]', 'Il gestionale di Messina Corporation: entra come Vendite o come Manuel (stage). È lo stesso programma di Autotrasporti, separato dal profilo.'],
-    ['portale', 'Portale', 'portale', 'portale.[dominio]', 'Il portale dei clienti di Messina Autotrasporti, visto con i loro occhi: entra come Snam o Econocom.'],
-    ['negozio', 'Negozio', 'negozio', 'negozio.[dominio]', 'Il negozio online di Messina Corporation. Il pagamento è simulato: l’ordine arriva in Corporation › Ordini.'],
-    ['sitoT', 'Sito Autotrasporti', 'sitoT', 'www.messina-autotrasporti.it', 'Il sito pubblico di Messina Autotrasporti. Preventivo, ritiro, candidatura e contatto arrivano in Autotrasporti › Mail.'],
-    ['sitoC', 'Sito Corporation', 'sitoC', 'www.[dominio-corporation]', 'Il sito pubblico di Messina Corporation. «Valuta un lotto» arriva in Corporation › Mail, cartella Lotti; «Negozio» apre il negozio.']
+  var D = {"HT": {"home": "tocca una delle cose da guardare oggi per andare dritta alla pagina giusta.", "portale": "è il portale dei clienti di Messina Autotrasporti, visto con i loro occhi. Scegli Snam o Econocom: Snam vede spedizioni e magazzino dal vivo, Econocom i telefoni UniCredit con IMEI, cespite e utente.", "mail": "apri la mail di Snam e premi «Crea bolla da questa mail», poi «Apri in Bolle».", "bolle": "scegli una bolla e premi «Conferma». Se manca un dato non si può confermare: premi «Chiedi».", "magazzino": "tocca uno scaffale e poi un posto per vedere gli Articoli; apri «Storico» per tutte le operazioni di tutti.", "giacenze": "tre strade per ogni giacenza. «Prenota la riconsegna»: scegli giorno e ora, ed è fatta. «Chiedi al cliente»: un clic e parte la mail che chiede la data. «Reso al mittente»: la merce torna a chi l’ha spedita e la giacenza si chiude.", "telepass": "tocca un autista per vedere tutti i suoi passaggi: in rosso quelli fuori orario o in giorni senza giro.", "presenze": "apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.", "clienti": "tocca un cliente per aprire la sua scheda con tutte le tariffe, voce per voce.", "fatture": "premi «Invia», poi «Pagata» quando il cliente paga; «Nuova» per farne una a mano.", "satellitare": "tocca un autista: vedi il giro previsto e il percorso fatto, con le deviazioni e le soste da guardare.", "telecamere": "tocca una telecamera per vederla grande. Sotto: gli avvisi della notte e la foto salvata a ogni scansione del magazzino.", "mezzi": "tocca un tipo di mezzo. Nella colonna Autista scegli l’autista fisso del mezzo: giri, Telepass e satellitare si collegano a lui.", "autisti": "tocca «Partito», «Rientrato» o «Assente» per filtrare.", "j7": "«Importa» carica i file esportati da J7; «Confronto» e «Parallelo» mostrano i due sistemi che lavorano insieme finché si spegne J7.", "traffico": "i giri di domani sono già pronti: il programma li prepara da solo. Tocca un giro per aprirlo grande e modificarlo; quando va bene, «Conferma». Se poi arriva una spedizione nuova, la richiesta di conferma ricompare.", "giro": "qui Mauro e Nelson cambiano il giro all’ultimo momento: Su e Giù per l’ordine, Modifica per fascia e accessori, Passa a… per darla a un altro mezzo, Togli, oppure «+ Aggiungi fermata».", "anomalie": "tocca una sezione per entrare e risolvere le anomalie una per una.", "anomalieSez": "premi «Apri» per andare dove si risolve.", "cliente": "qui ci sono le tariffe del cliente. Torna a «Tutti i clienti» per aprirne un altro."}, "HC": {"home": "tocca una delle cose da guardare oggi per andare alla pagina giusta.", "mail": "apri la mail del DDT e premi «Carica il DDT nel lotto». Il tasto principale cambia con il tipo di mail.", "lotti": "la colonna «Incassato finora» sale a ogni computer venduto del lotto.", "inv": "prova i tasti «Schede» e «Tabella» in alto a destra, e i filtri per marchio e grado.", "ordini": "premi «Etichetta spedizione» su un ordine da preparare.", "stage": "tocca una postazione del banco per vedere a che punto è. Le due rosse si sono interrotte.", "stageTel": "tocca un filtro, ad esempio «Sblocco», per vedere solo quei telefoni.", "telecamere": "la stessa sezione del gestionale Autotrasporti: il capannone è uno solo.", "ricambi": "i pezzi smontati dai computer che non si vendono interi. Ogni ricambio resta legato al computer e al lotto da cui viene: quello che incassa conta nel recupero del lotto."}, "HN": "apri un computer: cambia grado (A, B, C, D) e memoria e guarda il prezzo; sotto c’è la scheda tecnica completa. In alto anche «Ricambi».", "HS": ["è il sito pubblico di Messina Autotrasporti, con tutte le sue pagine: usa il menu come su un sito vero. Prova «Preventivo», «Prenota un ritiro» o «Lavora con noi»: ogni richiesta arriva in Autotrasporti › Mail. In «Traccia» scrivi un numero qualsiasi.", "è il sito pubblico di Messina Corporation, con tutte le sue pagine. «Negozio» porta al negozio online; «Valuta un lotto» arriva in Corporation › Mail, cartella Lotti."], "INFO": {"autistiApp": "<div class=\"appinfo glass\"><h2>App autisti<\/h2><p class=\"muted\" style=\"margin:8px 0 0\">Il telefono dell’autista. Gli accessori arrivano già dalla bolla.<\/p>\n      <ol><li>Tocca la prima fermata, Snam. Prima pagina: 1 Colli, 2 Accessori, 3 Firma. Ogni blocco ha il suo «Conferma» e si accende quando hai confermato quello sopra.<\/li><li>Colli: tasto fotocamera per scansionarli, poi «Conferma». Accessori: vedi quelli della bolla, con «+ Aggiungi» metti quelli chiesti all’ultimo, poi «Conferma». Firma: tocca la penna e fai firmare il cliente con il dito, poi «Conferma».<\/li><li>«Avanti»: seconda pagina, la Bolla. Prima la foto (si apre la fotocamera vera: una foto mossa viene rifiutata), poi «Consegnato» o «Non Consegnato».<\/li><li>Dopo la firma «Non Consegnato» sparisce: se il cliente ha firmato, la merce l’ha presa. Su un’altra fermata premi subito «Non Consegnato» in fondo alla prima pagina, senza scansionare niente, e poi «Torna in magazzino: giacenza».<\/li><li>Nel gestionale apri Autotrasporti › Giacenze: la trovi lì.<\/li><\/ol>\n      <div style=\"margin-top:14px;border-top:1px solid var(--line);padding-top:12px\"><label for=\"soglia\"><b>Severità del controllo<\/b> <span class=\"lbl\">(la regola l’ufficio)<\/span><\/label>\n      <input id=\"soglia\" type=\"range\" min=\"10\" max=\"120\" step=\"5\" value=\"35\" style=\"width:100%;margin-top:8px\">\n      <div class=\"row between lbl\"><span>Morbido<\/span><span>minimo <span id=\"sogliaN\">35<\/span><\/span><span>Severo<\/span><\/div>\n      <p class=\"lbl\" style=\"margin:8px 0 0\">Si parte morbido e si tara con le vostre bolle vere: le foto buone devono passare sempre.<\/p><\/div><\/div>", "magApp": "<div class=\"appinfo glass\"><h2>App magazzino<\/h2><p class=\"muted\" style=\"margin:8px 0 0\">Ogni collo e ogni bancale si scansiona insieme al suo posto: se non è scansionato, per il programma non esiste. I tasti sono Entrata, Uscita, Trasferisci e Missioni.<\/p>\n      <ol><li>«Entrata»: scegli «Bancale» (bancale, poi posto) o «Collo» (scatola, poi il bancale dove la appoggi). Quattro volte.<\/li><li>«Uscita»: scansiona i colli. Il terzo è sbagliato apposta e l’app suona.<\/li><li>La spedizione non può partire finché non sono 4 su 4.<\/li><li>Tocca il riquadro rosso della missione e apri un posto: scansiona finché si spunta tutto e si chiude da solo. Nel quarto posto manca un pezzo e ce n’è uno in più: non si chiude, premi «Segnala» e va all’ufficio.<\/li><li>Poi apri Autotrasporti › Magazzino.<\/li><\/ol><\/div>", "presApp": "<div class=\"appinfo glass\"><h2>App presenze<\/h2><p class=\"muted\" style=\"margin:8px 0 0\">Il badge virtuale sul telefono di ogni dipendente, al posto della tessera.<\/p>\n      <ol><li>Guarda il QR: cambia ogni 30 secondi, così una foto mandata a un collega non serve.<\/li><li>Premi «Entrata», poi «Uscita». Si possono ripetere più volte nello stesso giorno.<\/li><li>Prova «Simula: un collega prova con il mio badge»: il lettore rifiuta e parte l’allarme.<\/li><li>Più in basso: «I miei orari» e le ferie. Ognuno vede solo i suoi.<\/li><li>Nel gestionale apri Autotrasporti › Presenze: Allarmi, Riepiloghi e Ferie li vedono solo Angela e la Direzione.<\/li><\/ol>\n      <p class=\"lbl\" style=\"margin:10px 0 0\">Il lettore all’ingresso lo collegheremo appena sappiamo il modello.<\/p><\/div>", "caricoApp": "<div class=\"appinfo glass\"><h2>App Corporation<\/h2><p style=\"margin:8px 0 0\"><b>Entrate<\/b>: caricare un computer o un telefono in magazzino.<\/p><p class=\"muted\" style=\"margin:8px 0 0\">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.<\/p>\n      <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.<\/li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.<\/li><li>Scegli il grado, regola il prezzo e i siti.<\/li><li>Scansiona il bancale o premi «Nuovo».<\/li><li>Premi «Conferma»: il PC è già in inventario con bancale e posto.<\/li><\/ol><p class=\"lbl\" style=\"margin:10px 0 0\">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.<\/p><\/div>"}};
+  // le 10 parti del mockup (VIEWS), nello stesso ordine
+  var VIEWS = [['intro', 'Introduzione'], ['trasp', 'Autotrasporti'], ['autisti', 'App autisti'], ['magazzino', 'App magazzino'], ['presenze', 'App presenze'],
+    ['corp', 'Corporation'], ['carico', 'App Corporation'], ['negozio', 'Negozio online'], ['sitoT', 'Sito Autotrasporti'], ['sitoC', 'Sito Corporation']];
+  // programma vero di ogni parte e configurazione della Prova (utente di esempio, parte dell'app)
+  var PARTI = {
+    trasp: { prog: 'gestionale', cfg: { provaUtente: 'direzione@prova.messina' }, tipo: 'gest' },
+    corp: { prog: 'gestionale', cfg: { provaUtente: 'direzione.corporation@prova.messina' }, tipo: 'gest' },
+    autisti: { prog: 'app', cfg: { parte: 'autisti', provaUtente: 'autista@prova.messina' }, tipo: 'app', info: 'autistiApp' },
+    magazzino: { prog: 'app', cfg: { parte: 'magazzino', provaUtente: 'magazzino@prova.messina' }, tipo: 'app', info: 'magApp' },
+    presenze: { prog: 'app', cfg: { parte: 'presenze', provaUtente: 'christian@prova.messina' }, tipo: 'app', info: 'presApp' },
+    carico: { prog: 'app', cfg: { parte: 'corporation', provaUtente: 'vendite@prova.messina' }, tipo: 'app', info: 'caricoApp' },
+    negozio: { prog: 'negozio', cfg: {}, tipo: 'gest' },
+    sitoT: { prog: 'sitoT', tipo: 'sito' }, sitoC: { prog: 'sitoC', tipo: 'sito' }
+  };
+  var S = { view: 'intro' };
+  var cornici = {}, nodi = {}, stato = null, versione = 0;
+  var tabsEl = document.getElementById('tabs'), app = document.getElementById('app');
+  var hint = function (t) { return '<div class="hint glass"><b>Da provare</b><span>' + t + '</span></div>'; };
+
+  function intro(){
+  const WEB=['negozio','portale','sitoT','sitoC'];
+  const parts=[
+    ['trasp','Gestionale Autotrasporti','Mail, bolle, giri, magazzino, giacenze, clienti con le tariffe, fatture, mezzi, autisti, Telepass e presenze.'],
+    ['autisti','App autisti','Il telefono dell’autista: il giro, la scansione dei colli, la firma, le mancate consegne e le giacenze.'],
+    ['magazzino','App magazzino','Entrata, uscita, trasferimenti e missioni: ogni collo scansionato con il suo posto.'],
+    ['presenze','App presenze','Il badge virtuale sul telefono: entrata e uscita con un QR che cambia ogni 30 secondi.'],
+    ['corp','Gestionale Corporation','Lotti, inventario, ordini dei siti e i due stage, computer e cellulari.'],
+    ['carico','App Corporation','Entrate: foto del seriale, scheda, grado, prezzo e bancale: così un computer entra in magazzino.'],
+    ['negozio','Negozio online','Come vede i computer chi compra: un prezzo per ogni grado.'],
+    ['portale','Portale clienti','Dentro Autotrasporti: quello che vedono Snam ed Econocom. Spedizioni, magazzino con i seriali, giacenze e fatture.','pGo','home'],
+    ['sitoT','Sito Autotrasporti','Il sito pubblico di Messina Autotrasporti: servizi, flotta, traccia, preventivi e candidature che arrivano nella Mail.'],
+    ['sitoC','Sito Corporation','Il sito pubblico di Messina Corporation: cancellazione dei dati, valutazione dei lotti, gradi e il tasto Negozio.']
   ];
-  var MOTORI = { trasp: 1, app: 1, corp: 1, portale: 1, negozio: 1 };   // pannelli con il database di prova
-  var tabs = document.getElementById('tabs'), main = document.getElementById('pannelli');
-  var cornici = {}, pannelli = {}, stato = null, versione = 0;
-  var esc = function (x) { return String(x).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); };
+  const consegna=[['tGo','mail','Arriva la mail con l’ordine','Autotrasporti › Mail'],['tGo','bolle','Il programma prepara la bolla, l’ufficio la conferma','Autotrasporti › Bolle'],['view','magazzino','La merce entra in magazzino ed esce sul camion, sempre scansionata','App magazzino'],['tGo','traffico','Il traffico organizza i giri del giorno dopo','Autotrasporti › Traffico'],['view','autisti','L’autista consegna con il telefono','App autisti'],['tGo','fatture','La consegna diventa una riga di fattura','Autotrasporti › Fatturazione']];
+  const computer=[['cGo','stage','Il computer viene formattato allo stage','Corporation › Stage Computer'],['cGo','lotti','Messina compra il lotto','Corporation › Lotti'],['view','carico','Foto del seriale e carico in magazzino','Entrate'],['view','negozio','Il computer va in vendita sui siti','Negozio online'],['cGo','ordini','Arriva l’ordine e si spedisce','Corporation › Ordini']];
+  const steps=list=>`<ol class="steps">${list.map((s,i)=>`<li><button class="step" data-act="${s[0]}" data-arg="${s[1]}"><span class="num">${i+1}</span><span><b>${s[2]}</b><br><span class="lbl">${s[3]}</span></span></button></li>`).join('')}</ol>`;
+  return `
+  <section class="hero glass">
+    <h1>Il nuovo programma Messina</h1>
+    <p>Questa è una prova da toccare: tutti i tasti funzionano e i dati sono di esempio, quindi niente arriva davvero a clienti o colleghi. Messina Autotrasporti e Messina Corporation hanno due programmi separati.</p>
+  </section>
+  <h2 class="gruppo-tit">Programmi</h2>
+  <div class="grid g-prog" style="margin-bottom:22px">
+    ${parts.filter(p=>WEB.indexOf(p[0])<0).map(p=>`<button class="part glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+  </div>
+  <h2 class="gruppo-tit">Siti web</h2>
+  <div class="grid g-siti" style="margin-bottom:16px">
+    ${WEB.map(k=>parts.find(p=>p[0]===k)).map(p=>`<button class="part sitocard glass" data-act="${p[3]||'view'}" data-arg="${p[4]||p[0]}"><span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>${({negozio:'negozio.[dominio]',portale:'portale.[dominio]',sitoT:'www.messina-autotrasporti.it',sitoC:'www.[dominio-corporation]'})[p[0]]}</span></span><h3>${p[1]}</h3><span class="muted">${p[2]}</span><span class="go">Apri</span></button>`).join('')}
+  </div>
+  <div class="grid g2">
+    <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di una consegna</h3>${steps(consegna)}</div>
+    <div class="glass card"><h3 style="font-size:18px;margin-bottom:8px">Il percorso di un computer</h3>${steps(computer)}</div>
+  </div>`;
+}
 
-  function intro() {
-    var prog = ['trasp', 'app', 'corp'], web = ['portale', 'negozio', 'sitoT', 'sitoC'];
-    var desc = {
-      trasp: 'Mail, bolle, traffico e giri, magazzino, giacenze, clienti e tariffe, fatturazione, mezzi, autisti, Telepass, presenze.',
-      app: 'Il telefono di autisti, magazzino e Corporation: giro, colli, firma, entrate, missioni e badge.',
-      corp: 'Lotti, inventario, ordini dei siti, stage computer e cellulari, ricambi.',
-      portale: 'Quello che vedono Snam ed Econocom: spedizioni, magazzino dal vivo, giacenze e fatture.',
-      negozio: 'Come vede i computer chi compra: un prezzo per ogni grado.',
-      sitoT: 'Servizi, flotta, traccia, preventivi e candidature che arrivano nella Mail.',
-      sitoC: 'Cancellazione dei dati, valutazione dei lotti, gradi e il tasto Negozio.'
-    };
-    var card = function (k, web) {
-      var p = P.find(function (x) { return x[0] === k; });
-      return '<button type="button" class="part glass" data-vai="' + k + '">' + (web ? '<span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>' + esc(p[3]) + '</span></span>' : '') +
-        '<h3>' + esc(p[1]) + '</h3><span class="muted">' + esc(desc[k]) + '</span><span class="go">Apri</span></button>';
-    };
-    return '<section class="hero glass"><h1>Il nuovo programma Messina</h1><p>Qui dentro gira il programma vero, lo stesso che andrà online, con dati di esempio: niente arriva a clienti o colleghi. ' +
-      'Tutti i pannelli usano lo stesso database: quello che fai in un programma lo ritrovi negli altri, come in azienda. Messina Autotrasporti e Messina Corporation restano separate.</p>' +
-      '<div class="riga" style="margin-top:16px"><button type="button" class="btn ghost" id="ricomincia">Ricomincia</button><span class="muted" style="font-size:13px">Riporta tutti i programmi ai dati di partenza.</span></div></section>' +
-      '<h2 class="gruppo-tit">Programmi</h2><div class="grid g-prog">' + prog.map(function (k) { return card(k, false); }).join('') + '</div>' +
-      '<h2 class="gruppo-tit">Siti web</h2><div class="grid g-siti">' + web.map(function (k) { return card(k, true); }).join('') + '</div>';
-  }
 
-  function sorgente(prog) {
-    var h = PROGRAMMI[prog];
+  function sorgente(k) {
+    var p = PARTI[k], h = PROGRAMMI[p.prog];
+    if (p.cfg) h = h.replace('window.MESSINA = {};', 'window.MESSINA = ' + JSON.stringify(p.cfg).replace(/</g, '\\u003c') + ';');
     return h;
   }
-
-  P.forEach(function (p) {
-    var b = document.createElement('button');
-    b.type = 'button'; b.className = 'tab'; b.textContent = p[1]; b.setAttribute('data-vai', p[0]);
-    tabs.appendChild(b);
-    var s = document.createElement('section');
-    s.className = 'pannello'; s.hidden = true; s.id = 'p-' + p[0];
-    if (p[0] === 'intro') s.innerHTML = intro();
-    else {
-      s.innerHTML = '<div class="hint glass">' + esc(p[4]) + '</div>';
-      var f = document.createElement('iframe');
-      f.className = 'schermo'; f.name = p[0]; f.title = p[1];
-      f.srcdoc = sorgente(p[2]);
-      cornici[p[0]] = f;
-      if (p[2] === 'app') { var t = document.createElement('div'); t.className = 'telefono'; t.appendChild(f); s.appendChild(t); }
-      else {
-        var w = document.createElement('div'); w.className = 'browser glass';
-        w.innerHTML = '<div class="bbar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">' + esc(p[3]) + '</span></div>';
-        w.appendChild(f); s.appendChild(w);
-      }
+  // «Da provare» del mockup per la sezione aperta nel gestionale
+  function hintGest(k) {
+    var f = cornici[k], h = '';
+    try { h = decodeURIComponent((f.contentWindow.location.hash || '').replace(/^#\/?/, '')); } catch (e) { h = ''; }
+    var x = h.split('/'), s = x[0] || 'home', sub = x[1];
+    if (k === 'negozio') return D.HN;
+    if (k === 'trasp') {
+      if (s === 'traffico' && sub) return D.HT.giro;
+      if (s === 'anomalie' && sub) return D.HT.anomalieSez;
+      if (s === 'clienti' && sub) return D.HT.cliente;
+      return D.HT[s] || D.HT.home;
     }
-    pannelli[p[0]] = s; main.appendChild(s);
-  });
-
-  function vai(k) {
-    if (!pannelli[k]) k = 'intro';
-    Object.keys(pannelli).forEach(function (x) { pannelli[x].hidden = x !== k; });
-    tabs.querySelectorAll('.tab').forEach(function (b) { var on = b.getAttribute('data-vai') === k; b.classList.toggle('on', on); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); });
-    try { history.replaceState(null, '', '#' + k); } catch (e) { /* */ }
-    window.scrollTo(0, 0);
+    return D.HC[s] || D.HC.home;
   }
+  function nodo(k) {
+    if (nodi[k]) return nodi[k];
+    var p = PARTI[k], el = document.createElement('div'), f = document.createElement('iframe');
+    f.name = k; f.title = VIEWS.find(function (v) { return v[0] === k; })[1];
+    if (p.tipo === 'gest') {
+      el.innerHTML = '<div class="hint glass" data-hint><b>Da provare</b><span></span></div>';
+      f.className = 'gframe'; el.appendChild(f);
+    } else if (p.tipo === 'app') {
+      el.innerHTML = '<div class="appsec">' + D.INFO[p.info] + '<div class="phone"><div class="screen"></div></div></div>';
+      el.querySelector('.screen').appendChild(f);
+    } else {
+      var t = k === 'sitoT';
+      el.innerHTML = hint(D.HS[t ? 0 : 1]) + '<div class="browser glass"><div class="bbar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">' + (t ? 'www.messina-autotrasporti.it' : 'www.[dominio-corporation]') + '</span></div></div>';
+      f.className = 'sitoframe'; el.querySelector('.browser').appendChild(f);
+    }
+    f.srcdoc = sorgente(k);
+    f.addEventListener('load', function () { aggancia(k); });
+    cornici[k] = f; nodi[k] = el;
+    return el;
+  }
+  // dopo il caricamento: sfondo trasparente (lo sfondo è quello della pagina, come nel mockup), altezza del contenuto, «Da provare»
+  function aggancia(k) {
+    var f = cornici[k], p = PARTI[k], w = f.contentWindow, d = f.contentDocument;
+    if (!d) return;
+    if (p.tipo !== 'sito') { var st = d.createElement('style'); st.textContent = 'html,body{background:transparent!important}'; d.head.appendChild(st); }
+    if (p.tipo === 'gest') {
+      var misura = function () { var h = Math.max(640, d.documentElement.scrollHeight); if (Math.abs(f.offsetHeight - h) > 1) f.style.height = h + 'px'; };
+      new ResizeObserver(misura).observe(d.documentElement); misura();
+      var aggHint = function () { var el = nodi[k].querySelector('[data-hint] span'); if (el) el.textContent = hintGest(k); };
+      w.addEventListener('hashchange', function () { aggHint(); window.scrollTo(0, 0); }); aggHint();
+    }
+  }
+  function render() {
+    tabsEl.innerHTML = VIEWS.map(function (v) { return '<button class="tab ' + (S.view === v[0] ? 'on' : '') + '" data-act="view" data-arg="' + v[0] + '">' + v[1] + '</button>'; }).join('');
+    var on = tabsEl.querySelector('.tab.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    Array.prototype.forEach.call(app.children, function (c) { c.hidden = true; });
+    if (S.view === 'intro') { var i = document.getElementById('p-intro'); if (!i) { i = document.createElement('div'); i.id = 'p-intro'; app.appendChild(i); } i.innerHTML = intro(); i.hidden = false; return; }
+    var el = nodo(S.view); if (el.parentNode !== app) app.appendChild(el); el.hidden = false;
+  }
+  function apri(k, hash) {
+    S.view = k; render(); window.scrollTo(0, 0);
+    if (hash !== undefined) { var f = cornici[k]; var metti = function () { try { f.contentWindow.location.hash = '#/' + hash; } catch (e) { /* */ } };
+      if (f.contentDocument && f.contentDocument.readyState === 'complete' && f.contentWindow.location.href !== 'about:blank') metti(); else f.addEventListener('load', metti, { once: true }); }
+  }
+  var A = {
+    view: function (v) { apri(v); },
+    tGo: function (s) { apri('trasp', s); },
+    cGo: function (s) { apri('corp', s); },
+    pGo: function () { apri('trasp', 'portale'); }
+  };
   document.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('[data-vai]');
-    if (b) { vai(b.getAttribute('data-vai')); return; }
-    if (e.target.id === 'ricomincia') ricomincia();
+    var el = e.target.closest && e.target.closest('[data-act]'); if (!el) return;
+    var f = A[el.dataset.act]; if (!f) return; e.preventDefault(); f(el.dataset.arg);
+  });
+  // severità del controllo (App autisti): la scrive nel database di prova come farebbe l'ufficio
+  document.addEventListener('input', function (e) {
+    if (e.target.id !== 'soglia') return;
+    var n = document.getElementById('sogliaN'); if (n) n.textContent = e.target.value;
+    var f = cornici.autisti; try { f.contentWindow.postMessage({ tipo: 'messina-prova-soglia', v: +e.target.value }, '*'); } catch (x) { /* */ }
   });
 
-  var timer = null, avviso = document.getElementById('avviso');
-  function dici(testo) {
-    avviso.textContent = testo; avviso.hidden = false;
-    clearTimeout(timer); timer = setTimeout(function () { avviso.hidden = true; }, 3800);
+  // avvisi: stesso aspetto dei toast del mockup
+  var toasts = [], seq = 0;
+  function evt(chi, testo) {
+    var id = ++seq; toasts.push({ id: id, chi: chi, testo: testo }); paint();
+    setTimeout(function () { toasts = toasts.filter(function (x) { return x.id !== id; }); paint(); }, 5600);
   }
+  function paint() { var el = document.getElementById('toasts'); el.innerHTML = toasts.slice(-3).map(function (x) { return '<div class="toast glass"><span class="pill dark">' + x.chi + '</span><span>' + x.testo + '</span></div>'; }).join(''); }
 
-  function ricomincia() {
-    stato = null; versione = 0;
-    try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) sessionStorage.removeItem(k); }); } catch (e) { /* */ }
-    try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) localStorage.removeItem(k); }); } catch (e) { /* */ }
-    Object.keys(cornici).forEach(function (k) { var f = cornici[k]; f.srcdoc = f.srcdoc; });
-    dici('Tutti i programmi sono tornati ai dati di partenza.');
-  }
-
-  // database condiviso: la prima copia che arriva è quella di tutti; ogni modifica va agli altri programmi
-  var nomeDi = function (src) { for (var k in cornici) if (cornici[k].contentWindow === src) return k; return null; };
-  var manda = function (k, msg) { try { cornici[k].contentWindow.postMessage(msg, '*'); } catch (e) { /* */ } };
-  var LINK = { negozioUrl: 'negozio', portaleUrl: 'portale', corporationUrl: 'sitoC', trasportiUrl: 'sitoT', privacyUrl: null };
+  // un solo database di prova: la prima copia che arriva è quella di tutti; ogni modifica va agli altri programmi
+  var MOTORI = { trasp: 1, corp: 1, autisti: 1, magazzino: 1, presenze: 1, carico: 1, negozio: 1 };
+  // cornici dentro le cornici (il Portale dentro Autotrasporti): si riconoscono dalla cornice che le contiene
+  var annidate = {};
+  var nomeDi = function (src) {
+    for (var k in cornici) if (cornici[k].contentWindow === src) return k;
+    for (var a in annidate) if (annidate[a] === src) return a;
+    for (var j in cornici) { try { if (src && src.parent === cornici[j].contentWindow) { var n = j + '>' + (src.name || 'x'); annidate[n] = src; return n; } } catch (e) { /* */ } }
+    return null;
+  };
+  var finestra = function (k) { return annidate[k] || (cornici[k] && cornici[k].contentWindow); };
+  var manda = function (k, msg) { try { finestra(k).postMessage(msg, '*'); } catch (e) { /* */ } };
+  var motore = function (k) { return MOTORI[k] || k.indexOf('>') > 0; };
   window.addEventListener('message', function (e) {
     var d = e.data, k = nomeDi(e.source);
     if (!k || !d || typeof d !== 'object') return;
-    if (d.tipo === 'messina-prova' && MOTORI[k] && d.t && typeof d.t === 'object') {
+    if (d.tipo === 'messina-prova' && motore(k) && d.t && typeof d.t === 'object') {
       if (d.azione === 'ciao') {
-        // il primo programma che si accende dà i dati di partenza a tutti
         if (!stato) { stato = d.t; versione = 1; manda(k, { tipo: 'messina-prova-versione', v: versione }); }
         else manda(k, { tipo: 'messina-prova-stato', da: 'pagina', v: versione, t: stato });
       } else if (d.azione === 'stato') {
-        if (d.base !== versione) { manda(k, { tipo: 'messina-prova-stato', da: 'pagina', v: versione, t: stato }); return; }   // copia vecchia: vale quella nuova
+        if (d.base !== versione) { manda(k, { tipo: 'messina-prova-stato', da: 'pagina', v: versione, t: stato }); return; }
         stato = d.t; versione++;
         manda(k, { tipo: 'messina-prova-versione', v: versione });
-        Object.keys(MOTORI).forEach(function (x) { if (x !== k) manda(x, { tipo: 'messina-prova-stato', da: d.da, v: versione, t: stato }); });
+        Object.keys(cornici).concat(Object.keys(annidate)).forEach(function (x) { if (x !== k && motore(x)) manda(x, { tipo: 'messina-prova-stato', da: d.da, v: versione, t: stato }); });
       }
     } else if (d.tipo === 'messina-sito' && d.corpo && typeof d.corpo === 'object') {
-      // il modulo del sito chiama il servizio «richiesta-sito», come online: la mail nasce nel database comune
-      manda(d.corpo.sito === 'corporation' ? 'corp' : 'trasp', { tipo: 'messina-prova-fn', nome: 'richiesta-sito', corpo: d.corpo });
-      dici(d.corpo.sito === 'corporation' ? 'Richiesta arrivata in Corporation › Mail.' : 'Richiesta arrivata in Autotrasporti › Mail.');
-    } else if (d.tipo === 'messina-vai' && typeof d.dove === 'string' && LINK[d.dove]) {
-      vai(LINK[d.dove]);
+      var dest = d.corpo.sito === 'corporation' ? 'corp' : 'trasp';
+      nodo(dest); manda(dest, { tipo: 'messina-prova-fn', nome: 'richiesta-sito', corpo: d.corpo });
+      evt('Sito', d.corpo.sito === 'corporation' ? 'Richiesta arrivata in Corporation › Mail.' : 'Richiesta arrivata in Autotrasporti › Mail.');
+    } else if (d.tipo === 'messina-pagina' && typeof d.path === 'string') {
+      var u = nodi[k] && nodi[k].querySelector('.url'); if (u) u.textContent = u.textContent.split('/')[0] + (d.path === '/' ? '' : d.path.replace(/\/$/, ''));
+    } else if (d.tipo === 'messina-vai' && typeof d.dove === 'string') {
+      if (d.dove === 'negozioUrl') apri('negozio'); else if (d.dove === 'portaleUrl') apri('trasp', 'portale');
+      else if (d.dove === 'corporationUrl') apri('sitoC'); else if (d.dove === 'trasportiUrl') apri('sitoT');
+      else if (d.dove === 'privacyUrl') evt('Sito', 'L’informativa privacy è una bozza: la fa verificare il consulente prima di metterla online.');
     }
   });
-
-  vai((location.hash || '').slice(1) || 'intro');
+  // i programmi con il database partono subito, così condividono i dati anche prima di essere aperti
+  ['trasp'].forEach(function (k) { var el = nodo(k); el.hidden = true; app.appendChild(el); });
+  render();
 })();
 </script>
 </body>
