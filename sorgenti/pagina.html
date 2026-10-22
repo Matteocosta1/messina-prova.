@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f3f5">
+<meta name="color-scheme" content="light only">
+<title>Prova programma Messina</title>
+<!--
+  Prova programma Messina: dentro ogni pannello gira il programma VERO di messina-sistema (stesso codice
+  della produzione) in modalità Prova. Un solo database di esempio condiviso da tutti i pannelli:
+  ogni programma, dopo una modifica, manda la sua copia dei dati a questa pagina, che la gira agli altri.
+  Questo file non si modifica a mano: si ricostruisce con  bash sorgenti/costruisci.sh <percorso di messina-sistema>
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#f2f3f5;--halo1:#e0e4eb;--halo2:#e9e9ee;--ink:#111214;--muted:#5b5e66;--line:rgba(17,18,20,.09);
+  --glass:rgba(255,255,255,.72);--glass-edge:rgba(255,255,255,.95);--solid:#111214;--on-solid:#fff;--soft:rgba(17,18,20,.05);
+  --frame:#1b1c20;--shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);min-height:100vh;
+  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);background-color:var(--bg)}
+button{font-family:inherit;color:inherit;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-edge);box-shadow:var(--shadow);border-radius:20px}
+.muted{color:var(--muted)}
+.wrap{max-width:1380px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:16px;padding:10px 12px;display:flex;align-items:center;gap:14px}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:19px;white-space:nowrap;padding:0 6px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;font-size:14px;font-weight:600;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;min-height:40px}
+.tab.on{background:var(--solid);color:var(--on-solid)}
+.hint{padding:12px 16px;margin-bottom:14px;border-radius:16px;font-size:14px}
+.pannello[hidden]{display:none!important}
+/* introduzione */
+.hero{padding:26px 24px;margin-bottom:22px}
+.hero h1{font-size:34px;letter-spacing:-.035em;font-weight:800;margin-bottom:8px}
+.hero p{margin:0;max-width:72ch;color:var(--muted);font-size:16px}
+.gruppo-tit{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 12px}
+.grid{display:grid;gap:14px}
+.g-prog{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:22px}
+.g-siti{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px}
+.part{display:flex;flex-direction:column;gap:8px;text-align:left;cursor:pointer;padding:18px;font-size:14px}
+.part h3{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.part .go{margin-top:auto;font-weight:700}
+.minibar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:12px;background:var(--soft)}
+.minibar i{width:8px;height:8px;border-radius:99px;background:rgba(17,18,20,.18);flex:none}
+.minibar span{flex:1;min-width:0;text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.riga{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:0;background:var(--solid);color:var(--on-solid);font-weight:700;font-size:15px;padding:11px 18px;border-radius:999px;cursor:pointer;min-height:44px}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+/* finestra del browser */
+.browser{border-radius:22px;overflow:hidden;padding:0}
+.bbar{display:flex;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.bbar .dots{display:flex;gap:6px;flex:none}.bbar .dots i{width:10px;height:10px;border-radius:99px;background:rgba(17,18,20,.16)}
+.bbar .url{flex:1;min-width:0;text-align:center;font-size:13px;color:var(--muted);background:var(--soft);border-radius:99px;padding:6px 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.schermo{display:block;width:100%;height:calc(100vh - 200px);height:calc(100dvh - 200px);min-height:560px;border:0;background:#f2f3f5}
+/* telefono */
+.telefono{width:414px;max-width:100%;margin:0 auto;padding:12px;border-radius:52px;background:var(--frame);box-shadow:var(--shadow)}
+.telefono .schermo{height:844px;max-height:calc(100dvh - 200px);min-height:620px;border-radius:40px}
+@media (max-width:1100px){.g-prog,.g-siti{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .brand{display:none}.top{padding:8px;gap:8px;border-radius:18px}.tab{padding:8px 12px}
+  .hint{font-size:13px;padding:10px 12px}.hero h1{font-size:27px}.hero{padding:20px 18px}
+  .schermo{height:calc(100dvh - 150px);min-height:480px}
+}
+@media (max-width:640px){.g-siti,.g-prog{grid-template-columns:1fr}}
+@media (max-width:500px){.telefono{padding:0;border-radius:24px;background:transparent;box-shadow:none}.telefono .schermo{height:calc(100dvh - 150px);max-height:none;min-height:480px;border-radius:24px}}
+.avviso{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;background:var(--solid);color:var(--on-solid);
+  padding:12px 18px;border-radius:16px;font-size:14px;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
+.avviso[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top glass"><div class="brand">Messina</div><nav class="tabs" id="tabs" aria-label="Parti del programma"></nav></header>
+  <main id="pannelli"></main>
+</div>
+<div class="avviso" id="avviso" role="status" hidden></div>
+<script>
+/*@@PROGRAMMI@@*/
+(function () {
+  'use strict';
+  // pannelli: [chiave, nome, programma, indirizzo, spiegazione]
+  var P = [
+    ['intro', 'Introduzione'],
+    ['trasp', 'Autotrasporti', 'gestionale', 'gestionale.[dominio]', 'Il gestionale di Messina Autotrasporti. Scegli chi sei (direzione, amministrazione, bolle, traffico, magazzino): ognuno vede solo le sue sezioni.'],
+    ['app', 'App', 'app', '', 'L’app Messina sul telefono: entra come Autista per il giro e le consegne, come Magazziniere per entrate e missioni, come Vendite o Manuel per le Entrate della Corporation.'],
+    ['corp', 'Corporation', 'gestionale', 'corporation.[dominio]', 'Il gestionale di Messina Corporation: entra come Vendite o come Manuel (stage). È lo stesso programma di Autotrasporti, separato dal profilo.'],
+    ['portale', 'Portale', 'portale', 'portale.[dominio]', 'Il portale dei clienti di Messina Autotrasporti, visto con i loro occhi: entra come Snam o Econocom.'],
+    ['negozio', 'Negozio', 'negozio', 'negozio.[dominio]', 'Il negozio online di Messina Corporation. Il pagamento è simulato: l’ordine arriva in Corporation › Ordini.'],
+    ['sitoT', 'Sito Autotrasporti', 'sitoT', 'www.messina-autotrasporti.it', 'Il sito pubblico di Messina Autotrasporti. Preventivo, ritiro, candidatura e contatto arrivano in Autotrasporti › Mail.'],
+    ['sitoC', 'Sito Corporation', 'sitoC', 'www.[dominio-corporation]', 'Il sito pubblico di Messina Corporation. «Valuta un lotto» arriva in Corporation › Mail, cartella Lotti; «Negozio» apre il negozio.']
+  ];
+  var MOTORI = { trasp: 1, app: 1, corp: 1, portale: 1, negozio: 1 };   // pannelli con il database di prova
+  var tabs = document.getElementById('tabs'), main = document.getElementById('pannelli');
+  var cornici = {}, pannelli = {}, stato = null;
+  var esc = function (x) { return String(x).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); };
+
+  function intro() {
+    var prog = ['trasp', 'app', 'corp'], web = ['portale', 'negozio', 'sitoT', 'sitoC'];
+    var desc = {
+      trasp: 'Mail, bolle, traffico e giri, magazzino, giacenze, clienti e tariffe, fatturazione, mezzi, autisti, Telepass, presenze.',
+      app: 'Il telefono di autisti, magazzino e Corporation: giro, colli, firma, entrate, missioni e badge.',
+      corp: 'Lotti, inventario, ordini dei siti, stage computer e cellulari, ricambi.',
+      portale: 'Quello che vedono Snam ed Econocom: spedizioni, magazzino dal vivo, giacenze e fatture.',
+      negozio: 'Come vede i computer chi compra: un prezzo per ogni grado.',
+      sitoT: 'Servizi, flotta, traccia, preventivi e candidature che arrivano nella Mail.',
+      sitoC: 'Cancellazione dei dati, valutazione dei lotti, gradi e il tasto Negozio.'
+    };
+    var card = function (k, web) {
+      var p = P.find(function (x) { return x[0] === k; });
+      return '<button type="button" class="part glass" data-vai="' + k + '">' + (web ? '<span class="minibar" aria-hidden="true"><i></i><i></i><i></i><span>' + esc(p[3]) + '</span></span>' : '') +
+        '<h3>' + esc(p[1]) + '</h3><span class="muted">' + esc(desc[k]) + '</span><span class="go">Apri</span></button>';
+    };
+    return '<section class="hero glass"><h1>Il nuovo programma Messina</h1><p>Qui dentro gira il programma vero, lo stesso che andrà online, con dati di esempio: niente arriva a clienti o colleghi. ' +
+      'Tutti i pannelli usano lo stesso database: quello che fai in un programma lo ritrovi negli altri, come in azienda. Messina Autotrasporti e Messina Corporation restano separate.</p>' +
+      '<div class="riga" style="margin-top:16px"><button type="button" class="btn ghost" id="ricomincia">Ricomincia</button><span class="muted" style="font-size:13px">Riporta tutti i programmi ai dati di partenza.</span></div></section>' +
+      '<h2 class="gruppo-tit">Programmi</h2><div class="grid g-prog">' + prog.map(function (k) { return card(k, false); }).join('') + '</div>' +
+      '<h2 class="gruppo-tit">Siti web</h2><div class="grid g-siti">' + web.map(function (k) { return card(k, true); }).join('') + '</div>';
+  }
+
+  function sorgente(prog) {
+    var h = PROGRAMMI[prog];
+    return h;
+  }
+
+  P.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tab'; b.textContent = p[1]; b.setAttribute('data-vai', p[0]);
+    tabs.appendChild(b);
+    var s = document.createElement('section');
+    s.className = 'pannello'; s.hidden = true; s.id = 'p-' + p[0];
+    if (p[0] === 'intro') s.innerHTML = intro();
+    else {
+      s.innerHTML = '<div class="hint glass">' + esc(p[4]) + '</div>';
+      var f = document.createElement('iframe');
+      f.className = 'schermo'; f.name = p[0]; f.title = p[1];
+      f.srcdoc = sorgente(p[2]);
+      cornici[p[0]] = f;
+      if (p[2] === 'app') { var t = document.createElement('div'); t.className = 'telefono'; t.appendChild(f); s.appendChild(t); }
+      else {
+        var w = document.createElement('div'); w.className = 'browser glass';
+        w.innerHTML = '<div class="bbar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="url">' + esc(p[3]) + '</span></div>';
+        w.appendChild(f); s.appendChild(w);
+      }
+    }
+    pannelli[p[0]] = s; main.appendChild(s);
+  });
+
+  function vai(k) {
+    if (!pannelli[k]) k = 'intro';
+    Object.keys(pannelli).forEach(function (x) { pannelli[x].hidden = x !== k; });
+    tabs.querySelectorAll('.tab').forEach(function (b) { var on = b.getAttribute('data-vai') === k; b.classList.toggle('on', on); if (on) b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); });
+    try { history.replaceState(null, '', '#' + k); } catch (e) { /* */ }
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-vai]');
+    if (b) { vai(b.getAttribute('data-vai')); return; }
+    if (e.target.id === 'ricomincia') ricomincia();
+  });
+
+  var timer = null, avviso = document.getElementById('avviso');
+  function dici(testo) {
+    avviso.textContent = testo; avviso.hidden = false;
+    clearTimeout(timer); timer = setTimeout(function () { avviso.hidden = true; }, 3800);
+  }
+
+  function ricomincia() {
+    stato = null;
+    try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) sessionStorage.removeItem(k); }); } catch (e) { /* */ }
+    try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) localStorage.removeItem(k); }); } catch (e) { /* */ }
+    Object.keys(cornici).forEach(function (k) { var f = cornici[k]; f.srcdoc = f.srcdoc; });
+    dici('Tutti i programmi sono tornati ai dati di partenza.');
+  }
+
+  // database condiviso: la prima copia che arriva è quella di tutti; ogni modifica va agli altri programmi
+  var nomeDi = function (src) { for (var k in cornici) if (cornici[k].contentWindow === src) return k; return null; };
+  var manda = function (k, msg) { try { cornici[k].contentWindow.postMessage(msg, '*'); } catch (e) { /* */ } };
+  var LINK = { negozioUrl: 'negozio', portaleUrl: 'portale', corporationUrl: 'sitoC', trasportiUrl: 'sitoT', privacyUrl: null };
+  window.addEventListener('message', function (e) {
+    var d = e.data, k = nomeDi(e.source);
+    if (!k || !d || typeof d !== 'object') return;
+    if (d.tipo === 'messina-prova' && MOTORI[k] && d.t && typeof d.t === 'object') {
+      if (d.azione === 'ciao') {
+        if (!stato) stato = d.t;
+        else manda(k, { tipo: 'messina-prova-stato', da: 'pagina', t: stato });
+      } else if (d.azione === 'stato') {
+        stato = d.t;
+        Object.keys(MOTORI).forEach(function (x) { if (x !== k) manda(x, { tipo: 'messina-prova-stato', da: d.da, t: stato }); });
+      }
+    } else if (d.tipo === 'messina-sito' && d.corpo && typeof d.corpo === 'object') {
+      // il modulo del sito chiama il servizio «richiesta-sito», come online: la mail nasce nel database comune
+      manda(d.corpo.sito === 'corporation' ? 'corp' : 'trasp', { tipo: 'messina-prova-fn', nome: 'richiesta-sito', corpo: d.corpo });
+      dici(d.corpo.sito === 'corporation' ? 'Richiesta arrivata in Corporation › Mail.' : 'Richiesta arrivata in Autotrasporti › Mail.');
+    } else if (d.tipo === 'messina-vai' && typeof d.dove === 'string' && LINK[d.dove]) {
+      vai(LINK[d.dove]);
+    }
+  });
+
+  vai((location.hash || '').slice(1) || 'intro');
+})();
+</script>
+</body>
+</html>
