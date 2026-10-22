@@ -23,6 +23,10 @@ def programma(nome):
         if h.count(vecchio) != 1:
             raise SystemExit(f'{nome}: non trovo {vecchio}')
         h = h.replace(vecchio, nuovo)
+    # dentro una cornice srcdoc i link «#/…» puntano alla pagina che la contiene: con questa base restano nel programma
+    if '<head>' not in h[:300]:   # il primo <head> è quello della pagina (il JavaScript può contenere la stessa parola)
+        raise SystemExit(f'{nome}: non trovo <head>')
+    h = h.replace('<head>', '<head>\n<base href="about:srcdoc">', 1)
     # nella cornice non servono manifest e icone dell'app installabile
     h = re.sub(r'<link rel="(manifest|apple-touch-icon|icon)"[^>]*>\n?', '', h)
     return h

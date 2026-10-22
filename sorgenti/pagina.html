@@ -99,7 +99,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
   ];
   var MOTORI = { trasp: 1, app: 1, corp: 1, portale: 1, negozio: 1 };   // pannelli con il database di prova
   var tabs = document.getElementById('tabs'), main = document.getElementById('pannelli');
-  var cornici = {}, pannelli = {}, stato = null;
+  var cornici = {}, pannelli = {}, stato = null, versione = 0;
   var esc = function (x) { return String(x).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); };
 
   function intro() {
@@ -173,7 +173,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
   }
 
   function ricomincia() {
-    stato = null;
+    stato = null; versione = 0;
     try { Object.keys(sessionStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) sessionStorage.removeItem(k); }); } catch (e) { /* */ }
     try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf('messina.') === 0) localStorage.removeItem(k); }); } catch (e) { /* */ }
     Object.keys(cornici).forEach(function (k) { var f = cornici[k]; f.srcdoc = f.srcdoc; });
@@ -189,11 +189,14 @@ h1,h2,h3{margin:0;text-wrap:balance}
     if (!k || !d || typeof d !== 'object') return;
     if (d.tipo === 'messina-prova' && MOTORI[k] && d.t && typeof d.t === 'object') {
       if (d.azione === 'ciao') {
-        if (!stato) stato = d.t;
-        else manda(k, { tipo: 'messina-prova-stato', da: 'pagina', t: stato });
+        // il primo programma che si accende dà i dati di partenza a tutti
+        if (!stato) { stato = d.t; versione = 1; manda(k, { tipo: 'messina-prova-versione', v: versione }); }
+        else manda(k, { tipo: 'messina-prova-stato', da: 'pagina', v: versione, t: stato });
       } else if (d.azione === 'stato') {
-        stato = d.t;
-        Object.keys(MOTORI).forEach(function (x) { if (x !== k) manda(x, { tipo: 'messina-prova-stato', da: d.da, t: stato }); });
+        if (d.base !== versione) { manda(k, { tipo: 'messina-prova-stato', da: 'pagina', v: versione, t: stato }); return; }   // copia vecchia: vale quella nuova
+        stato = d.t; versione++;
+        manda(k, { tipo: 'messina-prova-versione', v: versione });
+        Object.keys(MOTORI).forEach(function (x) { if (x !== k) manda(x, { tipo: 'messina-prova-stato', da: d.da, v: versione, t: stato }); });
       }
     } else if (d.tipo === 'messina-sito' && d.corpo && typeof d.corpo === 'object') {
       // il modulo del sito chiama il servizio «richiesta-sito», come online: la mail nasce nel database comune
