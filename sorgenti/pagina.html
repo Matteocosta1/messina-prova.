@@ -400,7 +400,9 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
   function aggancia(k) {
     var f = cornici[k], p = PARTI[k], w = f.contentWindow, d = f.contentDocument;
     if (!d) return;
-    if (p.tipo !== 'sito') { var st = d.createElement('style'); st.textContent = 'html,body{background:transparent!important}'; d.head.appendChild(st); }
+    if (p.tipo !== 'sito') { var st = d.createElement('style'); st.textContent = 'html,body{background:transparent!important}' + (p.tipo === 'app' ? '.appvera{background:transparent!important}' : ''); d.head.appendChild(st); }
+    // nel mockup le regole «max-width» guardano la larghezza della pagina, non quella del telefono finto: qui si fa lo stesso
+    if (p.tipo === 'app') comeLaPagina(d);
     if (p.tipo === 'gest') {
       var misura = function () { var h = Math.max(640, d.documentElement.scrollHeight); if (Math.abs(f.offsetHeight - h) > 1) f.style.height = h + 'px'; };
       new ResizeObserver(misura).observe(d.documentElement); misura();
@@ -408,9 +410,19 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
       w.addEventListener('hashchange', function () { aggHint(); window.scrollTo(0, 0); }); aggHint();
     }
   }
+  /** toglie dalla cornice le regole @media (max-width:N) che nella pagina larga non valgono (come nel mockup, dove il telefono è dentro la pagina) */
+  function comeLaPagina(d) {
+    var W = window.innerWidth;
+    Array.prototype.forEach.call(d.styleSheets, function (sh) {
+      var r; try { r = sh.cssRules; } catch (e) { return; }
+      for (var i = r.length - 1; i >= 0; i--) {
+        var m = r[i].media && r[i].conditionText !== undefined ? /max-width:\s*(\d+)px/.exec(r[i].conditionText) : null;
+        if (m && W > +m[1]) sh.deleteRule(i);
+      }
+    });
+  }
   function render() {
     tabsEl.innerHTML = VIEWS.map(function (v) { return '<button class="tab ' + (S.view === v[0] ? 'on' : '') + '" data-act="view" data-arg="' + v[0] + '">' + v[1] + '</button>'; }).join('');
-    var on = tabsEl.querySelector('.tab.on'); if (on) on.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     Array.prototype.forEach.call(app.children, function (c) { c.hidden = true; });
     if (S.view === 'intro') { var i = document.getElementById('p-intro'); if (!i) { i = document.createElement('div'); i.id = 'p-intro'; app.appendChild(i); } i.innerHTML = intro(); i.hidden = false; return; }
     var el = nodo(S.view); if (el.parentNode !== app) app.appendChild(el); el.hidden = false;
@@ -452,7 +464,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
   var nomeDi = function (src) {
     for (var k in cornici) if (cornici[k].contentWindow === src) return k;
     for (var a in annidate) if (annidate[a] === src) return a;
-    for (var j in cornici) { try { if (src && src.parent === cornici[j].contentWindow) { var n = j + '>' + (src.name || 'x'); annidate[n] = src; return n; } } catch (e) { /* */ } }
+    for (var j in cornici) { try { if (src && src.parent === cornici[j].contentWindow) { var n = j + '>' + (src.name || 'x'); annidate[n] = src; try { comeLaPagina(src.document); } catch (e2) { /* */ } return n; } } catch (e) { /* */ } }
     return null;
   };
   var finestra = function (k) { return annidate[k] || (cornici[k] && cornici[k].contentWindow); };
@@ -479,6 +491,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
       var u = nodi[k] && nodi[k].querySelector('.url'); if (u) u.textContent = u.textContent.split('/')[0] + (d.path === '/' ? '' : d.path.replace(/\/$/, ''));
     } else if (d.tipo === 'messina-vai' && typeof d.dove === 'string') {
       if (d.dove === 'negozioUrl') apri('negozio'); else if (d.dove === 'portaleUrl') apri('trasp', 'portale');
+      else if (d.dove === 'appMagazzino') apri('magazzino');
       else if (d.dove === 'corporationUrl') apri('sitoC'); else if (d.dove === 'trasportiUrl') apri('sitoT');
       else if (d.dove === 'privacyUrl') evt('Sito', 'L’informativa privacy è una bozza: la fa verificare il consulente prima di metterla online.');
     }
