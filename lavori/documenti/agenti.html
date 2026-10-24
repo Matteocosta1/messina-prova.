@@ -1,0 +1,164 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>JARVIS per Messina</title>
+<style>
+@page{size:A4;margin:20mm 18mm 18mm 18mm}
+*{box-sizing:border-box}
+body{font-family:Inter,sans-serif;color:#111;font-size:10.8pt;line-height:1.55;margin:0}
+h1{font-family:'Inter Display',Inter;font-size:30pt;font-weight:700;letter-spacing:-.025em;line-height:1.05;margin:0 0 6px}
+.sotto{font-family:'Inter Display',Inter;font-size:15pt;font-weight:500;color:#444;margin:0 0 6px}
+.by{color:#777;font-size:9.5pt;margin:0 0 22px}
+h2{font-family:'Inter Display',Inter;font-size:18pt;font-weight:700;letter-spacing:-.015em;margin:26px 0 12px;padding-bottom:8px;border-bottom:2px solid #111;break-after:avoid}
+.blocco{break-inside:avoid}
+h3{font-size:12pt;font-weight:700;margin:16px 0 6px;break-after:avoid}
+p{margin:0 0 9px}
+.lead{font-size:12.5pt;line-height:1.5;margin:0 0 14px}
+table{width:100%;border-collapse:collapse;margin:6px 0 14px;font-size:9.6pt}
+th{text-align:left;background:#111;color:#fff;font-weight:600;padding:7px 9px}
+td{padding:7px 9px;border-bottom:1px solid #ddd;vertical-align:top}
+tr{break-inside:avoid}
+td:first-child{font-weight:600}
+ul,ol{margin:0 0 10px;padding-left:20px}
+li{margin:0 0 6px;break-inside:avoid}
+.box{border:1.5px solid #111;border-radius:12px;padding:12px 14px;margin:10px 0 14px;break-inside:avoid}
+.box b.t{display:block;font-size:11pt;margin-bottom:4px}
+.grigio{background:#f3f3f4;border-color:#f3f3f4}
+/* schema */
+.schema{margin:10px 0 6px;break-inside:avoid}
+.liv{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:stretch;margin:0}
+.liv .nome{font-size:8.6pt;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;padding-top:9px}
+.fila{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #bbb;border-radius:999px;padding:4px 11px;font-size:9.3pt;background:#fff}
+.chip.n{background:#111;color:#fff;border-color:#111}
+.jarvis{background:#111;color:#fff;border-radius:14px;padding:10px 14px}
+.jarvis b{font-size:13pt;letter-spacing:.04em}
+.jarvis span{display:block;font-size:9.4pt;color:#ddd;margin-top:2px}
+.sistema{border:2px solid #111;border-radius:14px;padding:9px 14px;font-size:9.6pt}
+.sistema b{font-size:11pt}
+.freccia{grid-column:2;text-align:center;color:#999;font-size:13pt;line-height:1;margin:3px 0}
+.lato{font-size:9.2pt;color:#444;margin-top:8px}
+/* giornata */
+.ora{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #e5e5e5;break-inside:avoid}
+.ora b{font-variant-numeric:tabular-nums}
+.verbi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+.verbo{background:#f3f3f4;border-radius:12px;padding:10px 12px;break-inside:avoid}
+.verbo b{display:block;font-size:11pt;margin-bottom:2px}
+.fonti{font-size:8.6pt;color:#555}
+.fonti a{color:#555}
+</style></head><body>
+
+<h1>JARVIS per Messina</h1>
+<p class="sotto">Come aiuterà l’azienda e come guiderà gli agenti</p>
+<p class="by">24 ottobre 2026 · Alessandro · Messina Autotrasporti e Messina Corporation</p>
+
+<p class="lead">JARVIS diventa il <b>regista dell’azienda</b>. È un cervello unico che conosce tutto il sistema Messina, cioè clienti, bolle, giri, magazzino, fatture e persone, e lo mette a disposizione di chi lavora. Sotto di lui lavora una squadra di <b>agenti</b>: dipendenti digitali, ognuno con un ruolo preciso, che rispondono al telefono, alle mail e su WhatsApp, preparano il lavoro e lo passano alle persone. <b>Le decisioni importanti restano sempre a una persona.</b></p>
+
+<h2>Come è fatto</h2>
+<div class="schema">
+  <div class="liv"><div class="nome">Chi contatta</div><div class="fila"><span class="chip">Clienti</span><span class="chip">Destinatari</span><span class="chip">Autisti</span><span class="chip">Fornitori</span><span class="chip">Chi compra un PC</span></div></div>
+  <div class="liv"><div></div><div class="freccia">↓</div></div>
+  <div class="liv"><div class="nome">Canali</div><div class="fila"><span class="chip">Telefono</span><span class="chip">Mail</span><span class="chip">WhatsApp</span><span class="chip">App</span><span class="chip">Gestionali</span><span class="chip">Sito</span></div></div>
+  <div class="liv"><div></div><div class="freccia">↓</div></div>
+  <div class="liv"><div class="nome">Il regista</div><div class="jarvis"><b>JARVIS</b><span>Smista ogni richiesta, controlla il lavoro, passa i casi alle persone, riferisce ogni mattina.</span></div></div>
+  <div class="liv"><div></div><div class="freccia">↓</div></div>
+  <div class="liv"><div class="nome">Gli agenti</div><div class="fila"><span class="chip n">Centralino</span><span class="chip n">Tracciamento</span><span class="chip n">Avvisi</span><span class="chip n">Giacenze</span><span class="chip n">Ordini</span><span class="chip n">Commerciale</span><span class="chip n">Solleciti</span><span class="chip n">Vendite</span><span class="chip n">Autisti</span><span class="chip n">Direzione</span></div></div>
+  <div class="liv"><div></div><div class="freccia">↓</div></div>
+  <div class="liv"><div class="nome">Il cervello</div><div class="sistema"><b>Sistema Messina</b> · database, regole, permessi, storico che non si cancella</div></div>
+  <div class="liv"><div></div><div class="lato"><b>Le persone di Messina</b> stanno accanto a JARVIS: approvano, decidono e ricevono i casi difficili.</div></div>
+</div>
+
+<ul>
+  <li><b>Il cervello è il sistema Messina</b>, lo stesso di gestionali e app. Le regole sono scritte nel database: né JARVIS né gli agenti possono aggirarle. Per esempio, un agente non può fatturare una bolla senza colli, esattamente come una persona.</li>
+  <li><b>Ogni agente ha il suo utente</b>, i permessi minimi per il suo lavoro e la sua firma nello storico. Si sa sempre chi ha fatto cosa: una persona o un agente.</li>
+  <li><b>Un solo cervello, tanti canali:</b> che il cliente telefoni, scriva o usi il sito, la risposta viene dagli stessi dati.</li>
+</ul>
+<div class="box grigio"><b class="t">JARVIS personale e JARVIS di Messina</b>Usano la stessa tecnologia, ma i dati sono separati. Il JARVIS di Alessandro, con le sue note, la sua vita privata e il diario, non vede i dati dell’azienda, e l’azienda non vede i suoi. In azienda JARVIS lavora con gli account e i permessi di Messina.</div>
+
+<h2>Cosa fa JARVIS per l’azienda</h2>
+<table>
+<tr><th style="width:20%">Beneficio</th><th>Esempi concreti</th></tr>
+<tr><td>Tempo</td><td>Le mail dei clienti diventano bozze di bolla: l’ufficio controlla invece di ricopiare. Gianluca prepara un preventivo a voce. La fattura di fine mese si prepara da sola e l’amministrazione la controlla.</td></tr>
+<tr><td>Soldi</td><td>Segnala le voci extra dimenticate in fattura (sponda, attesa, sabato, peso volumetrico). Fa emergere gli sprechi: il mezzo che consuma troppo, il PC fermo da 60 giorni. Mostra in anticipo le scadenze dei prossimi mesi.</td></tr>
+<tr><td>Errori</td><td>Archivia foto e firme di ogni consegna: nelle contestazioni ci sono le prove. Segnala il collo mancante prima della partenza e l’IBAN cambiato in una mail sospetta, la truffa più frequente nelle aziende.</td></tr>
+<tr><td>Decisioni</td><td>«Come siamo messi questo mese?», «Quale cliente ci rende meno?»: la risposta arriva dai numeri veri, in un attimo. Il resoconto del mattino è già pronto, con le priorità del giorno.</td></tr>
+<tr><td>Continuità</td><td>Accordi, procedure e abitudini dei clienti non restano nella testa di una sola persona. Chi entra nuovo impara più in fretta chiedendo a JARVIS.</td></tr>
+</table>
+
+<h2>La squadra di agenti</h2>
+<table>
+<tr><th style="width:17%">Agente</th><th>Cosa fa</th><th style="width:20%">Dove lavora</th><th style="width:20%">Chi dà il sì</th></tr>
+<tr><td>Centralino</td><td>Risponde a tutte le chiamate, anche fuori orario. Capisce chi chiama e perché, smista o lascia il messaggio.</td><td>Telefono</td><td>—</td></tr>
+<tr><td>Tracciamento</td><td>Dice al cliente dov’è la spedizione, dopo aver controllato il numero di bolla.</td><td>Telefono, mail, WhatsApp</td><td>—</td></tr>
+<tr><td>Avvisi</td><td>Il giorno prima avvisa il destinatario della fascia oraria: «Domani tra le 10 e le 12, c’è qualcuno?»</td><td>Telefono, SMS, WhatsApp</td><td>—</td></tr>
+<tr><td>Giacenze</td><td>Chiama il destinatario e fissa la riconsegna.</td><td>Telefono</td><td>Ufficio bolle</td></tr>
+<tr><td>Ordini</td><td>Trasforma gli ordini a voce e via mail in bozze di bolla.</td><td>Mail, telefono</td><td>Ufficio bolle</td></tr>
+<tr><td>Commerciale</td><td>Raccoglie le richieste di preventivo e prepara la bozza.</td><td>Mail, sito, telefono</td><td>Gianluca, Direzione</td></tr>
+<tr><td>Solleciti</td><td>Ricorda con cortesia le fatture in scadenza o scadute, seguendo lo scadenzario.</td><td>Mail, telefono</td><td>Amministrazione</td></tr>
+<tr><td>Vendite</td><td>Corporation: risponde sui PC (grado, garanzia, disponibilità), raccoglie gli ordini delle aziende e le richieste di valutazione dei lotti.</td><td>Telefono, mail, sito</td><td>Vendite</td></tr>
+<tr><td>Autisti</td><td>Riceve le chiamate degli autisti in difficoltà («Sono bloccato in A1»), avvisa il Traffico e i clienti del giro.</td><td>Telefono, app</td><td>Traffico</td></tr>
+<tr><td>Direzione</td><td>Assistente di Matteo, Pier e dei genitori: numeri, resoconti, domande.</td><td>App, voce</td><td>—</td></tr>
+</table>
+
+<h2>Come JARVIS guida gli agenti</h2>
+<div class="verbi">
+  <div class="verbo"><b>1 · Smista</b>Ogni chiamata, mail o messaggio va all’agente giusto.</div>
+  <div class="verbo"><b>2 · Controlla</b>Prima che un lavoro esca, verifica che rispetti le regole: importi solo dalle tariffe, dati completi, permessi giusti.</div>
+  <div class="verbo"><b>3 · Passa alle persone</b>Se un agente non sa o la cosa è delicata, gira il caso alla persona giusta con un riassunto pronto.</div>
+  <div class="verbo"><b>4 · Chiede il sì</b>Prezzi, sconti, bonifici e cambi di IBAN partono solo dopo l’approvazione di una persona.</div>
+  <div class="verbo"><b>5 · Riferisce</b>Ogni mattina, nel resoconto: cosa hanno fatto gli agenti, cosa è passato alle persone, cosa è rimasto aperto.</div>
+  <div class="verbo"><b>6 · Migliora</b>Se un agente sbaglia o non capisce, JARVIS propone come correggerlo. La modifica la approva Alessandro.</div>
+</div>
+
+<div class="blocco"><h3>Una giornata con JARVIS</h3>
+<div class="ora"><b>07:00</b><span>Il resoconto del mattino arriva a Direzione e Amministrazione: com’è andata ieri, cosa hanno fatto gli agenti, le priorità di oggi.</span></div>
+<div class="ora"><b>07:30</b><span>Avvisi manda la fascia oraria ai destinatari di domani.</span></div>
+<div class="ora"><b>09:15</b><span>Un cliente chiama: «Dov’è la mia spedizione?». Tracciamento risponde in un minuto.</span></div>
+<div class="ora"><b>10:40</b><span>Arriva una mail con un ordine: Ordini prepara la bozza di bolla, l’ufficio bolle la controlla e la conferma.</span></div>
+<div class="ora"><b>11:20</b><span>Un autista è fermo in A1: l’agente Autisti avvisa il Traffico e i clienti del giro.</span></div>
+<div class="ora"><b>14:00</b><span>Giacenze chiama un destinatario e fissa la riconsegna per giovedì.</span></div>
+<div class="ora"><b>16:30</b><span>Solleciti ricorda a un cliente una fattura scaduta; l’amministrazione vede com’è andata.</span></div>
+<div class="ora"><b>19:00</b><span>Il Centralino risponde fuori orario e lascia i messaggi per la mattina dopo.</span></div></div>
+
+<div class="blocco"><h2>Le regole</h2>
+<ul>
+  <li><b>Ogni chiamata si apre dicendo che è un agente AI.</b> Lo impone l’AI Act europeo (art. 50) dal 2 agosto 2026.</li>
+  <li><b>Soldi:</b> prezzi sotto il listino, sconti, bonifici e cambi di IBAN li decide sempre una persona. Gli importi vengono solo dalle tariffe, mai da quello che si sente in una telefonata o si legge in una mail.</li>
+  <li><b>Ogni agente ha il suo utente</b>, i permessi minimi e la firma nello storico, che non si cancella.</li>
+  <li><b>Nessun agente decide sulle persone</b>, per esempio nella selezione o nella valutazione: per l’AI Act sono sistemi ad alto rischio.</li>
+  <li><b>Niente posizione continua dei dipendenti, lettura dell’umore o impronta vocale</b> (art. 4 dello Statuto dei lavoratori, AI Act, GDPR).</li>
+  <li><b>Chiamate registrate:</b> serve l’informativa a chi chiama. Per le chiamate commerciali verso chi non è ancora cliente si controlla il Registro delle opposizioni.</li>
+</ul></div>
+
+<div class="blocco"><h2>Come si parte</h2>
+<p>Si comincia quando il sistema è in uso da almeno un mese e i suoi numeri coincidono con quelli di J7. Prima i dati devono essere puliti: al telefono un errore pesa più che su uno schermo.</p>
+<table>
+<tr><th style="width:11%">Fase</th><th style="width:34%">Agenti</th><th>Si passa alla fase dopo quando</th></tr>
+<tr><td>1</td><td>Centralino fuori orario, Tracciamento</td><td>Gli agenti risolvono da soli la maggior parte delle chiamate senza errori (la soglia si fissa all’inizio).</td></tr>
+<tr><td>2</td><td>Avvisi, Giacenze, Autisti</td><td>Le consegne al primo tentativo salgono verso il 97% e le giacenze restano ferme meno giorni.</td></tr>
+<tr><td>3</td><td>Ordini, Commerciale, Solleciti</td><td>Le bozze sono corrette quasi sempre e gli incassi arrivano più puntuali.</td></tr>
+<tr><td>4</td><td>Vendite Corporation, Direzione</td><td>—</td></tr>
+</table></div>
+
+<div class="blocco"><h3>Come si misura</h3>
+<table>
+<tr><th>Cosa si misura</th><th style="width:22%">Oggi</th><th style="width:26%">Dove si vuole andare</th></tr>
+<tr><td>Chiamate risolte senza una persona</td><td>—</td><td>Soglia da fissare</td></tr>
+<tr><td>Consegne al primo tentativo</td><td>94%</td><td>97%</td></tr>
+<tr><td>Giorni medi di giacenza</td><td>Da misurare</td><td>In calo</td></tr>
+<tr><td>Giorni medi per incassare una fattura</td><td>Da misurare</td><td>In calo</td></tr>
+<tr><td>Tempo per creare una bolla</td><td>Da misurare</td><td>In calo</td></tr>
+<tr><td>Voci extra recuperate in fattura</td><td>—</td><td>€ al mese</td></tr>
+</table>
+<p>Se un numero non migliora, l’agente si corregge o si spegne.</p></div>
+
+<div class="blocco"><h3>Costi</h3>
+<p>Si paga <b>a consumo</b>, per minuto parlato. Non ci sono canoni grossi.</p>
+<table>
+<tr><th style="width:30%">Voce</th><th>Prezzo verificato</th></tr>
+<tr><td>Voce degli agenti (ElevenLabs)</td><td>0,08 $ al minuto di conversazione. Piano Pro: 99 $ al mese con 1.238 minuti compresi. Il ragionamento e la linea telefonica sono a parte.</td></tr>
+<tr><td>Linea telefonica (Twilio)</td><td>Chiamate verso fissi italiani 0,0168 $ al minuto, verso cellulari 0,0445 $ al minuto (da numero europeo). Il numero italiano normale si quota all’apertura: servono i documenti della società.</td></tr>
+<tr><td>Ragionamento (Claude)</td><td>Pochi centesimi a chiamata, con un tetto di spesa.</td></tr>
+<tr><td><b>Esempio</b></td><td><b>1.000 minuti al mese: circa 100–170 $ in tutto.</b></td></tr>
+</table>
+<p>Prima di aprire ogni servizio si ricontrollano prezzo e prova gratuita.</p></div>
+
+<p class="fonti">Fonti: <a href="https://www.getmacha.com/blog/elevenlabs-agents-pricing-explained">ElevenLabs Agents, prezzi (Macha, ottobre 2026)</a> · <a href="https://www.twilio.com/en-us/voice/pricing/it">Twilio, tariffe voce Italia</a>.</p>
+</body></html>

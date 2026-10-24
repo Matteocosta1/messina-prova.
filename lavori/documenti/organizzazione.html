@@ -1,0 +1,266 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><title>Messina - Organizzazione e gestione</title><style>
+@page{size:A4;margin:20mm 18mm 18mm 18mm}
+*{box-sizing:border-box}
+body{font-family:Inter,sans-serif;color:#111;font-size:10.8pt;line-height:1.55;margin:0}
+h1{font-family:'Inter Display',Inter;font-size:30pt;font-weight:700;letter-spacing:-.025em;line-height:1.05;margin:0 0 6px}
+.sotto{font-family:'Inter Display',Inter;font-size:15pt;font-weight:500;color:#444;margin:0 0 6px}
+.by{color:#777;font-size:9.5pt;margin:0 0 22px}
+h2{font-family:'Inter Display',Inter;font-size:18pt;font-weight:700;letter-spacing:-.015em;margin:26px 0 12px;padding-bottom:8px;border-bottom:2px solid #111;break-after:avoid}
+.blocco{break-inside:avoid}
+h3{font-size:12pt;font-weight:700;margin:16px 0 6px;break-after:avoid}
+p{margin:0 0 9px}
+.lead{font-size:12.5pt;line-height:1.5;margin:0 0 14px}
+thead{display:table-header-group}tbody tr:first-child{break-before:avoid}
+table{width:100%;border-collapse:collapse;margin:6px 0 14px;font-size:9.6pt}
+th{text-align:left;background:#111;color:#fff;font-weight:600;padding:7px 9px}
+td{padding:7px 9px;border-bottom:1px solid #ddd;vertical-align:top}
+tr{break-inside:avoid}
+td:first-child{font-weight:600}
+ul,ol{margin:0 0 10px;padding-left:20px}
+li{margin:0 0 6px;break-inside:avoid}
+.box{border:1.5px solid #111;border-radius:12px;padding:12px 14px;margin:10px 0 14px;break-inside:avoid}
+.box b.t{display:block;font-size:11pt;margin-bottom:4px}
+.grigio{background:#f3f3f4;border-color:#f3f3f4}
+/* schema */
+.schema{margin:10px 0 6px;break-inside:avoid}
+.liv{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:stretch;margin:0}
+.liv .nome{font-size:8.6pt;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.06em;padding-top:9px}
+.fila{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #bbb;border-radius:999px;padding:4px 11px;font-size:9.3pt;background:#fff}
+.chip.n{background:#111;color:#fff;border-color:#111}
+.jarvis{background:#111;color:#fff;border-radius:14px;padding:10px 14px}
+.jarvis b{font-size:13pt;letter-spacing:.04em}
+.jarvis span{display:block;font-size:9.4pt;color:#ddd;margin-top:2px}
+.sistema{border:2px solid #111;border-radius:14px;padding:9px 14px;font-size:9.6pt}
+.sistema b{font-size:11pt}
+.freccia{grid-column:2;text-align:center;color:#999;font-size:13pt;line-height:1;margin:3px 0}
+.lato{font-size:9.2pt;color:#444;margin-top:8px}
+/* giornata */
+.ora{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #e5e5e5;break-inside:avoid}
+.ora b{font-variant-numeric:tabular-nums}
+.verbi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+.verbo{background:#f3f3f4;border-radius:12px;padding:10px 12px;break-inside:avoid}
+.verbo b{display:block;font-size:11pt;margin-bottom:2px}
+.fonti{font-size:8.6pt;color:#555}
+.fonti a{color:#555}
+
+.org{break-inside:avoid;margin:10px 0 14px}
+.org .cima{display:flex;justify-content:center}
+.org .nodo{border:1.5px solid #111;border-radius:12px;padding:7px 10px;text-align:center;font-size:9pt;background:#fff}
+.org .nodo b{display:block;font-size:10pt}
+.org .riga .nodo{font-size:8.4pt;padding:6px 2px}
+.org .riga .nodo b{font-size:8.6pt;letter-spacing:-.015em;white-space:nowrap}
+.org .nodo.n{background:#111;color:#fff}
+.org .nodo.n span{color:#ddd}
+.org .linea{width:2px;height:14px;background:#111;margin:0 auto}
+.org .riga{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;border-top:2px solid #111;padding-top:10px;margin:0}
+.org .nota{font-size:8.6pt;color:#555;text-align:center;margin-top:8px}
+.sintesi li{margin-bottom:8px}
+.tag{display:inline-block;font-size:8pt;font-weight:700;border-radius:99px;padding:1px 8px;border:1px solid #111}
+.tag.r{background:#111;color:#fff}
+td.c{text-align:center}
+.piccolo{font-size:9pt;color:#444}
+</style></head><body>
+<h1>Messina</h1>
+<p class="sotto">Organizzazione e gestione aziendale</p>
+<p class="by">24 ottobre 2026 · Alessandro · Messina Autotrasporti e Messina Corporation · Analisi e proposte da approvare</p>
+
+<p class="lead">Messina sta crescendo più in fretta di come è organizzata. Il lavoro c'è: Apple al Nord, Econocom con 40.000 telefoni, la Corporation che compra e vende lotti. Ma decisioni, conoscenze e controlli dipendono ancora da poche persone e da un programma vecchio. Questo documento dice <b>dove l'azienda rischia, come organizzarla e con quali strumenti governarla</b>, in un ordine che si può seguire un passo alla volta.</p>
+
+<div class="box">
+<b class="t">In sintesi: le sei cose da fare per prime</b>
+<ol class="sintesi" style="margin:4px 0 0">
+<li><b>Verificare con il consulente del lavoro il contratto con la società che assume gran parte del personale.</b> Se a dirigere quei lavoratori è Messina, serve una forma regolare. Dal 2024 l'uso irregolare è di nuovo reato.</li>
+<li><b>Scrivere le deleghe con soglie di spesa e di sconto</b>, così che non tutto debba passare da papà.</li>
+<li><b>Nominare un responsabile delle operazioni dei Trasporti</b>, con un sostituto.</li>
+<li><b>Doppio controllo su ogni bonifico nuovo o con IBAN cambiato.</b> È la truffa più frequente nelle aziende come Messina.</li>
+<li><b>Sapere quanto guadagna Messina su ogni cliente e su ogni consegna</b> (controllo di gestione), con lo scadenzario dei pagamenti.</li>
+<li><b>Controllare assicurazioni e regole per le batterie al litio</b>, visto il valore e il tipo di merce che passa dal magazzino.</li>
+</ol></div>
+
+<h2>1 · La fotografia di oggi</h2>
+<table><thead><tr><th style="width:24%">Società</th><th>Cosa fa</th></tr></thead><tbody>
+<tr><td>Messina Autotrasporti</td><td>Distribuzione al Nord, tutta quella di Apple; magazzino conto terzi (Snam, Econocom con UniCredit, Luxiona, Velier, Asystel, L'Oréal); stage di formattazione dei PC per Accenture. Circa 30 mezzi, dagli Sprinter ai bilici, e 30–50 autisti.</td></tr>
+<tr><td>Messina Corporation</td><td>Acquisto di lotti, test e grado, vendita di PC e telefoni usati su Back Market, Refurbed, eBay, Subito e sul negozio online; ricambi.</td></tr>
+<tr><td>Sede</td><td>Un solo capannone e un solo magazzino fisico a Lacchiarella, usato dalle due società. Turni dalle 6 alle 2, niente notte, weekend su richiesta.</td></tr>
+</tbody></table>
+<table class="blocco"><thead><tr><th style="width:24%">Persone</th><th>Ruolo oggi</th></tr></thead><tbody>
+<tr><td>Papà</td><td>Decide prezzi, nuovi clienti e assunzioni; tratta con i clienti; controlla tutto.</td></tr>
+<tr><td>Mamma, Angela</td><td>Contabilità e fatture; Angela segue anche stipendi, presenze e problemi del personale. Commercialista esterno in Calabria.</td></tr>
+<tr><td>Gianluca</td><td>Commerciale: preventivi e tariffe.</td></tr>
+<tr><td>Christian, Gabriele, Alberto, Anna</td><td>Mail, bolle e prenotazioni; Anna segue Luxiona e una parte del magazzino.</td></tr>
+<tr><td>Mauro, Nelson</td><td>Traffico: assegnano mezzi e giri, oggi a mano.</td></tr>
+<tr><td>Matteo, Pier</td><td>Corporation (lotti, prezzi, vendite), clienti come Snam, fatture e pagamenti della Corporation, coordinamento del progetto.</td></tr>
+<tr><td>Alessandro</td><td>Sistemi, programma nuovo, collegamenti, agenti.</td></tr>
+<tr><td>Magazzino e officina</td><td>Molti magazzinieri, alcuni carrellisti, un meccanico. In gran parte assunti da un'altra società.</td></tr>
+</tbody></table>
+
+<h2>2 · Diagnosi: dove l'azienda rischia</h2>
+<table><thead><tr><th style="width:22%">Rischio</th><th style="width:10%">Peso</th><th>Perché conta</th><th style="width:28%">Rimedio</th></tr></thead><tbody>
+<tr><td>Personale di un'altra società</td><td class="c"><span class="tag r">Alto</span></td><td>Se i lavoratori sono assunti da un'altra società ma li organizza e dirige Messina, la legge lo permette solo con una somministrazione tramite agenzia autorizzata, un appalto vero (dove è l'appaltatore a organizzare e a rischiare) o un distacco regolare. Altrimenti è interposizione illecita di manodopera: il DL 19/2024 ha reintrodotto l'arresto o l'ammenda, e i lavoratori possono chiedere di essere assunti da Messina.</td><td>Verifica del contratto con il consulente del lavoro, subito.</td></tr>
+<tr><td>Decisioni accentrate</td><td class="c"><span class="tag r">Alto</span></td><td>Prezzi, clienti e assunzioni passano tutti da papà. Se lui è assente o sovraccarico, il lavoro rallenta o si ferma.</td><td>Deleghe con soglie (capitolo 4).</td></tr>
+<tr><td>Sapere nella testa</td><td class="c"><span class="tag r">Alto</span></td><td>Accordi fatti a voce, tariffe, abitudini dei clienti. Se una persona se ne va, il sapere va via con lei.</td><td>Tutto scritto nel sistema e nel Secondo cervello.</td></tr>
+<tr><td>J7 e IT esterno</td><td class="c"><span class="tag">Medio</span></td><td>Dati e accessi in mano a fornitori esterni.</td><td>Esportazione, lavoro in parallelo, disdetta (già pianificato).</td></tr>
+<tr><td>Pochi clienti grandi</td><td class="c"><span class="tag">Medio</span></td><td>Se Apple o Econocom riducono il lavoro, il fatturato crolla.</td><td>Misurare la quota di ogni cliente; sopra il 25–30% su uno solo, cercare attivamente altri clienti.</td></tr>
+<tr><td>Due società mescolate</td><td class="c"><span class="tag">Medio</span></td><td>Stesso capannone, persone in comune, stage fatturato dai Trasporti: i costi si confondono e il Fisco può contestare prezzi tra società non scritti.</td><td>Contratti scritti tra le due società (affitto, personale, servizi) e un criterio fisso per dividere i costi.</td></tr>
+<tr><td>Cassa</td><td class="c"><span class="tag">Medio</span></td><td>I clienti pagano a 60–90 giorni; a dicembre ci sono le tredicesime; i lotti costano molto in una volta sola.</td><td>Scadenzario e previsione di cassa a 13 settimane (capitolo 6).</td></tr>
+<tr><td>Merce di valore</td><td class="c"><span class="tag">Medio</span></td><td>Nei trasporti nazionali il vettore risponde al massimo di 1 € per kg di merce persa o rovinata (art. 1696 c.c.), salvo dolo o colpa grave. Per telefoni e PC il cliente subisce un danno molto più alto, e può rivalersi o lasciare Messina.</td><td>Polizza merci adeguata e limiti scritti nei contratti (capitolo 10).</td></tr>
+</tbody></table>
+
+<h2>3 · L'organizzazione proposta</h2>
+<p>Sette aree. Ognuna ha <b>un responsabile e un sostituto</b>, così nessuna funzione dipende da una persona sola. Le persone indicate sono proposte da confermare in famiglia.</p>
+<div class="org">
+  <div class="cima"><div class="nodo n" style="min-width:46%"><b>Direzione</b><span>Papà · sostituto Matteo — strategia, clienti grandi, prezzi, assunzioni</span></div></div>
+  <div class="linea"></div>
+  <div class="riga">
+    <div class="nodo"><b>Operazioni</b>da nominare<br>Trasporti</div>
+    <div class="nodo"><b>Corporation</b>Matteo<br>sost. Pier</div>
+    <div class="nodo"><b>Amministrazione</b>Mamma<br>sost. Angela</div>
+    <div class="nodo"><b>Personale</b>Angela<br>sost. Mamma</div>
+    <div class="nodo"><b>Commerciale</b>Gianluca<br>sost. Papà</div>
+    <div class="nodo"><b>Sistemi</b>Alessandro<br>sost. da trovare</div>
+  </div>
+  <p class="nota">Sotto Operazioni: Ufficio bolle (Christian, Gabriele, Alberto, Anna), Traffico (Mauro, Nelson), Autisti, Magazzino, Officina.</p>
+</div>
+<table><thead><tr><th style="width:17%">Area</th><th>Di cosa risponde</th><th style="width:28%">Numero con cui si giudica</th></tr></thead><tbody>
+<tr><td>Direzione</td><td>Strategia, clienti grandi, prezzi fuori soglia, assunzioni, budget.</td><td>Margine dell'azienda, crescita</td></tr>
+<tr><td>Operazioni</td><td>Bolle, traffico, consegne, magazzino, mezzi, autisti: il servizio di ogni giorno.</td><td>Consegne al primo tentativo, costo per consegna</td></tr>
+<tr><td>Corporation</td><td>Acquisto dei lotti, prezzi, vendite, stage.</td><td>Margine per lotto, giorni per vendere</td></tr>
+<tr><td>Amministrazione</td><td>Fatture, incassi, pagamenti, banche, cassa, rapporti con il commercialista.</td><td>Giorni medi d'incasso, cassa a 13 settimane</td></tr>
+<tr><td>Personale</td><td>Presenze, paghe, ferie, contratti, sicurezza sul lavoro, formazione.</td><td>Straordinari, assenze, formazione in regola</td></tr>
+<tr><td>Commerciale</td><td>Preventivi, tariffe, nuovi clienti, rinnovi.</td><td>Preventivi accettati, margine dei nuovi clienti</td></tr>
+<tr><td>Sistemi</td><td>Programma, dati, agenti, sicurezza informatica, accessi.</td><td>Sistema sempre attivo, incidenti zero</td></tr>
+</tbody></table>
+<p><b>Il ruolo che manca oggi è il responsabile delle operazioni.</b> Il traffico prepara i giri e l'ufficio bolle le bolle, ma nessuno risponde ogni giorno di consegne, magazzino e mezzi insieme. È la prima nomina che consiglio.</p>
+
+<h2>4 · Chi decide cosa: deleghe e soglie</h2>
+<p>Le soglie qui sotto sono <b>esempi</b>, da fissare con papà. Conta il principio: sotto una soglia decide chi fa il lavoro, sopra decide chi ne risponde. Tutto resta scritto nel sistema.</p>
+<table><thead><tr><th style="width:30%">Decisione</th><th>Chi propone</th><th>Chi decide</th><th>Esempio di soglia</th></tr></thead><tbody>
+<tr><td>Sconto su un preventivo</td><td>Gianluca</td><td>Gianluca · oltre: Direzione</td><td>Fino al 5% sotto listino</td></tr>
+<tr><td>Nuovo cliente</td><td>Gianluca</td><td>Direzione</td><td>Sempre</td></tr>
+<tr><td>Prezzo di vendita di un PC</td><td>Vendite</td><td>Matteo · sotto il minimo: Direzione</td><td>Prezzo minimo per grado</td></tr>
+<tr><td>Acquisto di un lotto</td><td>Matteo</td><td>Matteo · oltre: Direzione</td><td>Fino a 20.000 €</td></tr>
+<tr><td>Spesa ordinaria</td><td>Responsabile d'area</td><td>Responsabile · oltre: Direzione</td><td>Fino a 500 €</td></tr>
+<tr><td>Bonifico</td><td>Amministrazione</td><td>Due persone se il beneficiario è nuovo o l'IBAN è cambiato</td><td>Sempre, con telefonata al numero già noto</td></tr>
+<tr><td>Assunzione</td><td>Responsabile d'area</td><td>Direzione</td><td>Sempre</td></tr>
+<tr><td>Straordinari e turni extra</td><td>Operazioni</td><td>Operazioni · oltre: Direzione</td><td>Entro il budget del mese</td></tr>
+</tbody></table>
+
+<h2>5 · I processi, dall'inizio alla fine</h2>
+<p>Un processo funziona quando ha un proprietario, dei controlli e un numero che dice se va bene. Il sistema nuovo segue già questi passi; qui c'è chi ne risponde.</p>
+<table><thead><tr><th style="width:18%">Processo</th><th>I passi</th><th style="width:20%">Controlli già nel sistema</th><th style="width:17%">Numero chiave</th></tr></thead><tbody>
+<tr><td>Dall'ordine all'incasso (Trasporti)</td><td>Preventivo → tariffe del cliente → ordine via mail → bolla → giro → consegna con firma, foto e colli → fattura di fine mese → incasso → sollecito</td><td>Bolla bloccata se mancano dati; consegna bloccata senza colli, firma e foto; voci extra prese dalle tariffe</td><td>Giorni medi per incassare</td></tr>
+<tr><td>Magazzino</td><td>Entrata con scansione → posto → missioni d'inventario → uscita con scansione</td><td>Niente si chiude se i conti non tornano; storico non cancellabile</td><td>Accuratezza dell'inventario (obiettivo 99,5%)</td></tr>
+<tr><td>Acquisti e pagamenti</td><td>Ordine → fattura del fornitore → scadenza → pagamento</td><td>Doppio controllo dell'IBAN; scadenzario</td><td>Pagamenti in ritardo: zero</td></tr>
+<tr><td>Lotto (Corporation)</td><td>Acquisto → entrata → test e grado → prezzo confermato → vendita su più canali → spedizione → reso</td><td>Quadratura del lotto; prezzo confermato da Matteo; IVA del margine</td><td>Margine per lotto, giorni per vendere</td></tr>
+<tr><td>Persone</td><td>Assunzione → formazione → presenze → paghe → ferie → uscita</td><td>Badge con QR che cambia; correzioni tracciate; accessi chiusi il giorno dell'uscita</td><td>Straordinari, assenze, formazione</td></tr>
+</tbody></table>
+
+<h2>6 · Controllo di gestione e cassa</h2>
+<p>È lo strumento che oggi manca di più. Serve a sapere <b>dove Messina guadagna e dove perde</b>, non solo quanto fattura.</p>
+<h3>Cosa si misura</h3>
+<table><thead><tr><th style="width:26%">Misura</th><th>Come si calcola</th><th style="width:28%">A cosa serve</th></tr></thead><tbody>
+<tr><td>Costo per consegna</td><td>(costi del mese di autisti, mezzi, gasolio, pedaggi, manutenzione) ÷ consegne del mese</td><td>Sapere se una tariffa copre il lavoro</td></tr>
+<tr><td>Costo al km per mezzo</td><td>(gasolio + manutenzione + rata + assicurazione del mezzo) ÷ km del mese</td><td>Scegliere il mezzo giusto per ogni giro</td></tr>
+<tr><td>Margine per cliente</td><td>fatturato del cliente − costi delle sue consegne e del suo magazzino</td><td>Scoprire i clienti che fanno perdere soldi e rinegoziare</td></tr>
+<tr><td>Margine per lotto</td><td>venduto netto − costo del lotto − spese (test, corriere, commissioni, resi)</td><td>Capire quali lotti comprare</td></tr>
+<tr><td>Pareggio giornaliero</td><td>costi del mese ÷ giorni lavorativi</td><td>Sapere ogni giorno se si è sopra o sotto</td></tr>
+<tr><td>Budget e numeri veri</td><td>Ogni mese, quanto previsto e quanto successo per ogni voce</td><td>Correggere in tempo</td></tr>
+</tbody></table>
+<h3>La cassa a 13 settimane</h3>
+<p>È lo strumento che usano le aziende per non trovarsi senza soldi. Ogni settimana, per le 13 settimane successive, mette in fila:</p>
+<ul>
+<li><b>le entrate</b>, dallo scadenzario delle fatture ai clienti;</li>
+<li><b>le uscite</b>: fornitori, lotti, stipendi, affitto, rate e, il 16 di ogni mese, tasse e contributi con l'F24 e la liquidazione IVA.</li>
+</ul>
+<p>Se una settimana va in rosso lo si vede due o tre mesi prima, e c'è tempo per spostare un pagamento, sollecitare un cliente o chiedere alla banca l'anticipo di una fattura.</p>
+<h3>La chiusura di ogni mese</h3>
+<table><thead><tr><th style="width:22%">Giorno lavorativo</th><th>Cosa si fa</th><th style="width:22%">Chi</th></tr></thead><tbody>
+<tr><td>1</td><td>Consegne e bolle del mese chiuse; non consegnate sistemate</td><td>Operazioni</td></tr>
+<tr><td>2</td><td>«Chiudi mese»: fatture preparate dal sistema, controllate e inviate allo SdI</td><td>Amministrazione</td></tr>
+<tr><td>3</td><td>Costi del mese registrati: carburante, Telepass, fornitori</td><td>Amministrazione</td></tr>
+<tr><td>5</td><td>Controllo di gestione: margini per cliente, per lotto e per mezzo</td><td>Amministrazione e Direzione</td></tr>
+<tr><td>Entro il 16</td><td>Paghe, F24, IVA</td><td>Personale, Amministrazione, commercialista</td></tr>
+<tr><td>Riunione del mese</td><td>Decisioni su prezzi, costi e clienti</td><td>Direzione e responsabili</td></tr>
+</tbody></table>
+<p class="piccolo">C'è anche un obbligo di legge: dal Codice della crisi d'impresa, l'art. 2086 del codice civile chiede agli amministratori assetti organizzativi, amministrativi e contabili adeguati a capire in tempo se l'azienda va in difficoltà. Controllo di gestione e cassa a 13 settimane sono il modo concreto di rispettarlo.</p>
+
+<h2>7 · Il cruscotto: i numeri da guardare</h2>
+<table><thead><tr><th style="width:18%">Area</th><th>Numero</th><th style="width:18%">Quando</th><th style="width:22%">Obiettivo proposto</th></tr></thead><tbody>
+<tr><td>Consegne</td><td>Consegne al primo tentativo</td><td>Ogni giorno</td><td>97%</td></tr>
+<tr><td>Consegne</td><td>Consegne nella fascia oraria promessa</td><td>Ogni giorno</td><td>95%</td></tr>
+<tr><td>Magazzino</td><td>Accuratezza dell'inventario</td><td>Ogni settimana</td><td>99,5%</td></tr>
+<tr><td>Magazzino</td><td>Giorni medi di giacenza</td><td>Ogni settimana</td><td>In calo</td></tr>
+<tr><td>Mezzi</td><td>Costo al km, consumo per mezzo</td><td>Ogni mese</td><td>Sotto la media della flotta</td></tr>
+<tr><td>Soldi</td><td>Margine del giorno e del mese</td><td>Ogni giorno</td><td>Sopra il pareggio</td></tr>
+<tr><td>Soldi</td><td>Giorni medi per incassare</td><td>Ogni mese</td><td>In calo</td></tr>
+<tr><td>Soldi</td><td>Quota del cliente più grande sul fatturato</td><td>Ogni trimestre</td><td>Sotto il 30%</td></tr>
+<tr><td>Corporation</td><td>Margine per lotto, giorni per vendere</td><td>Ogni mese</td><td>Da fissare dopo i primi 3 lotti</td></tr>
+<tr><td>Persone</td><td>Ore di straordinario, assenze</td><td>Ogni mese</td><td>Entro il budget</td></tr>
+</tbody></table>
+<p>Gli obiettivi sono punti di partenza. Dopo i primi tre mesi di numeri veri si rifissano.</p>
+
+<h2>8 · Il ritmo di governo</h2>
+<table><thead><tr><th style="width:18%">Quando</th><th style="width:16%">Durata</th><th>Chi e su cosa</th></tr></thead><tbody>
+<tr><td>Ogni giorno, 8:00</td><td>10 minuti</td><td>Operazioni, bolle, traffico, magazzino: il resoconto del mattino e le priorità.</td></tr>
+<tr><td>Ogni lunedì</td><td>30 minuti</td><td>Alessandro, Matteo, Pier: avanzamento del sistema e problemi (c'è già).</td></tr>
+<tr><td>Ogni giovedì</td><td>15 minuti</td><td>Matteo con papà e mamma: decisioni e aggiornamenti (c'è già).</td></tr>
+<tr><td>Ogni mese</td><td>1 ora</td><td>Direzione e responsabili: chiusura, margini, cassa, decisioni.</td></tr>
+<tr><td>Ogni trimestre</td><td>2 ore</td><td>Prezzi, tariffe, clienti, investimenti.</td></tr>
+<tr><td>Ogni anno</td><td>Mezza giornata</td><td>Budget dell'anno dopo, sui numeri veri.</td></tr>
+</tbody></table>
+
+<h2>9 · Le persone</h2>
+<ul>
+<li><b>Ogni ruolo ha un sostituto addestrato.</b> L'idea di papà per l'ufficio bolle (tutti sanno gestire tutti i clienti) va estesa a traffico, amministrazione e Corporation.</li>
+<li><b>Ogni ruolo ha la sua pagina scritta</b>: cosa fa, con quali strumenti, cosa decide, a chi risponde. Serve anche per formare chi arriva.</li>
+<li><b>Formazione</b> di due ore per reparto sul sistema nuovo, con un foglio di una pagina per app (è già nel Piano).</li>
+<li><b>Le valutazioni le fanno le persone</b>, mai il programma o un agente. I numeri aiutano a parlare con i dipendenti, non a giudicarli in automatico.</li>
+<li><b>Chi entra e chi esce:</b> accessi aperti e chiusi lo stesso giorno, badge e telefono compresi.</li>
+</ul>
+
+<h2>10 · Obblighi e rischi da verificare</h2>
+<p>Non sono tutti problemi: è l'elenco da controllare una volta con i consulenti, per sapere che è tutto in regola.</p>
+<table><thead><tr><th style="width:18%">Area</th><th>Cosa verificare</th><th style="width:20%">Con chi</th></tr></thead><tbody>
+<tr><td>Lavoro</td><td>Contratto con la società che assume il personale: somministrazione, appalto o distacco regolari (D.Lgs. 276/2003, DL 19/2024).</td><td>Consulente del lavoro</td></tr>
+<tr><td>Controlli sul lavoro</td><td>Badge, Telepass, satellitare e telecamere: accordo sindacale o autorizzazione dell'Ispettorato, informativa firmata (art. 4 dello Statuto dei lavoratori).</td><td>Consulente del lavoro</td></tr>
+<tr><td>Sicurezza</td><td>Valutazione dei rischi aggiornata, responsabile della sicurezza, abilitazione dei carrellisti, formazione, sorveglianza sanitaria (D.Lgs. 81/2008).</td><td>Responsabile della sicurezza</td></tr>
+<tr><td>Autotrasporto</td><td>Iscrizione all'Albo; cronotachigrafo e tempi di guida e riposo per i mezzi oltre 3,5 t (Reg. UE 561/2006).</td><td>Consulente trasporti</td></tr>
+<tr><td>Batterie al litio</td><td>I telefoni nuovi nella loro scatola rientrano di solito nella disposizione speciale 188 dell'ADR: niente ADR completo, ma i colli vanno marcati con il marchio delle batterie UN 3481, salvo spedizioni fino a 2 colli. <b>I telefoni usati o rovinati di ritorno (resi UniCredit) hanno regole più severe</b> se le batterie sono danneggiate.</td><td>Consulente ADR</td></tr>
+<tr><td>Assicurazioni</td><td>Polizza merci trasportate e in deposito adeguata al valore, perché il limite di legge è 1 €/kg (art. 1696 c.c.); responsabilità civile; polizza contro gli attacchi informatici.</td><td>Broker assicurativo</td></tr>
+<tr><td>Corporation</td><td>IVA nel regime del margine per l'usato; garanzia legale (almeno 12 mesi sull'usato se concordato); obblighi sui rifiuti elettronici (RAEE) per pezzi smontati e resi; certificato di cancellazione dei dati (c'è, con Certus).</td><td>Commercialista, consulente ambientale</td></tr>
+<tr><td>Privacy</td><td>Registro dei trattamenti, informative a dipendenti e clienti, nomine dei fornitori che trattano dati (J7, Supabase, Fatture in Cloud), valutazione d'impatto per presenze e controlli.</td><td>Consulente privacy</td></tr>
+<tr><td>Sicurezza informatica</td><td>Verificare se Messina rientra nella NIS2 (i servizi di corriere ci sono) e, se sì, registrarsi sulla piattaforma dell'ACN.</td><td>Consulente, Alessandro</td></tr>
+<tr><td>Tra le due società</td><td>Contratti scritti per affitto, personale e servizi, con prezzi di mercato.</td><td>Commercialista</td></tr>
+<tr><td>Prevenzione</td><td>Valutare un modello organizzativo 231: protegge l'azienda in caso di reati commessi da chi lavora per lei, per esempio sulla sicurezza o sul lavoro.</td><td>Avvocato</td></tr>
+</tbody></table>
+
+<h2>11 · Come aiutano il sistema e JARVIS</h2>
+<p>Gli strumenti in costruzione sono il modo pratico di realizzare questa organizzazione:</p>
+<ul>
+<li><b>Il sistema Messina</b> mette i processi del capitolo 5 nei programmi, con i controlli dentro il database: niente si chiude se i conti non tornano, e ognuno vede solo la sua parte.</li>
+<li><b>La Home</b> con costi, margine e scadenze è il cruscotto del capitolo 7; il resoconto del mattino e le priorità sono la riunione delle 8.</li>
+<li><b>JARVIS e gli agenti</b> tolgono il lavoro ripetitivo (mail, bolle, avvisi, solleciti) e passano alle persone le decisioni. Il dettaglio è nel documento «Messina - JARVIS e agenti».</li>
+</ul>
+
+<h2>12 · Il piano dei prossimi 12 mesi</h2>
+<table><thead><tr><th style="width:20%">Quando</th><th>Cosa</th></tr></thead><tbody>
+<tr><td>Subito</td><td>Verifica dei contratti del personale · deleghe con soglie · responsabile delle operazioni · doppio controllo sui bonifici · verifica di polizze e batterie al litio.</td></tr>
+<tr><td>Novembre 2026</td><td>Pilota del sistema nuovo · scadenzario · costo per consegna · chiusura del mese con «Chiudi mese».</td></tr>
+<tr><td>Dicembre 2026</td><td>Cassa a 13 settimane, con tredicesime e lotti · allargamento a tutti i clienti se il pilota va bene · pagine scritte per ogni ruolo.</td></tr>
+<tr><td>Gennaio–marzo 2027</td><td>Spegnimento di J7 · controllo di gestione completo · margine per cliente e rinegoziazione delle tariffe in perdita · contratti tra le due società · budget 2027.</td></tr>
+<tr><td>Aprile–giugno 2027</td><td>Agenti AI per fasi · ottimizzatore dei giri · obblighi dei consulenti chiusi.</td></tr>
+<tr><td>Luglio–ottobre 2027</td><td>Primo anno di numeri veri: revisione di organizzazione, prezzi e obiettivi.</td></tr>
+</tbody></table>
+
+<h2>13 · Cosa serve sapere per completare il quadro</h2>
+<ol>
+<li>Quanto fattura ogni cliente in un anno, e quanto le due società in totale.</li>
+<li>Che contratto lega i lavoratori all'altra società, e quanti sono.</li>
+<li>Costi dell'ultimo anno per voce, dal commercialista.</li>
+<li>Polizze assicurative attive e massimali.</li>
+<li>Chi è il responsabile della sicurezza e quando è stata aggiornata la valutazione dei rischi.</li>
+<li>Fido e affidamenti con le banche.</li>
+</ol>
+<p class="piccolo">Questo documento è un'analisi organizzativa, non una consulenza legale o fiscale: i punti del capitolo 10 vanno confermati con i consulenti indicati.</p>
+</body></html>

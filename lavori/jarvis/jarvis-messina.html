@@ -1,0 +1,414 @@
+<title>JARVIS Messina</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* Stile Messina: bianco e nero con vetro leggero. Testata fissa con orologio e comandi; sotto JARVIS, gli agenti, chi scrive e le persone. */
+:root{
+  --bg:#f2f3f5; --halo1:#e0e4eb; --halo2:#e9e9ee;
+  --ink:#111214; --muted:#5b5e66; --line:rgba(17,18,20,.09);
+  --glass:rgba(255,255,255,.72); --glass-edge:rgba(255,255,255,.95); --glass-strong:rgba(255,255,255,.92);
+  --solid:#111214; --on-solid:#ffffff; --soft:rgba(17,18,20,.05);
+  --alert:#b42318; --alert-soft:#fdecea; --ok:#146c43; --ok-soft:#e7f5ec;
+  --shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --jar:#111214; --jar-edge:#111214;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e0f11; --halo1:#1a1d23; --halo2:#16171b; --ink:#f2f3f5; --muted:#a3a6ad; --line:rgba(255,255,255,.10);
+  --glass:rgba(26,27,31,.74); --glass-edge:rgba(255,255,255,.08); --glass-strong:rgba(34,35,40,.94);
+  --solid:#f2f3f5; --on-solid:#111214; --soft:rgba(255,255,255,.06);
+  --alert:#ff8a80; --alert-soft:rgba(255,138,128,.12); --ok:#6fd39a; --ok-soft:rgba(111,211,154,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -22px rgba(0,0,0,.7); --jar:#1b1c20; --jar-edge:rgba(255,255,255,.14); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e0f11; --halo1:#1a1d23; --halo2:#16171b; --ink:#f2f3f5; --muted:#a3a6ad; --line:rgba(255,255,255,.10);
+  --glass:rgba(26,27,31,.74); --glass-edge:rgba(255,255,255,.08); --glass-strong:rgba(34,35,40,.94);
+  --solid:#f2f3f5; --on-solid:#111214; --soft:rgba(255,255,255,.06);
+  --alert:#ff8a80; --alert-soft:rgba(255,138,128,.12); --ok:#6fd39a; --ok-soft:rgba(111,211,154,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -22px rgba(0,0,0,.7); --jar:#1b1c20; --jar-edge:rgba(255,255,255,.14); color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);
+  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);background-color:var(--bg);min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.wrap{max-width:1380px;margin:0 auto;padding-block:14px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-edge);box-shadow:var(--shadow);border-radius:20px}
+.lbl{font-size:13px;color:var(--muted);font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);white-space:nowrap}
+.pill.dark{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.pill.red{color:var(--alert);border-color:var(--alert);background:var(--alert-soft)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.btn{font-size:14px;font-weight:700;padding:9px 16px;border-radius:999px;border:1px solid var(--solid);background:var(--solid);color:var(--on-solid);min-height:40px}
+.btn.ghost{background:var(--glass-strong);color:var(--ink);border-color:var(--line)}
+.btn.sm{font-size:13px;padding:6px 12px;min-height:34px}
+.chip{font-size:13px;font-weight:600;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);min-height:34px}
+.chip.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+
+/* testata */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:16px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:19px;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:600}
+.ora{font-weight:800;font-size:26px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;min-width:4.2ch}
+.comandi{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-left:auto}
+.barra{flex:1 1 100%;height:4px;border-radius:99px;background:var(--soft);overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:var(--solid);border-radius:99px}
+
+/* disposizione */
+.griglia{display:grid;gap:16px;grid-template-columns:300px minmax(0,1fr) 320px;align-items:start}
+.colonna{display:flex;flex-direction:column;gap:16px;min-width:0}
+.colonna>*{min-width:0}
+/* tablet e telefono: JARVIS in alto, poi resoconto e decisioni delle persone, poi agenti, arrivi, registro */
+@media (max-width:1180px){
+  .griglia{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"jar jar" "res res" "per arr" "age age" "reg reg"}
+  .colonna{display:contents}
+  .a-jar{grid-area:jar}.a-res{grid-area:res}.a-per{grid-area:per}.a-arr{grid-area:arr}.a-age{grid-area:age}.a-reg{grid-area:reg}
+  .lista{max-height:420px}}
+@media (max-width:760px){
+  .griglia{grid-template-columns:minmax(0,1fr);grid-template-areas:"jar" "res" "per" "age" "arr" "reg"}
+  .ora{font-size:22px}.brand{font-size:17px}}
+.sez{padding:16px}
+.sez h2{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.testa{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+
+/* JARVIS */
+.jarvis{background:var(--jar);border:1px solid var(--jar-edge);color:#fff;border-radius:22px;padding:18px 20px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:center}
+.nucleo{flex:none;width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;position:relative}
+.nucleo::after{content:"";width:22px;height:22px;border-radius:50%;background:#fff;opacity:.9}
+.jarvis.attivo .nucleo{animation:battito 1.1s ease-in-out infinite}
+@keyframes battito{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}50%{box-shadow:0 0 0 10px rgba(255,255,255,0)}}
+.jarvis h3{font-size:13px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.7)}
+.jarvis .azione{font-size:19px;font-weight:700;letter-spacing:-.01em;margin-top:2px;min-height:1.45em}
+.jarvis .prima{font-size:13px;color:rgba(255,255,255,.62);margin-top:4px;min-height:1.4em}
+
+/* agenti */
+.agenti{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr));gap:10px}
+.agente{background:var(--glass-strong);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:118px;transition:border-color .2s,box-shadow .2s;text-align:left}
+.agente.lavoro{border-color:var(--solid);box-shadow:0 0 0 1px var(--solid)}
+.agente .riga{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:4px 8px}
+.agente b{font-size:15px}
+.agente .cosa{font-size:13px;color:var(--muted);min-height:2.8em}
+.agente .oggi{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:760px){.agenti{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* elenchi */
+.lista{display:flex;flex-direction:column;gap:8px;max-height:560px;overflow-y:auto;padding-right:2px}
+.voce{background:var(--glass-strong);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.voce.nuova{animation:entra .45s ease-out}
+@keyframes entra{from{opacity:.2;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.voce .riga{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.voce .chi{font-weight:700;font-size:14px}
+.voce .txt{font-size:14px}
+.voce .tasti{display:flex;gap:6px;margin-top:4px}
+.vuoto{font-size:14px;color:var(--muted);padding:10px 2px}
+.registro{display:flex;flex-direction:column;max-height:420px;overflow-y:auto}
+.reg{display:grid;grid-template-columns:52px 96px minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
+.reg:first-child{border-top:0}
+.reg .t{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.reg .chi{font-weight:700}
+.reg.blocco .txt{color:var(--alert);font-weight:600}
+@media (max-width:520px){.reg{grid-template-columns:44px minmax(0,1fr)}.reg .chi{grid-column:2}.reg .txt{grid-column:2}}
+
+/* resoconto */
+.numeri{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:10px;margin-bottom:12px}
+.numero{background:var(--soft);border-radius:14px;padding:12px}
+.numero .big{font-size:28px;font-weight:800;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.tab{width:100%;border-collapse:collapse;font-size:14px}
+.tab td{padding:8px 4px;border-top:1px solid var(--line)}
+.tab td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.nota{font-size:12.5px;color:var(--muted);margin-top:14px}
+@media (prefers-reduced-motion:reduce){.jarvis.attivo .nucleo,.voce.nuova{animation:none}.agente{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top glass">
+    <div class="brand">JARVIS <span>· Messina</span></div>
+    <div class="ora" id="ora">06:55</div>
+    <span class="lbl" id="giorno">Lunedì 19 ottobre · simulazione</span>
+    <div class="comandi">
+      <button class="btn" id="avvia" type="button">Avvia</button>
+      <button class="btn ghost" id="avanti" type="button">Avanti</button>
+      <button class="chip" data-vel="1" type="button">1×</button>
+      <button class="chip on" data-vel="2" type="button">2×</button>
+      <button class="chip" data-vel="4" type="button">4×</button>
+      <button class="btn ghost" id="ricomincia" type="button">Ricomincia</button>
+    </div>
+    <div class="barra" aria-hidden="true"><i id="barra"></i></div>
+  </header>
+
+  <div class="griglia">
+    <section class="colonna">
+      <div class="glass sez a-arr">
+        <div class="testa"><h2>Arrivi</h2><span class="lbl" id="contaArrivi">0 oggi</span></div>
+        <div class="lista" id="arrivi"><div class="vuoto">Chiamate, mail, messaggi e avvisi del sistema compaiono qui quando arrivano.</div></div>
+      </div>
+    </section>
+
+    <section class="colonna">
+      <div class="jarvis a-jar" id="jarvis">
+        <div class="nucleo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h3>JARVIS · COORDINATORE</h3>
+          <div class="azione" id="azione">Pronto. Premi «Avvia» per iniziare la giornata.</div>
+          <div class="prima" id="prima">Smista ogni richiesta, controlla il lavoro, passa i casi alle persone.</div>
+        </div>
+      </div>
+      <div class="glass sez a-res" id="boxResoconto" hidden>
+        <div class="testa"><h2>Resoconto</h2><span class="lbl">Fine giornata, 19:30</span></div>
+        <div id="resoconto"></div>
+      </div>
+      <div class="glass sez a-age">
+        <div class="testa"><h2>Agenti</h2><span class="lbl" id="contaAgenti">10 agenti · tutti liberi</span></div>
+        <div class="agenti" id="agenti"></div>
+      </div>
+      <div class="glass sez a-reg">
+        <div class="testa"><h2>Registro</h2><span class="lbl">Tutto quello che succede, in ordine</span></div>
+        <div class="registro" id="registro"><div class="vuoto">Il registro si riempie quando parte la giornata.</div></div>
+      </div>
+    </section>
+
+    <section class="colonna">
+      <div class="glass sez a-per">
+        <div class="testa"><h2>Persone</h2><span class="lbl" id="contaPersone">Niente in attesa</span></div>
+        <div class="lista" id="persone"><div class="vuoto">Qui arrivano le decisioni che spettano alle persone. Tocca «Sì» o «No» come farebbero loro.</div></div>
+      </div>
+    </section>
+  </div>
+  <p class="nota">Simulazione illustrativa con dati di esempio: nomi di clienti e numeri servono solo a mostrare come lavorano JARVIS e gli agenti.</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+var AGENTI=[
+  ['Centralino','Risponde e smista le chiamate'],['Tracciamento','Dice dov’è la spedizione'],['Avvisi','Avvisa i destinatari'],
+  ['Giacenze','Fissa le riconsegne'],['Ordini','Prepara le bozze di bolla'],['Commerciale','Prepara i preventivi'],
+  ['Solleciti','Ricorda le fatture scadute'],['Vendite','PC della Corporation'],['Autisti','Aiuta gli autisti nel giro'],['Direzione','Numeri e resoconti']];
+
+/* La giornata: ogni evento arriva a un'ora e JARVIS lo gestisce in passi (dt = minuti dopo l'arrivo).
+   j = azione di JARVIS · ag+fa = un agente comincia · ag+esito = finisce · chiede = decisione a una persona · passa = la persona riceve il caso · blocca = controllo di JARVIS */
+var GIORNATA=[
+ {t:'07:00',can:'Sistema',da:'Messina',txt:'Inizio della giornata',p:[
+   {dt:0,j:'Prepara il resoconto del mattino',ag:'Direzione',fa:'Raccoglie i numeri di ieri'},
+   {dt:4,ag:'Direzione',esito:'Resoconto inviato a Direzione e Amministrazione'}]},
+ {t:'07:10',can:'Sistema',da:'Traffico',txt:'Consegne di domani: 48 destinatari da avvisare',p:[
+   {dt:0,j:'Assegna gli avvisi di domani',ag:'Avvisi',fa:'Manda la fascia oraria a 48 destinatari'},
+   {dt:25,ag:'Avvisi',esito:'48 destinatari avvisati, 3 chiedono un’altra fascia',n:48}]},
+ {t:'07:40',can:'Mail',da:'Snam',txt:'Ordine: 4 bancali per Milano, consegna giovedì',p:[
+   {dt:0,j:'Mail con un ordine: la passa a Ordini',ag:'Ordini',fa:'Prepara la bozza di bolla Snam'},
+   {dt:6,ag:'Ordini',esito:'Bozza pronta, manca il piano di consegna'},
+   {dt:7,j:'Dato mancante: la bolla va confermata da una persona',chiede:'Ufficio bolle',nome:'Gabriele',cosa:'Bolla Snam, 4 bancali: chiedere il piano di consegna e confermare'}]},
+ {t:'08:10',can:'Telefono',da:'Velier',txt:'«Dov’è la spedizione 26-000412?»',p:[
+   {dt:0,j:'Chiamata su una spedizione: la passa a Tracciamento',ag:'Tracciamento',fa:'Controlla il numero di bolla'},
+   {dt:2,ag:'Tracciamento',esito:'Risposto: in consegna, arrivo tra le 10 e le 12',sola:true}]},
+ {t:'08:35',can:'App',da:'Autista 3',txt:'«Sono fermo in A1, coda di 40 minuti»',p:[
+   {dt:0,j:'Autista in difficoltà: la passa ad Autisti',ag:'Autisti',fa:'Ricalcola gli orari del giro Est'},
+   {dt:2,ag:'Autisti',esito:'Nuovi orari pronti, Traffico avvisato'},
+   {dt:2,passa:'Traffico',nome:'Mauro',cosa:'Autista 3 in ritardo di 40 minuti sul giro Est'},
+   {dt:3,j:'Fa avvisare i clienti del giro',ag:'Avvisi',fa:'Avvisa i 3 clienti del giro Est'},
+   {dt:8,ag:'Avvisi',esito:'3 clienti avvisati del ritardo',n:3}]},
+ {t:'09:05',can:'WhatsApp',da:'Destinatario',txt:'«Domani non ci sono, potete giovedì?»',p:[
+   {dt:0,j:'Richiesta di cambio data: la passa ad Avvisi',ag:'Avvisi',fa:'Sposta la consegna a giovedì'},
+   {dt:3,ag:'Avvisi',esito:'Consegna spostata a giovedì, tra le 10 e le 12'},
+   {dt:3,passa:'Traffico',nome:'Mauro',cosa:'Consegna spostata nel giro di giovedì'}]},
+ {t:'09:30',can:'Mail',da:'Apple',txt:'Ordine: 12 colli per Rozzano',p:[
+   {dt:0,j:'Mail con un ordine: la passa a Ordini',ag:'Ordini',fa:'Prepara la bozza di bolla Apple'},
+   {dt:5,ag:'Ordini',esito:'Bozza completa: tariffa e accessori dal contratto'},
+   {dt:6,chiede:'Ufficio bolle',nome:'Christian',cosa:'Bolla Apple, 12 colli per Rozzano: confermare'}]},
+ {t:'10:00',can:'Telefono',da:'Logistica Bianchi',txt:'«Ci fate un preventivo? 40 bancali al mese»',p:[
+   {dt:0,j:'Nuovo potenziale cliente: lo passa a Commerciale',ag:'Commerciale',fa:'Raccoglie i dati e prepara il preventivo'},
+   {dt:10,ag:'Commerciale',esito:'Preventivo pronto, il cliente chiede il 7% di sconto'},
+   {dt:11,blocca:'Lo sconto del 7% supera la soglia del 5%: decide la Direzione'},
+   {dt:11,chiede:'Direzione',nome:'Papà',cosa:'Preventivo Logistica Bianchi con sconto del 7%: va bene?'}]},
+ {t:'10:40',can:'Sistema',da:'Giacenze',txt:'2 giacenze aspettano la riconsegna',p:[
+   {dt:0,j:'Assegna le giacenze',ag:'Giacenze',fa:'Chiama i due destinatari'},
+   {dt:12,ag:'Giacenze',esito:'1 riconsegna fissata giovedì alle 10, 1 destinatario non risponde'},
+   {dt:13,chiede:'Ufficio bolle',nome:'Alberto',cosa:'Riconsegna di giovedì alle 10: confermare'}]},
+ {t:'11:15',can:'Mail',da:'Fornitore',txt:'«Abbiamo un nuovo IBAN, pagate qui la fattura»',p:[
+   {dt:0,j:'Controlla la mail: cambio di IBAN'},
+   {dt:1,blocca:'Bloccato: IBAN cambiato con una mail, possibile truffa'},
+   {dt:1,passa:'Amministrazione',nome:'Angela',cosa:'Verificare il nuovo IBAN telefonando al numero già noto'}]},
+ {t:'11:50',can:'Sito',da:'Studio Rossi',txt:'«Ci servono 20 ThinkPad grado B»',p:[
+   {dt:0,j:'Richiesta di un’azienda: la passa a Vendite',ag:'Vendite',fa:'Controlla la disponibilità in magazzino'},
+   {dt:4,ag:'Vendite',esito:'23 disponibili, bozza a € 249 l’uno'},
+   {dt:5,chiede:'Corporation',nome:'Matteo',cosa:'20 ThinkPad grado B a € 249 l’uno: confermi il prezzo?'}]},
+ {t:'12:30',can:'Telefono',da:'Luxiona',txt:'«Posso parlare con Gianluca?»',p:[
+   {dt:0,j:'Chiamata per una persona: la passa al Centralino',ag:'Centralino',fa:'Gianluca è in pausa: prende il messaggio'},
+   {dt:2,ag:'Centralino',esito:'Messaggio lasciato a Gianluca'},
+   {dt:2,passa:'Commerciale',nome:'Gianluca',cosa:'Richiamare Luxiona'}]},
+ {t:'14:00',can:'Sistema',da:'Scadenze',txt:'3 fatture scadute ieri',p:[
+   {dt:0,j:'Assegna i solleciti',ag:'Solleciti',fa:'Manda tre promemoria cortesi'},
+   {dt:20,ag:'Solleciti',esito:'Un cliente risponde: pagato oggi'},
+   {dt:20,passa:'Amministrazione',nome:'Angela',cosa:'Controllare in banca l’incasso annunciato'}]},
+ {t:'15:00',can:'Mail',da:'Econocom',txt:'Domani 120 telefoni UniCredit, elenco degli utenti allegato',p:[
+   {dt:0,j:'Mail con un elenco: la passa a Ordini',ag:'Ordini',fa:'Legge l’elenco e prepara 120 bozze'},
+   {dt:15,ag:'Ordini',esito:'120 bozze pronte, 8 con accessori'},
+   {dt:16,chiede:'Ufficio bolle',nome:'Christian',cosa:'120 spedizioni UniCredit per domani: confermare'}]},
+ {t:'15:40',can:'Mail',da:'Velier',txt:'«Come d’accordo al telefono: 50 € a consegna»',p:[
+   {dt:0,j:'Controlla l’importo: deve venire dalle tariffe'},
+   {dt:1,blocca:'Importo della mail ignorato: il contratto dice € 45 a consegna'},
+   {dt:1,passa:'Commerciale',nome:'Gianluca',cosa:'Velier scrive 50 €, il contratto dice 45 €: verificare'}]},
+ {t:'16:10',can:'App',da:'Autista 7',txt:'«Cliente assente, consegna non riuscita»',p:[
+   {dt:0,j:'Consegna non riuscita: la passa a Giacenze',ag:'Giacenze',fa:'Apre la giacenza e propone una nuova data'},
+   {dt:5,ag:'Giacenze',esito:'Giacenza aperta, messaggio al destinatario',sola:true}]},
+ {t:'17:20',can:'Telefono',da:'Snam',txt:'«La merce è arrivata danneggiata»',p:[
+   {dt:0,j:'Caso delicato: va a una persona, con il riassunto pronto'},
+   {dt:1,passa:'Snam',nome:'Pier',cosa:'Snam: merce danneggiata. Riassunto, firma e foto della consegna allegati'}]},
+ {t:'18:00',can:'Sistema',da:'Traffico',txt:'Giri di domani preparati',p:[
+   {dt:0,j:'Controlla i giri: colli, mezzi, sponde'},
+   {dt:3,chiede:'Traffico',nome:'Mauro',cosa:'Giri di domani controllati: confermare'}]},
+ {t:'19:05',can:'Telefono',da:'Numero sconosciuto',txt:'Chiamata fuori orario',p:[
+   {dt:0,j:'Fuori orario: la passa al Centralino',ag:'Centralino',fa:'Risponde e prende il messaggio'},
+   {dt:3,ag:'Centralino',esito:'Messaggio pronto per domattina',sola:true}]},
+ {t:'19:30',can:'Sistema',da:'Messina',txt:'Fine della giornata',p:[
+   {dt:0,j:'Prepara il riepilogo della giornata',fine:true}]}
+];
+
+var INIZIO=6*60+55, FINE=19*60+35;
+var min=function(s){var a=s.split(':');return +a[0]*60+ +a[1];};
+var hhmm=function(m){m=Math.floor(m);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');};
+var esc=function(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var $=function(id){return document.getElementById(id);};
+
+var coda, ora, timer, vel=2, stato, finita=false;
+function prepara(){
+  coda=[]; finita=false;
+  GIORNATA.forEach(function(e,i){
+    var t=min(e.t);
+    coda.push({at:t,tipo:'arrivo',e:e,i:i});
+    e.p.forEach(function(s,k){coda.push({at:t+s.dt,tipo:'passo',e:e,s:s,ord:k});});
+  });
+  coda.sort(function(a,b){return a.at-b.at||(a.tipo==='arrivo'?-1:1)||(a.ord||0)-(b.ord||0);});
+  ora=INIZIO;
+  stato={ag:{},arrivi:0,sole:0,passati:0,chieste:0,risposte:{si:0,no:0},blocchi:0,attesa:{},prime:[]};
+  AGENTI.forEach(function(a){stato.ag[a[0]]={lavoro:null,fatti:0,pezzi:0};});
+  $('arrivi').innerHTML='<div class="vuoto">Chiamate, mail, messaggi e avvisi del sistema compaiono qui quando arrivano.</div>';
+  $('persone').innerHTML='<div class="vuoto">Qui arrivano le decisioni che spettano alle persone. Tocca «Sì» o «No» come farebbero loro.</div>';
+  $('registro').innerHTML='<div class="vuoto">Il registro si riempie quando parte la giornata.</div>';
+  $('azione').textContent='Pronto. Premi «Avvia» per iniziare la giornata.';
+  $('prima').textContent='Smista ogni richiesta, controlla il lavoro, passa i casi alle persone.';
+  $('boxResoconto').hidden=true;
+  disegnaAgenti(); orologio(); conteggi();
+}
+
+function disegnaAgenti(attivo){
+  $('agenti').innerHTML=AGENTI.map(function(a){
+    var s=stato.ag[a[0]], lav=!!s.lavoro;
+    return '<div class="agente'+(lav?' lavoro':'')+'"><div class="riga"><b>'+a[0]+'</b>'+(lav?'<span class="pill dark">Al lavoro</span>':'<span class="pill">Libero</span>')+'</div>'+
+      '<div class="cosa">'+esc(lav?s.lavoro:a[1])+'</div><div class="oggi">Oggi: '+s.fatti+(s.pezzi>s.fatti?' lavori · '+s.pezzi+' persone raggiunte':s.fatti===1?' lavoro':' lavori')+'</div></div>';
+  }).join('');
+  var n=AGENTI.filter(function(a){return stato.ag[a[0]].lavoro;}).length;
+  $('contaAgenti').textContent=AGENTI.length+' agenti · '+(n?n+' al lavoro':'tutti liberi');
+}
+function orologio(){
+  $('ora').textContent=hhmm(ora);
+  $('barra').style.width=Math.min(100,(ora-INIZIO)/(FINE-INIZIO)*100)+'%';
+}
+function conteggi(){
+  $('contaArrivi').textContent=stato.arrivi+' oggi';
+  var att=Object.keys(stato.attesa).length;
+  $('contaPersone').textContent=att?att+(att===1?' decisione in attesa':' decisioni in attesa'):'Niente in attesa';
+}
+function aggiungi(id,html){
+  var box=$(id), v=box.querySelector('.vuoto'); if(v) v.remove();
+  box.insertAdjacentHTML('afterbegin',html);
+}
+function registra(chi,txt,cls){
+  aggiungi('registro','<div class="reg'+(cls?' '+cls:'')+'"><span class="t">'+hhmm(ora)+'</span><span class="chi">'+esc(chi)+'</span><span class="txt">'+esc(txt)+'</span></div>');
+}
+function jarvis(txt){
+  stato.prime.unshift(txt);
+  $('azione').textContent=txt;
+  $('prima').textContent=stato.prime[1]?'Prima: '+stato.prime[1]:'';
+  $('jarvis').classList.add('attivo');
+  clearTimeout(jarvis.t); jarvis.t=setTimeout(function(){$('jarvis').classList.remove('attivo');},1400);
+  registra('JARVIS',txt);
+}
+
+function esegui(x){
+  var e=x.e;
+  if(x.tipo==='arrivo'){
+    if(e.can!=='Sistema') stato.arrivi++;
+    aggiungi('arrivi','<div class="voce nuova"><div class="riga"><span class="chi">'+esc(e.da)+'</span><span class="pill">'+esc(e.can)+' · '+e.t+'</span></div><div class="txt">'+esc(e.txt)+'</div></div>');
+    registra(e.da,e.can+': '+e.txt);
+    conteggi(); return;
+  }
+  var s=x.s;
+  if(s.j) jarvis(s.j);
+  if(s.ag&&s.fa){stato.ag[s.ag].lavoro=s.fa; registra(s.ag,s.fa); disegnaAgenti();}
+  if(s.ag&&s.esito){var a=stato.ag[s.ag]; a.lavoro=null; a.fatti++; a.pezzi+=s.n||1; if(s.sola) stato.sole++; registra(s.ag,s.esito); disegnaAgenti();}
+  if(s.blocca){stato.blocchi++; jarvis(s.blocca); var r=$('registro').firstElementChild; if(r) r.classList.add('blocco');}
+  if(s.passa){stato.passati++;
+    aggiungi('persone','<div class="voce nuova"><div class="riga"><span class="chi">'+esc(s.nome)+' · '+esc(s.passa)+'</span><span class="pill">Caso</span></div><div class="txt">'+esc(s.cosa)+'</div><div class="lbl">Da JARVIS alle '+hhmm(ora)+'</div></div>');
+    registra(s.nome,'Riceve: '+s.cosa);}
+  if(s.chiede){stato.chieste++; var id='d'+x.e.t.replace(':','')+x.ord;
+    stato.attesa[id]=s;
+    aggiungi('persone','<div class="voce nuova" id="'+id+'"><div class="riga"><span class="chi">'+esc(s.nome)+' · '+esc(s.chiede)+'</span><span class="pill red">Decidere</span></div><div class="txt">'+esc(s.cosa)+'</div>'+
+      '<div class="tasti"><button class="btn sm" type="button" data-si="'+id+'">Sì</button><button class="btn ghost sm" type="button" data-no="'+id+'">No</button></div></div>');
+    registra(s.nome,'Deve decidere: '+s.cosa); conteggi();}
+  if(s.fine){finita=true; fine(); jarvis('Giornata chiusa: il resoconto è pronto');}
+}
+
+function decidi(id,si){
+  var s=stato.attesa[id]; if(!s) return;
+  delete stato.attesa[id]; stato.risposte[si?'si':'no']++;
+  var el=$(id); el.querySelector('.tasti').remove();
+  var p=el.querySelector('.pill'); p.className='pill '+(si?'ok':''); p.textContent=si?'Approvato':'Respinto';
+  el.insertAdjacentHTML('beforeend','<div class="lbl">'+(si?'Approvato':'Respinto')+' da '+esc(s.nome)+' alle '+hhmm(ora)+'</div>');
+  registra(s.nome,(si?'Approva: ':'Respinge: ')+s.cosa);
+  if(!finita&&!timer) jarvis(si?'Ricevuto il sì: il lavoro può partire':'Ricevuto il no: il lavoro si ferma e resta nello storico');
+  conteggi();
+  if(!$('boxResoconto').hidden) fine();
+}
+
+function fine(){
+  var r=$('resoconto'), att=Object.keys(stato.attesa).length;
+  var lavori=AGENTI.map(function(a){return [a[0],stato.ag[a[0]].fatti,stato.ag[a[0]].pezzi];}).filter(function(x){return x[1];}).sort(function(a,b){return b[1]-a[1];});
+  var totLavori=lavori.reduce(function(a,x){return a+x[1];},0);
+  r.innerHTML='<div class="numeri">'+
+    num('Richieste arrivate',stato.arrivi,'telefono, mail, WhatsApp, app, sito')+
+    num('Lavori degli agenti',totLavori,'completati oggi')+
+    num('Risolte da sole',stato.sole,'senza bisogno di una persona')+
+    num('Passate alle persone',stato.passati+stato.chieste,stato.chieste+' decisioni, '+stato.passati+' casi')+
+    num('Bloccate da JARVIS',stato.blocchi,'controlli su soldi e regole')+
+    num('Decisioni aperte',att,att?'aspettano un sì o un no':'tutte prese')+
+    '</div><table class="tab">'+lavori.map(function(x){return '<tr><td>'+x[0]+'</td><td>'+x[1]+(x[1]===1?' lavoro':' lavori')+(x[2]>x[1]?' · '+x[2]+' persone raggiunte':'')+'</td></tr>';}).join('')+'</table>'+
+    '<p class="nota">Questo resoconto arriva domattina alle 7:00 a Direzione e Amministrazione, insieme alle decisioni rimaste aperte.</p>';
+  $('boxResoconto').hidden=false;
+}
+function num(t,v,s){return '<div class="numero"><div class="lbl">'+t+'</div><div class="big">'+v+'</div><div class="lbl">'+s+'</div></div>';}
+
+function passo(fino){
+  while(coda.length&&coda[0].at<=fino){var x=coda.shift(); ora=Math.max(ora,x.at); esegui(x);}
+}
+function tick(){
+  var libero=AGENTI.every(function(a){return !stato.ag[a[0]].lavoro;}), vicino=coda.length&&coda[0].at-ora<3;
+  ora=Math.min(FINE,ora+0.25*vel*(libero&&!vicino?4:1));
+  passo(ora); orologio();
+  if(ora>=FINE&&!coda.length) ferma();
+}
+function avvia(){ if(timer) return ferma(); if(ora>=FINE&&!coda.length) prepara(); timer=setInterval(tick,50); $('avvia').textContent='Pausa'; }
+function ferma(){ clearInterval(timer); timer=null; $('avvia').textContent=ora>=FINE&&!coda.length?'Avvia':'Riprendi'; }
+function avanti(){
+  if(!coda.length) return;
+  var t=coda[0].at; ora=Math.max(ora,t);
+  passo(t); orologio();
+}
+
+$('avvia').addEventListener('click',avvia);
+$('avanti').addEventListener('click',avanti);
+$('ricomincia').addEventListener('click',function(){ferma(); prepara(); $('avvia').textContent='Avvia';});
+document.querySelectorAll('[data-vel]').forEach(function(b){b.addEventListener('click',function(){
+  vel=+b.getAttribute('data-vel'); document.querySelectorAll('[data-vel]').forEach(function(c){c.classList.toggle('on',c===b);});});});
+$('persone').addEventListener('click',function(ev){
+  var b=ev.target.closest('button'); if(!b) return;
+  if(b.dataset.si) decidi(b.dataset.si,true);
+  if(b.dataset.no) decidi(b.dataset.no,false);
+});
+prepara();
+})();
+</script>
