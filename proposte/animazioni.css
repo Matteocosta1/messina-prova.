@@ -1,0 +1,24 @@
+/* ===== Animazioni Messina (proposta 25/10/2026) =====
+   Leggere: solo opacità e spostamenti di pochi pixel, nessuna libreria, niente animazioni continue.
+   Curve prese da JARVIS: rientro timingCurve(0.38, 0.7, 0.125, 1) e molla del tasto (StileStark). */
+:root{--m-curva:cubic-bezier(.38,.7,.125,1);--m-molla:cubic-bezier(.34,1.56,.64,1)}
+
+/* 1 · Tasti: si stringono appena sotto il dito e tornano con una piccola molla */
+.btn,.chipbtn,.nav,.tab,.li,.giro,.pcard[data-act],button.glass{transition:transform .26s var(--m-molla)}
+.btn:active:not(:disabled),.chipbtn:active,.nav:active,.tab:active,.li:active,.giro:active,.pcard[data-act]:active,button.glass:active{transform:scale(.965);transition-duration:.08s}
+
+/* 2 · Apertura e sezioni: i riquadri entrano in fila, dall'alto in basso */
+.m-entra{animation:m-entra .36s var(--m-curva) both;animation-delay:calc(var(--m-i,0) * 35ms)}
+@keyframes m-entra{from{opacity:0;transform:translateY(6px)}}
+.m-apre{animation:m-apre .42s var(--m-curva) both;animation-delay:calc(var(--m-i,0) * 70ms)}
+@keyframes m-apre{from{opacity:0;transform:translateY(-6px)}}
+
+/* 3 · Avvisi: entra solo l'avviso nuovo (prima rientravano tutti a ogni avviso) */
+.toast{animation:tin .38s var(--m-curva)}
+.toast.m-visto{animation:none}
+.msg.m-nuovo{animation:tin .32s var(--m-curva)}
+
+@media (prefers-reduced-motion:reduce){
+  .m-entra,.m-apre,.toast,.msg.m-nuovo{animation:none!important}
+  .btn,.chipbtn,.nav,.tab,.li,.giro,.pcard[data-act],button.glass{transition:none!important;transform:none!important}
+}
