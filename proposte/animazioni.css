@@ -22,3 +22,54 @@
   .m-entra,.m-apre,.toast,.msg.m-nuovo{animation:none!important}
   .btn,.chipbtn,.nav,.tab,.li,.giro,.pcard[data-act],button.glass{transition:none!important;transform:none!important}
 }
+
+/* ===== Le app nel telefono, più alla JARVIS ===== */
+/* 6 · Tasti grandi delle app: molla e lampo di luce, come i tasti di JARVIS */
+.bigbtn,.round,.back,.stop,.gbtn,.gopt,.prod{transition:transform .26s var(--m-molla),filter .26s ease}
+.bigbtn:active:not(:disabled),.round:active,.back:active,.stop:active,.gbtn:active,.gopt:active,.prod:active{transform:scale(.97);transition-duration:.08s}
+.bigbtn:not(.ghost):active:not(:disabled){filter:brightness(1.6)}
+
+/* 7 · Schermata che si accende: si scopre dall'alto con una riga di luce (la «stampa» della chat di JARVIS) */
+.pscr.m-svela{animation:m-svela .6s cubic-bezier(.5,.05,.25,1) both}
+@keyframes m-svela{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+.m-riga{position:absolute;left:0;right:0;top:0;height:2px;z-index:5;pointer-events:none;background:var(--solid);
+  box-shadow:0 0 12px 2px rgba(17,18,20,.28);animation:m-riga .6s cubic-bezier(.5,.05,.25,1) forwards}
+@keyframes m-riga{from{transform:translateY(0)}92%{opacity:1}to{transform:translateY(var(--m-h,700px));opacity:0}}
+
+/* 8 · Scansione: dopo ogni sparo una fascia di luce passa sullo schermo (l'anello di scansione di JARVIS) */
+.m-scan{position:absolute;left:0;right:0;top:0;height:90px;z-index:5;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(17,18,20,.05) 70%,rgba(17,18,20,.55) 98%,transparent);
+  animation:m-scan .6s var(--m-curva) forwards}
+@keyframes m-scan{from{transform:translateY(-90px)}85%{opacity:1}to{transform:translateY(var(--m-h,700px));opacity:0}}
+
+/* 9 · Mirino della fotocamera: la riga laser che sale e scende mentre si inquadra il codice */
+.cam{position:relative;overflow:hidden}
+.cam::after{content:"";position:absolute;left:14%;right:14%;top:22%;height:2px;border-radius:2px;pointer-events:none;
+  background:rgba(255,255,255,.9);box-shadow:0 0 14px 3px rgba(255,255,255,.35);animation:m-laser 2.2s ease-in-out infinite alternate}
+@keyframes m-laser{to{top:78%}}
+
+/* 10 · Esiti: il ✓ scatta, il blocco fatto si illumina, l'errore dà uno scossone */
+.m-pop{animation:m-pop .45s var(--m-molla)}
+@keyframes m-pop{from{transform:scale(.55);opacity:.3}}
+.m-ok{animation:m-ok .7s ease-out}
+@keyframes m-ok{from{box-shadow:0 0 0 0 rgba(20,108,67,.45)}to{box-shadow:0 0 0 14px rgba(20,108,67,0)}}
+.m-allarme{animation:m-allarme .38s ease-in-out}
+@keyframes m-allarme{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+/* 11 · Barre di avanzamento: si riempiono fino al punto nuovo invece di saltare */
+.m-barra{transition:width .55s var(--m-curva)}
+
+/* 12 · Caricamento: l'anello che gira accanto a «Controllo la foto…» (il caricamento della chat di JARVIS, in piccolo) */
+.m-carica b::after{content:"";display:inline-block;width:14px;height:14px;margin-left:10px;vertical-align:-2px;border-radius:50%;
+  border:2px solid var(--line);border-top-color:var(--solid);animation:m-gira .7s linear infinite}
+@keyframes m-gira{to{transform:rotate(360deg)}}
+
+/* 13 · Badge: il QR nuovo ogni 30 secondi entra con una breve messa a fuoco */
+#qrbox.m-qr{animation:m-qr .5s var(--m-curva)}
+@keyframes m-qr{from{opacity:.15;transform:scale(.96);filter:blur(3px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .pscr.m-svela,.m-riga,.m-scan,.cam::after,.m-pop,.m-ok,.m-allarme,.m-carica b::after,#qrbox.m-qr{animation:none!important}
+  .m-riga,.m-scan{display:none}.m-barra{transition:none!important}
+  .bigbtn,.round,.back,.stop,.gbtn,.gopt,.prod{transition:none!important;transform:none!important;filter:none!important}
+}

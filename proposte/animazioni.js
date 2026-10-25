@@ -20,10 +20,23 @@
       el.addEventListener('animationend', () => pulisci(el, cls), { once: true });
     });
   };
+  // il telefono: la schermata si scopre dall'alto con la riga di luce
+  const sopra = (cls) => {
+    const sc = document.querySelector('#app .screen'); if (!sc) return;
+    const r = document.createElement('i'); r.className = cls; r.setAttribute('aria-hidden', 'true');
+    r.style.setProperty('--m-h', sc.clientHeight + 'px'); sc.appendChild(r);
+    r.addEventListener('animationend', () => r.remove(), { once: true });
+  };
+  const accendi = () => {
+    const ps = document.querySelector('#app .pscr'); if (!ps) return;
+    ps.classList.add('m-svela'); ps.addEventListener('animationend', () => pulisci(ps, 'm-svela'), { once: true });
+    sopra('m-riga');
+  };
   const entra = (cambioVista) => {
     if (fermo()) return;
     const app = document.getElementById('app');
-    const dentro = app.querySelector('.content') || app.querySelector('.pscr');
+    if (app.querySelector('.pscr')) { if (cambioVista) inFila(app.querySelector('.appinfo'), 'm-entra', 8); accendi(); return; }
+    const dentro = app.querySelector('.content');
     if (cambioVista || !dentro) {
       if (app.querySelector('.side')) inFila(app.querySelector('.side'), 'm-entra', 20);
       inFila(dentro || app, 'm-entra', 10);
@@ -72,6 +85,60 @@
     msgPrima = t;
   };
 
+  // nella stessa schermata di un'app: cosa è comparso o cambiato dall'ultimo tocco
+  const firma = (el) => el.tagName + '|' + el.className + '|' + (el.getAttribute('style') || '') + '|' + el.textContent.trim().slice(0, 90);
+  let segniPrima = null;
+  const esiti = (stessa) => {
+    const ps = document.querySelector('#app .pscr');
+    if (!ps) { segniPrima = null; return; }
+    const els = [...ps.querySelectorAll('.pcard,.kvp,.pill,span[style*="border-radius:99px"]')];
+    const ora = els.map(firma);
+    if (stessa && segniPrima && !fermo()) {
+      const resto = {}; segniPrima.forEach((f) => { resto[f] = (resto[f] || 0) + 1; });
+      const nuovi = [];
+      els.forEach((el, i) => { const f = ora[i]; if (resto[f]) resto[f]--; else nuovi.push(el); });
+      nuovi.forEach((el) => {
+        if (nuovi.some((x) => x !== el && x.contains(el) && !/var\(--ok\)/.test(el.getAttribute('style') || ''))) return;   // ci pensa il riquadro che lo contiene
+        const st = el.getAttribute('style') || '';
+        let cls = 'm-entra';
+        if (/var\(--alert\)/.test(st)) cls = 'm-allarme';
+        else if (el.tagName === 'SPAN' || el.classList.contains('pill')) cls = /var\(--ok\)/.test(st) || el.classList.contains('ok') ? 'm-pop' : '';
+        else if (/border:2px solid var\(--ok\)/.test(st)) cls = 'm-ok';
+        if (!cls) return;
+        el.classList.add(cls); el.addEventListener('animationend', () => pulisci(el, cls), { once: true });
+      });
+    }
+    segniPrima = ora;
+  };
+  let barrePrima = [];
+  const barre = (stessa) => {
+    const bs = [...document.querySelectorAll('#app .bar i')];
+    if (stessa && !fermo()) bs.forEach((el, i) => {
+      const da = barrePrima[i], a = el.style.width;
+      if (da == null || da === a) return;
+      el.style.width = da; void el.offsetWidth;
+      el.classList.add('m-barra'); el.style.width = a;
+      el.addEventListener('transitionend', () => pulisci(el, 'm-barra'), { once: true });
+    });
+    barrePrima = bs.map((el) => el.style.width);
+  };
+  const caricamento = () => {
+    document.querySelectorAll('#app .pscr .pcard').forEach((el) => { if (/^Controllo la foto/.test(el.textContent.trim())) el.classList.add('m-carica'); });
+  };
+  // l'ultimo tasto toccato: dopo uno sparo passa la fascia di scansione
+  let atto = '';
+  document.addEventListener('click', (e) => { const el = e.target.closest('[data-act]'); atto = el ? el.dataset.act : ''; }, true);
+
+  // il QR del badge: quando cambia (ogni 30 secondi) quello nuovo entra con una messa a fuoco
+  let qrBox = null, qrDentro = null;
+  setInterval(() => {
+    const q = document.getElementById('qrbox'), c = q && q.firstElementChild;
+    if (q && q === qrBox && c !== qrDentro && !fermo()) {
+      q.classList.add('m-qr'); q.addEventListener('animationend', () => pulisci(q, 'm-qr'), { once: true });
+    }
+    qrBox = q; qrDentro = c;
+  }, 100);
+
   // aggancio a render(): stesso disegno di prima, poi le animazioni
   let ultima = null, vista = null;
   const disegna = render;
@@ -81,6 +148,11 @@
     if (nuova && ultima !== null) entra(cambioVista);
     numeri(nuova);
     messaggio();
+    esiti(!nuova);
+    barre(!nuova);
+    caricamento();
+    if (/Scan$/.test(atto) && !fermo()) sopra('m-scan');
+    atto = '';
     ultima = k; vista = S.view;
   };
 

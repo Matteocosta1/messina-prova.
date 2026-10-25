@@ -304,6 +304,57 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
   .btn,.chipbtn,.nav,.tab,.li,.giro,.pcard[data-act],button.glass{transition:none!important;transform:none!important}
 }
 
+/* ===== Le app nel telefono, più alla JARVIS ===== */
+/* 6 · Tasti grandi delle app: molla e lampo di luce, come i tasti di JARVIS */
+.bigbtn,.round,.back,.stop,.gbtn,.gopt,.prod{transition:transform .26s var(--m-molla),filter .26s ease}
+.bigbtn:active:not(:disabled),.round:active,.back:active,.stop:active,.gbtn:active,.gopt:active,.prod:active{transform:scale(.97);transition-duration:.08s}
+.bigbtn:not(.ghost):active:not(:disabled){filter:brightness(1.6)}
+
+/* 7 · Schermata che si accende: si scopre dall'alto con una riga di luce (la «stampa» della chat di JARVIS) */
+.pscr.m-svela{animation:m-svela .6s cubic-bezier(.5,.05,.25,1) both}
+@keyframes m-svela{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+.m-riga{position:absolute;left:0;right:0;top:0;height:2px;z-index:5;pointer-events:none;background:var(--solid);
+  box-shadow:0 0 12px 2px rgba(17,18,20,.28);animation:m-riga .6s cubic-bezier(.5,.05,.25,1) forwards}
+@keyframes m-riga{from{transform:translateY(0)}92%{opacity:1}to{transform:translateY(var(--m-h,700px));opacity:0}}
+
+/* 8 · Scansione: dopo ogni sparo una fascia di luce passa sullo schermo (l'anello di scansione di JARVIS) */
+.m-scan{position:absolute;left:0;right:0;top:0;height:90px;z-index:5;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(17,18,20,.05) 70%,rgba(17,18,20,.55) 98%,transparent);
+  animation:m-scan .6s var(--m-curva) forwards}
+@keyframes m-scan{from{transform:translateY(-90px)}85%{opacity:1}to{transform:translateY(var(--m-h,700px));opacity:0}}
+
+/* 9 · Mirino della fotocamera: la riga laser che sale e scende mentre si inquadra il codice */
+.cam{position:relative;overflow:hidden}
+.cam::after{content:"";position:absolute;left:14%;right:14%;top:22%;height:2px;border-radius:2px;pointer-events:none;
+  background:rgba(255,255,255,.9);box-shadow:0 0 14px 3px rgba(255,255,255,.35);animation:m-laser 2.2s ease-in-out infinite alternate}
+@keyframes m-laser{to{top:78%}}
+
+/* 10 · Esiti: il ✓ scatta, il blocco fatto si illumina, l'errore dà uno scossone */
+.m-pop{animation:m-pop .45s var(--m-molla)}
+@keyframes m-pop{from{transform:scale(.55);opacity:.3}}
+.m-ok{animation:m-ok .7s ease-out}
+@keyframes m-ok{from{box-shadow:0 0 0 0 rgba(20,108,67,.45)}to{box-shadow:0 0 0 14px rgba(20,108,67,0)}}
+.m-allarme{animation:m-allarme .38s ease-in-out}
+@keyframes m-allarme{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+/* 11 · Barre di avanzamento: si riempiono fino al punto nuovo invece di saltare */
+.m-barra{transition:width .55s var(--m-curva)}
+
+/* 12 · Caricamento: l'anello che gira accanto a «Controllo la foto…» (il caricamento della chat di JARVIS, in piccolo) */
+.m-carica b::after{content:"";display:inline-block;width:14px;height:14px;margin-left:10px;vertical-align:-2px;border-radius:50%;
+  border:2px solid var(--line);border-top-color:var(--solid);animation:m-gira .7s linear infinite}
+@keyframes m-gira{to{transform:rotate(360deg)}}
+
+/* 13 · Badge: il QR nuovo ogni 30 secondi entra con una breve messa a fuoco */
+#qrbox.m-qr{animation:m-qr .5s var(--m-curva)}
+@keyframes m-qr{from{opacity:.15;transform:scale(.96);filter:blur(3px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .pscr.m-svela,.m-riga,.m-scan,.cam::after,.m-pop,.m-ok,.m-allarme,.m-carica b::after,#qrbox.m-qr{animation:none!important}
+  .m-riga,.m-scan{display:none}.m-barra{transition:none!important}
+  .bigbtn,.round,.back,.stop,.gbtn,.gopt,.prod{transition:none!important;transform:none!important;filter:none!important}
+}
+
 </style>
 
 <div class="wrap">
@@ -2104,10 +2155,23 @@ setInterval(()=>{
       el.addEventListener('animationend', () => pulisci(el, cls), { once: true });
     });
   };
+  // il telefono: la schermata si scopre dall'alto con la riga di luce
+  const sopra = (cls) => {
+    const sc = document.querySelector('#app .screen'); if (!sc) return;
+    const r = document.createElement('i'); r.className = cls; r.setAttribute('aria-hidden', 'true');
+    r.style.setProperty('--m-h', sc.clientHeight + 'px'); sc.appendChild(r);
+    r.addEventListener('animationend', () => r.remove(), { once: true });
+  };
+  const accendi = () => {
+    const ps = document.querySelector('#app .pscr'); if (!ps) return;
+    ps.classList.add('m-svela'); ps.addEventListener('animationend', () => pulisci(ps, 'm-svela'), { once: true });
+    sopra('m-riga');
+  };
   const entra = (cambioVista) => {
     if (fermo()) return;
     const app = document.getElementById('app');
-    const dentro = app.querySelector('.content') || app.querySelector('.pscr');
+    if (app.querySelector('.pscr')) { if (cambioVista) inFila(app.querySelector('.appinfo'), 'm-entra', 8); accendi(); return; }
+    const dentro = app.querySelector('.content');
     if (cambioVista || !dentro) {
       if (app.querySelector('.side')) inFila(app.querySelector('.side'), 'm-entra', 20);
       inFila(dentro || app, 'm-entra', 10);
@@ -2156,6 +2220,60 @@ setInterval(()=>{
     msgPrima = t;
   };
 
+  // nella stessa schermata di un'app: cosa è comparso o cambiato dall'ultimo tocco
+  const firma = (el) => el.tagName + '|' + el.className + '|' + (el.getAttribute('style') || '') + '|' + el.textContent.trim().slice(0, 90);
+  let segniPrima = null;
+  const esiti = (stessa) => {
+    const ps = document.querySelector('#app .pscr');
+    if (!ps) { segniPrima = null; return; }
+    const els = [...ps.querySelectorAll('.pcard,.kvp,.pill,span[style*="border-radius:99px"]')];
+    const ora = els.map(firma);
+    if (stessa && segniPrima && !fermo()) {
+      const resto = {}; segniPrima.forEach((f) => { resto[f] = (resto[f] || 0) + 1; });
+      const nuovi = [];
+      els.forEach((el, i) => { const f = ora[i]; if (resto[f]) resto[f]--; else nuovi.push(el); });
+      nuovi.forEach((el) => {
+        if (nuovi.some((x) => x !== el && x.contains(el) && !/var\(--ok\)/.test(el.getAttribute('style') || ''))) return;   // ci pensa il riquadro che lo contiene
+        const st = el.getAttribute('style') || '';
+        let cls = 'm-entra';
+        if (/var\(--alert\)/.test(st)) cls = 'm-allarme';
+        else if (el.tagName === 'SPAN' || el.classList.contains('pill')) cls = /var\(--ok\)/.test(st) || el.classList.contains('ok') ? 'm-pop' : '';
+        else if (/border:2px solid var\(--ok\)/.test(st)) cls = 'm-ok';
+        if (!cls) return;
+        el.classList.add(cls); el.addEventListener('animationend', () => pulisci(el, cls), { once: true });
+      });
+    }
+    segniPrima = ora;
+  };
+  let barrePrima = [];
+  const barre = (stessa) => {
+    const bs = [...document.querySelectorAll('#app .bar i')];
+    if (stessa && !fermo()) bs.forEach((el, i) => {
+      const da = barrePrima[i], a = el.style.width;
+      if (da == null || da === a) return;
+      el.style.width = da; void el.offsetWidth;
+      el.classList.add('m-barra'); el.style.width = a;
+      el.addEventListener('transitionend', () => pulisci(el, 'm-barra'), { once: true });
+    });
+    barrePrima = bs.map((el) => el.style.width);
+  };
+  const caricamento = () => {
+    document.querySelectorAll('#app .pscr .pcard').forEach((el) => { if (/^Controllo la foto/.test(el.textContent.trim())) el.classList.add('m-carica'); });
+  };
+  // l'ultimo tasto toccato: dopo uno sparo passa la fascia di scansione
+  let atto = '';
+  document.addEventListener('click', (e) => { const el = e.target.closest('[data-act]'); atto = el ? el.dataset.act : ''; }, true);
+
+  // il QR del badge: quando cambia (ogni 30 secondi) quello nuovo entra con una messa a fuoco
+  let qrBox = null, qrDentro = null;
+  setInterval(() => {
+    const q = document.getElementById('qrbox'), c = q && q.firstElementChild;
+    if (q && q === qrBox && c !== qrDentro && !fermo()) {
+      q.classList.add('m-qr'); q.addEventListener('animationend', () => pulisci(q, 'm-qr'), { once: true });
+    }
+    qrBox = q; qrDentro = c;
+  }, 100);
+
   // aggancio a render(): stesso disegno di prima, poi le animazioni
   let ultima = null, vista = null;
   const disegna = render;
@@ -2165,6 +2283,11 @@ setInterval(()=>{
     if (nuova && ultima !== null) entra(cambioVista);
     numeri(nuova);
     messaggio();
+    esiti(!nuova);
+    barre(!nuova);
+    caricamento();
+    if (/Scan$/.test(atto) && !fermo()) sopra('m-scan');
+    atto = '';
     ultima = k; vista = S.view;
   };
 
