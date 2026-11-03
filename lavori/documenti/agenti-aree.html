@@ -1,0 +1,275 @@
+<title>Agenti Messina</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* Stile Messina del mockup approvato: bianco e nero con vetro leggero. A sinistra gli agenti, a destra il sistema come nel mockup; si accende quello che l'agente usa. */
+:root{
+  --bg:#f2f3f5; --halo1:#e0e4eb; --halo2:#e9e9ee;
+  --ink:#111214; --muted:#5b5e66; --line:rgba(17,18,20,.09);
+  --glass:rgba(255,255,255,.72); --glass-edge:rgba(255,255,255,.95); --glass-strong:rgba(255,255,255,.92);
+  --solid:#111214; --on-solid:#ffffff; --soft:rgba(17,18,20,.05);
+  --alert:#b42318; --alert-soft:#fdecea; --ok:#146c43; --ok-soft:#e7f5ec; --frame:#1b1c20;
+  --shadow:0 1px 2px rgba(20,24,32,.04),0 16px 36px -22px rgba(20,24,32,.28);
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --curva:cubic-bezier(.38,.7,.125,1); --molla:cubic-bezier(.34,1.56,.64,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--ink);
+  background:radial-gradient(900px 520px at 90% -10%,var(--halo1),transparent 65%),radial-gradient(760px 520px at -8% 108%,var(--halo2),transparent 60%),var(--bg);
+  background-color:var(--bg);background-attachment:fixed;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--solid);outline-offset:2px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.wrap{max-width:1380px;margin:0 auto;padding-block:14px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%);border:1px solid var(--glass-edge);box-shadow:var(--shadow);border-radius:20px}
+.lbl{font-size:13px;color:var(--muted);font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);white-space:nowrap}
+.pill.dark{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-bottom:16px;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:19px;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:600}
+.top .lbl{flex:1 1 280px}
+
+.griglia{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){.griglia{grid-template-columns:minmax(0,1fr)}.top{position:static}}
+
+/* agenti */
+.agenti{padding:14px;display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(80px + env(safe-area-inset-top,0px));max-height:calc(100vh - 100px);overflow-y:auto}
+.gruppo{display:flex;flex-direction:column;gap:4px}
+.gruppo>.lbl{padding:0 8px;letter-spacing:.04em;text-transform:uppercase;font-size:11px;font-weight:700}
+.ag{border:0;background:transparent;text-align:left;padding:9px 10px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;font-weight:600;min-height:42px;transition:transform .26s var(--molla),background .2s}
+.ag:hover{background:var(--soft)}
+.ag:active{transform:scale(.97);transition-duration:.08s}
+.ag.on{background:var(--solid);color:var(--on-solid)}
+.ag .pill{font-size:11px;padding:2px 8px}
+.ag.on .pill{background:transparent;color:var(--on-solid);border-color:rgba(255,255,255,.4)}
+.ag.prova{color:var(--muted)}
+.ag.prova.on{color:var(--on-solid)}
+@media (max-width:980px){
+  .agenti{position:static;max-height:none;flex-direction:row;overflow-x:auto;padding:8px;gap:6px;scrollbar-width:none}
+  .agenti::-webkit-scrollbar{display:none}
+  .gruppo{flex-direction:row;gap:6px;flex:none}
+  .gruppo>.lbl{display:none}
+  .ag{white-space:nowrap;flex:none;border:1px solid var(--line);background:var(--glass-strong);border-radius:999px;min-height:40px;padding:8px 14px}
+  .ag .pill{display:none}
+}
+
+/* scheda dell'agente */
+.colonna{display:flex;flex-direction:column;gap:16px;min-width:0}
+.scheda{padding:18px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px 24px}
+@media (max-width:720px){.scheda{grid-template-columns:minmax(0,1fr)}}
+.scheda h2{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.scheda .cosa{font-size:17px;margin-top:4px;max-width:60ch}
+.kv{display:flex;flex-direction:column;gap:0}
+.kv div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.kv div:first-child{border-top:0}
+.kv b{text-align:right}
+.legenda{display:flex;flex-wrap:wrap;gap:8px;align-items:center;grid-column:1/-1}
+
+/* il sistema */
+.sistema{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr))}
+.area{padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.area.larga{grid-column:span 2}
+@media (max-width:640px){.area.larga{grid-column:auto}}
+.testa{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.testa h3{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.voci{display:flex;flex-wrap:wrap;gap:6px}
+.area.f-menu .voci{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+.voce{border:1px solid var(--line);background:var(--glass-strong);border-radius:10px;padding:7px 10px;font-size:13.5px;font-weight:600;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:36px;transition:background .25s,color .25s,border-color .25s,transform .26s var(--molla),opacity .25s}
+.voce:active{transform:scale(.96);transition-duration:.08s}
+.voce .n{font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;background:var(--soft);color:var(--muted);font-variant-numeric:tabular-nums}
+.voce.spenta{opacity:.38}
+.voce.legge{border-color:var(--solid);border-width:1.5px}
+.voce.scrive{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.voce.scrive .n,.voce.legge .n{display:none}
+.voce.scelta{outline:2px solid var(--solid);outline-offset:2px}
+.voce.accende{animation:accende .5s var(--curva) both;animation-delay:calc(var(--i,0)*30ms)}
+@keyframes accende{from{transform:scale(.92);opacity:.3}}
+.telefono{border-radius:26px;padding:6px;background:var(--frame)}
+.telefono .dentro{border-radius:21px;background:linear-gradient(180deg,#eceef3,#f6f7f9 55%,#eceef3);padding:12px 10px;display:flex;flex-direction:column;gap:6px;min-height:150px}
+.telefono .voce{width:100%}
+.browser{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--glass-strong)}
+.browser .barra{display:flex;gap:5px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.browser .barra i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.browser .voci{padding:10px}
+.vuota{font-size:13px;color:var(--muted)}
+
+/* dettaglio */
+.dettaglio{padding:16px;display:flex;flex-direction:column;gap:8px}
+.riga{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;padding:9px 0;border-top:1px solid var(--line);align-items:baseline;font-size:14.5px}
+.riga:first-of-type{border-top:0}
+.riga .dove{font-weight:700}
+@media (max-width:560px){.riga{grid-template-columns:minmax(0,1fr) auto}.riga .cosa2{grid-column:1/-1;order:3}}
+.entra{animation:entra .36s var(--curva) both;animation-delay:calc(var(--i,0)*35ms)}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}}
+.nota{font-size:12.5px;color:var(--muted);margin:4px 2px 0}
+@media (prefers-reduced-motion:reduce){.voce.accende,.entra{animation:none}.ag,.voce{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top glass">
+    <div class="brand">Agenti <span>· Messina</span></div>
+    <span class="lbl">Tocca un agente per vedere dove lavora nel sistema. Tocca una voce per vedere quali agenti la usano. Proposta del 26 ottobre 2026, da decidere.</span>
+  </header>
+
+  <div class="griglia">
+    <nav class="agenti glass" id="agenti" aria-label="Agenti"></nav>
+    <div class="colonna">
+      <section class="scheda glass" id="scheda" aria-live="polite"></section>
+      <section class="sistema" id="sistema" aria-label="Il sistema Messina"></section>
+      <section class="dettaglio glass" id="dettaglio"></section>
+      <p class="nota">Sezioni, schermate e pagine sono quelle del mockup approvato. «Preventivi» non c'è ancora: è il punto 7 delle Decisioni.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* Il sistema, con i nomi del mockup approvato */
+var AREE=[
+ {id:'T',nome:'Autotrasporti',tipo:'Gestionale',forma:'menu',larga:true,voci:['Home','Anomalie','Mail','Bolle','Traffico','Magazzino','Giacenze','Clienti','Preventivi','Portale','Fatturazione','Mezzi','Autisti','Telepass','Satellitare','Presenze','Telecamere','J7']},
+ {id:'C',nome:'Corporation',tipo:'Gestionale',forma:'menu',voci:['Home','Mail','Lotti','Inventario','Ordini','Stage Computer','Stage Cellulari','Ricambi','Telecamere']},
+ {id:'P',nome:'Portale',tipo:'Clienti',forma:'menu',voci:['Home','Spedizioni','Magazzino','Giacenze','Fatture']},
+ {id:'AA',nome:'App autisti',tipo:'App',forma:'telefono',voci:['Consegne','Fermata','Bolla','Non Consegnato']},
+ {id:'AM',nome:'App magazzino',tipo:'App',forma:'telefono',voci:['Entrata','Uscita','Trasferisci','Missioni']},
+ {id:'AP',nome:'App presenze',tipo:'App',forma:'telefono',voci:['Badge','Oggi','Ottobre']},
+ {id:'AC',nome:'App Corporation',tipo:'App',forma:'telefono',voci:['Scansione','Scheda','Grado','Prezzo','Bancale']},
+ {id:'N',nome:'Negozio online',tipo:'Sito',forma:'browser',voci:['Vetrina','Prodotto','Carrello','Per aziende']},
+ {id:'ST',nome:'Sito Autotrasporti',tipo:'Sito',forma:'browser',voci:['Servizi','Traccia','Preventivo','Ritiro','Lavora con noi','Contatti','Area clienti']},
+ {id:'SC',nome:'Sito Corporation',tipo:'Sito',forma:'browser',voci:['Aziende','Valuta un lotto','Gradi','Contatti']}
+];
+/* Gli agenti. tocca: 'Area:Voce' → [L legge | S scrive, cosa fa lì] */
+var AGENTI=[
+ {id:'jarvis',nome:'JARVIS',gruppo:'Regista',cosa:'Riceve tutto quello che arriva, lo dà all’agente giusto, controlla il risultato e passa i casi alle persone.',
+  canali:'Tutti',chi:'Alessandro (correzioni)',fase:'Con il primo agente',
+  tocca:{'T:Anomalie':['S','Mette qui quello che blocca: sconto oltre soglia, IBAN cambiato, importo diverso dal contratto'],'T:Home':['S','Prepara il resoconto del mattino con quello che hanno fatto gli agenti'],'T:Mail':['L','Legge ogni mail in arrivo e decide a chi va'],'C:Mail':['L','Legge ogni mail della Corporation e decide a chi va'],'C:Home':['S','Resoconto del mattino della Corporation'],'ST:Contatti':['L','Prende le richieste arrivate dal sito'],'SC:Contatti':['L','Prende le richieste arrivate dal sito'],'N:Per aziende':['L','Prende le richieste delle aziende']}},
+ {id:'centralino',nome:'Centralino',gruppo:'Contatti',cosa:'Risponde a tutte le chiamate, anche fuori orario: smista o prende il messaggio.',
+  canali:'Telefono',chi:'—',fase:'1',
+  tocca:{'T:Mail':['S','Lascia il messaggio scritto alla persona cercata'],'C:Mail':['S','Lascia il messaggio scritto alla persona cercata'],'T:Clienti':['L','Riconosce chi chiama dal numero e dal nome'],'ST:Contatti':['L','Risponde al numero scritto sul sito'],'SC:Contatti':['L','Risponde al numero scritto sul sito']}},
+ {id:'tracciamento',nome:'Tracciamento',gruppo:'Contatti',cosa:'Dice dov’è la spedizione, dopo aver controllato il numero di bolla e chi chiede.',
+  canali:'Telefono, mail, WhatsApp',chi:'—',fase:'1',
+  tocca:{'T:Bolle':['L','Cerca la bolla e il suo stato'],'T:Traffico':['L','Vede in quale giro è e l’orario previsto'],'P:Spedizioni':['L','Dà la stessa risposta che il cliente vede nel portale'],'ST:Traccia':['L','Dà la stessa risposta di «Traccia» sul sito'],'AA:Consegne':['L','Sa se la fermata è già fatta']}},
+ {id:'avvisi',nome:'Avvisi',gruppo:'Contatti',cosa:'Il giorno prima avvisa il destinatario della fascia oraria; raccoglie chi chiede un altro giorno.',
+  canali:'Telefono, SMS, WhatsApp',chi:'—',fase:'2',
+  tocca:{'T:Traffico':['S','Legge i giri di domani; i cambi di fascia arrivano a Mauro e Nelson'],'P:Spedizioni':['S','Segna «Destinatario avvisato»'],'T:Bolle':['L','Prende destinatario e telefono dalla bolla']}},
+ {id:'giacenze',nome:'Giacenze',gruppo:'Contatti',cosa:'Chiama il destinatario della consegna non riuscita e fissa la riconsegna.',
+  canali:'Telefono',chi:'Ufficio bolle',fase:'2',
+  tocca:{'T:Giacenze':['S','Propone giorno e ora della riconsegna: conferma l’ufficio'],'AA:Non Consegnato':['L','Parte dal motivo scelto dall’autista'],'P:Giacenze':['S','Il cliente vede la riconsegna fissata'],'T:Traffico':['S','La riconsegna confermata entra nel giro di quel giorno']}},
+ {id:'ordini',nome:'Ordini',gruppo:'Autotrasporti',cosa:'Trasforma ordini a voce e via mail in bozze di bolla, con le voci da fatturare.',
+  canali:'Mail, telefono',chi:'Christian, Gabriele, Alberto',fase:'3',
+  tocca:{'T:Mail':['L','Legge l’ordine e gli allegati'],'T:Bolle':['S','Prepara la bozza: va a chi ne ha meno da confermare'],'T:Clienti':['L','Prende tariffe e accessori del contratto'],'ST:Ritiro':['L','Prende le richieste di ritiro dal sito']}},
+ {id:'autisti',nome:'Autisti',gruppo:'Autotrasporti',cosa:'Riceve le chiamate degli autisti in difficoltà, avvisa il Traffico e i clienti del giro.',
+  canali:'Telefono, app',chi:'Mauro, Nelson',fase:'2',
+  tocca:{'AA:Consegne':['L','Vede il giro dell’autista che chiama'],'AA:Fermata':['L','Sa a che punto è la consegna'],'T:Traffico':['S','Ricalcola gli orari: decidono Mauro e Nelson'],'T:Autisti':['L','Riconosce l’autista e il suo mezzo']}},
+ {id:'commerciale',nome:'Commerciale',gruppo:'Autotrasporti',cosa:'Raccoglie le richieste di preventivo e prepara la bozza con il listino.',
+  canali:'Mail, sito, telefono',chi:'Gianluca, Direzione',fase:'3',
+  tocca:{'T:Preventivi':['S','Prepara la bozza: la firma Gianluca, lo sconto oltre soglia la Direzione'],'T:Clienti':['L','Usa listino base e tariffe in essere'],'ST:Preventivo':['L','Prende le richieste di preventivo dal sito'],'T:Mail':['L','Legge le richieste arrivate per mail']}},
+ {id:'solleciti',nome:'Solleciti',gruppo:'Autotrasporti',cosa:'Ricorda le fatture in scadenza o scadute, seguendo lo scadenzario.',
+  canali:'Mail, telefono',chi:'Amministrazione',fase:'3',
+  tocca:{'T:Fatturazione':['S','Prepara i promemoria: li manda l’Amministrazione'],'T:Clienti':['L','Prende referente e PEC del cliente'],'P:Fatture':['L','Il cliente vede le stesse fatture e scadenze']}},
+ {id:'vendite',nome:'Vendite',gruppo:'Corporation',cosa:'Risponde sui computer usati, raccoglie gli ordini delle aziende e le richieste di valutazione dei lotti.',
+  canali:'Telefono, mail, sito',chi:'Matteo, Pier',fase:'4',
+  tocca:{'C:Mail':['L','Legge le domande dei clienti'],'C:Inventario':['L','Controlla disponibilità, grado e scheda'],'C:Ordini':['S','Prepara l’ordine: il prezzo lo conferma Matteo'],'C:Lotti':['S','Prepara la richiesta di valutazione di un lotto'],'N:Prodotto':['L','Risponde sui modelli in vetrina'],'N:Per aziende':['L','Prende le richieste delle aziende'],'SC:Valuta un lotto':['L','Prende i lotti proposti dal sito'],'SC:Aziende':['L','Prende le richieste delle aziende']}},
+ {id:'direzione',nome:'Direzione',gruppo:'Direzione',cosa:'Assistente di Matteo, Pier e dei genitori: numeri, resoconti, domande sulle due società.',
+  canali:'App, voce',chi:'—',fase:'4',
+  tocca:{'T:Home':['L','Numeri del giorno, costi e margine'],'T:Anomalie':['L','Quello che aspetta una decisione'],'T:Fatturazione':['L','Fatturato e incassi'],'C:Home':['L','Numeri della Corporation'],'C:Lotti':['L','Quanto ha recuperato ogni lotto']}},
+ {id:'commercialista',nome:'Commercialista',gruppo:'Da decidere',prova:true,cosa:'Il «commercialista interno» chiesto da Matteo: ogni giorno il resoconto di fatture, incassi e scadenze.',
+  canali:'App, mail',chi:'Amministrazione',fase:'Da decidere',
+  tocca:{'T:Fatturazione':['L','Fatture, note di credito, esiti SdI'],'T:Home':['L','Costi del giorno e margine'],'C:Home':['L','Incassato e vendite nette'],'C:Lotti':['L','Costi e recuperi dei lotti']}},
+ {id:'econocom',nome:'Econocom',gruppo:'Da decidere',prova:true,cosa:'Risponde a Econocom e Accenture su PC e utenti già lavorati e prepara le missioni di ritiro e spedizione.',
+  canali:'Mail',chi:'Pier',fase:'Da decidere',
+  tocca:{'C:Mail':['S','Risponde alle mail di Econocom e Accenture'],'C:Stage Computer':['L','Sa quali PC sono già formattati'],'C:Stage Cellulari':['L','Sa quali telefoni sono già pronti'],'T:Magazzino':['L','Trova i device per IMEI e cespite'],'T:Traffico':['S','Prepara ritiri e spedizioni da confermare'],'AM:Missioni':['S','La preparazione arriva come missione al magazziniere']}},
+ {id:'ore',nome:'Ore',gruppo:'Da decidere',prova:true,cosa:'Prepara il riepilogo di ore, ferie e permessi per Angela e la madre. Non decide nulla sulle persone (AI Act).',
+  canali:'App',chi:'Angela',fase:'Da decidere',
+  tocca:{'T:Presenze':['L','Legge timbrature, Riepiloghi e Ferie già calcolati dal database'],'AP:Oggi':['L','Usa le timbrature del giorno']}}
+];
+var GRUPPI=['Regista','Contatti','Autotrasporti','Corporation','Direzione','Da decidere'];
+var $=function(id){return document.getElementById(id);};
+var esc=function(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var calma=matchMedia('(prefers-reduced-motion: reduce)');
+var scelto=null, voceScelta=null;
+
+function chiTocca(k){return AGENTI.filter(function(a){return a.tocca[k];});}
+
+function disegnaAgenti(){
+  $('agenti').innerHTML='<div class="gruppo"><button class="ag'+(scelto?'':' on')+'" type="button" data-ag="">Tutti<span class="pill">'+AGENTI.length+'</span></button></div>'+
+   GRUPPI.map(function(g){
+    return '<div class="gruppo"><div class="lbl">'+g+'</div>'+AGENTI.filter(function(a){return a.gruppo===g;}).map(function(a){
+      return '<button class="ag'+(a.prova?' prova':'')+(scelto===a.id?' on':'')+'" type="button" data-ag="'+a.id+'">'+a.nome+'<span class="pill">'+(a.fase.length<3?'Fase '+a.fase:a.fase==='Da decidere'?'Proposta':'Fase 1')+'</span></button>';
+    }).join('')+'</div>';
+  }).join('');
+}
+
+function disegnaScheda(){
+  var a=AGENTI.find(function(x){return x.id===scelto;});
+  if(!a){
+    var n=AGENTI.filter(function(x){return !x.prova;}).length;
+    $('scheda').innerHTML='<div><div class="lbl">La squadra</div><h2>'+n+' agenti e JARVIS</h2><div class="cosa">Ogni voce del sistema mostra quanti agenti la usano. Le app di magazzino e Corporation restano alle persone: lì si lavora con la pistola e le mani, gli agenti non servono.</div></div>'+
+      '<div class="kv"><div><span>Contatti</span><b>4</b></div><div><span>Autotrasporti</span><b>4</b></div><div><span>Corporation</span><b>1</b></div><div><span>Direzione</span><b>1</b></div><div><span>Da decidere</span><b>3</b></div></div>'+legenda();
+    return;
+  }
+  var dove=Object.keys(a.tocca), sc=dove.filter(function(k){return a.tocca[k][0]==='S';}).length;
+  $('scheda').innerHTML='<div><div class="lbl">'+esc(a.gruppo)+(a.prova?' · proposta, non ancora nella squadra':'')+'</div><h2>'+esc(a.nome)+'</h2><div class="cosa">'+esc(a.cosa)+'</div></div>'+
+    '<div class="kv"><div><span>Canali</span><b>'+esc(a.canali)+'</b></div><div><span>Chi dà il sì</span><b>'+esc(a.chi)+'</b></div><div><span>Fase</span><b>'+esc(a.fase)+'</b></div><div><span>Dove lavora</span><b>'+dove.length+' voci · prepara in '+sc+'</b></div></div>'+legenda();
+}
+function legenda(){return '<div class="legenda"><span class="voce scrive" style="pointer-events:none">Prepara</span><span class="lbl">prepara un lavoro che una persona conferma</span><span class="voce legge" style="pointer-events:none">Legge</span><span class="lbl">consulta i dati, non cambia niente</span></div>';}
+
+function disegnaSistema(anima){
+  var a=AGENTI.find(function(x){return x.id===scelto;}), i=0;
+  $('sistema').innerHTML=AREE.map(function(ar){
+    var voci=ar.voci.map(function(v){
+      var k=ar.id+':'+v, cls='voce', extra='';
+      if(a){ var t=a.tocca[k]; if(t){ cls+=t[0]==='S'?' scrive':' legge'; if(anima&&!calma.matches){cls+=' accende'; extra=' style="--i:'+(i++)+'"';} } else cls+=' spenta'; }
+      if(voceScelta===k) cls+=' scelta';
+      var n=chiTocca(k).length;
+      return '<button type="button" class="'+cls+'" data-voce="'+esc(k)+'"'+extra+'><span>'+esc(v)+'</span>'+(a?'':'<span class="n">'+(n||'')+'</span>')+'</button>';
+    }).join('');
+    var usati=ar.voci.filter(function(v){return a?a.tocca[ar.id+':'+v]:chiTocca(ar.id+':'+v).length;}).length;
+    var corpo=ar.forma==='telefono'?'<div class="telefono"><div class="dentro">'+voci+'</div></div>'
+      :ar.forma==='browser'?'<div class="browser"><div class="barra"><i></i><i></i><i></i></div><div class="voci">'+voci+'</div></div>'
+      :'<div class="voci">'+voci+'</div>';
+    return '<div class="area glass f-'+ar.forma+(ar.larga?' larga':'')+'"><div class="testa"><h3>'+esc(ar.nome)+'</h3><span class="lbl">'+esc(ar.tipo)+' · '+(usati?usati+(usati===1?' voce':' voci'):'nessun agente')+'</span></div>'+corpo+'</div>';
+  }).join('');
+}
+
+function disegnaDettaglio(){
+  var d=$('dettaglio'), righe=[], titolo;
+  if(voceScelta){
+    var p=voceScelta.split(':'), ar=AREE.find(function(x){return x.id===p[0];});
+    titolo=ar.nome+' › '+p[1];
+    righe=chiTocca(voceScelta).map(function(a){var t=a.tocca[voceScelta];return [a.nome,t[1],t[0]];});
+    if(!righe.length) righe=null;
+  } else {
+    var a=AGENTI.find(function(x){return x.id===scelto;});
+    if(!a){d.innerHTML='<h3 style="font-size:18px;font-weight:800">Cosa fanno, voce per voce</h3><div class="vuota">Scegli un agente a sinistra o una voce del sistema.</div>';return;}
+    titolo='Cosa fa '+a.nome+', voce per voce';
+    righe=Object.keys(a.tocca).map(function(k){var p=k.split(':'),ar=AREE.find(function(x){return x.id===p[0];});return [ar.nome+' › '+p[1],a.tocca[k][1],a.tocca[k][0]];});
+  }
+  d.innerHTML='<h3 style="font-size:18px;font-weight:800">'+esc(titolo)+'</h3>'+(righe?righe.map(function(r,i){
+    return '<div class="riga'+(calma.matches?'':' entra')+'" style="--i:'+i+'"><span class="dove">'+esc(r[0])+'</span><span class="cosa2">'+esc(r[1])+'</span>'+(r[2]==='S'?'<span class="pill dark">Prepara</span>':'<span class="pill">Legge</span>')+'</div>';
+  }).join(''):'<div class="vuota">Qui non lavora nessun agente: è lavoro delle persone.</div>');
+}
+
+function tutto(anima){disegnaAgenti();disegnaScheda();disegnaSistema(anima);disegnaDettaglio();}
+
+$('agenti').addEventListener('click',function(e){
+  var b=e.target.closest('[data-ag]'); if(!b) return;
+  scelto=b.dataset.ag||null; voceScelta=null; tutto(true);
+});
+$('sistema').addEventListener('click',function(e){
+  var b=e.target.closest('[data-voce]'); if(!b) return;
+  voceScelta=voceScelta===b.dataset.voce?null:b.dataset.voce;
+  disegnaSistema(false); disegnaDettaglio();
+  if(voceScelta&&innerWidth<980) $('dettaglio').scrollIntoView({behavior:calma.matches?'auto':'smooth',block:'nearest'});
+});
+tutto(false);
+})();
+</script>
