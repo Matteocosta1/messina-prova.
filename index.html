@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}
+/* proposta 23/11: campi del nuovo lotto, come packages/ui/src/produzione.css del programma */
+.input{font:inherit;font-size:15px;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--glass-strong);color:var(--ink);padding:10px 12px;width:100%}
+.field{display:flex;flex-direction:column;gap:6px}
+@media (max-width:760px){.input{font-size:16px}}
+</style>
 <title>Prova programma Messina</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="color-scheme" content="light only">
@@ -295,7 +300,7 @@ const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false, colliOk:false, accConf:false, firmaOpen:false, firmaImg:null},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:''},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
@@ -501,6 +506,46 @@ const DEVICES=[
  {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'Ricevimento',banc:'B-0146',costo:'€ 61',price:'€ 219',stato:'Reso',siti:'—',gpu:'Intel UHD',gg:1},
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',sn:'PF3XXXX8',shelf:'S11-1-2',banc:'B-0145',costo:'€ 61',price:'€ 159',stato:'Disponibile',siti:'eBay, Subito',gpu:'Intel Iris Xe',gg:4}
 ];
+/* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
+const LOTTI=[['L-016','Lettura','Nov 2026',3,'€ 450',0,'€ 0','0%'],['L-015','Banco','Ott 2026',612,'€ 36.700',12,'€ 2.202','6%'],['L-014','Pronto','Set 2026',480,'€ 28.800',131,'€ 20.736','72%'],['L-013','Pronto','Ago 2026',320,'€ 19.500',298,'€ 31.980','164%']];
+const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
+const LETTURE=[
+ {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0142',shelf:'S11-2-1'},
+ {sn:'PF4L0002',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:9120,bat:74,cicli:410,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:4,letto:'14:41'},
+ {sn:'PF4L0003',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Guasto',ore:21300,bat:81,cicli:260,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'Sì',post:5,letto:'14:47'}];
+const XCOL=['Seriale','Marca','Modello','Codice modello','Processore','RAM','Disco','Salute disco','Ore disco','Batteria %','Cicli batteria','Schermo','Scheda video','Password BIOS','Cancellazione','Grado','Difetti','Prezzo','Bancale','Posto','Postazione','Letto il','Caricato il'];
+function righeExcel(cod){
+  const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  if(cod==='L-016') return LETTURE.map((l,i)=>{const car=i===0||(i===1&&S.k.lettFatto);const d=i===1&&S.k.lettFatto?{grado:S.k.grado,prezzo:S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto}:l;
+    return [l.sn,'Lenovo','ThinkPad T14 Gen 2',l.cod,l.cpu,l.ram,l.disk,l.sal,l.ore,l.bat,l.cicli,l.screen,l.gpu,l.pw,null,car?d.grado:null,car&&i===1&&S.k.difetti['Batteria sotto 80%']?'Batteria sotto 80%':null,car?d.prezzo:null,car?d.banc:null,car?d.shelf:null,l.post,oggi+' '+l.letto,car?oggi+' 15:4'+i:null];});
+  const nuovo=S.c.nuovi&&S.c.nuovi.find(x=>x[0]===cod); if(nuovo) return [];
+  return DEVICES.filter(d=>d.lotto===cod).map(d=>[d.sn,d.brand,d.model,null,d.cpu,d.ram,d.disk,null,null,d.dif.indexOf('Batteria')>=0?76:null,null,d.screen,d.gpu,null,cod==='L-015'?'Certificata':null,d.grade,d.dif==='—'?null:d.dif,+d.price.replace(/\D/g,''),d.banc,d.shelf,null,null,oggi]);
+}
+/* file Excel vero (.xlsx), come packages/ui/src/excel.ts del programma */
+function scaricaExcel(nome,col,righe){
+  const x=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const L=n=>{let s='';for(n++;n>0;n=Math.floor((n-1)/26))s=String.fromCharCode(65+((n-1)%26))+s;return s;};
+  const cel=(v,r,st)=>v===null||v===undefined||v===''?'':(typeof v==='number'?`<c r="${r}"${st?' s="1"':''}><v>${v}</v></c>`:`<c r="${r}" t="inlineStr"${st?' s="1"':''}><is><t xml:space="preserve">${x(v)}</t></is></c>`);
+  const tutte=[col,...righe].map((r,y)=>`<row r="${y+1}">${r.map((v,c)=>cel(v,L(c)+(y+1),y===0)).join('')}</row>`).join('');
+  const larg=col.map((c,i)=>Math.min(40,Math.max(c.length,...righe.map(r=>String(r[i]??'').length))+2));
+  const F={'[Content_Types].xml':'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>',
+    '_rels/.rels':'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+    'xl/_rels/workbook.xml.rels':'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
+    'xl/styles.xml':'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>',
+    'xl/workbook.xml':`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${x(nome.slice(0,31))}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/worksheets/sheet1.xml':`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${larg.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${tutte}</sheetData><autoFilter ref="A1:${L(col.length-1)}${righe.length+1}"/></worksheet>`};
+  const T=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;T[n]=c>>>0;}
+  const crc=b=>{let c=0xffffffff;for(let i=0;i<b.length;i++)c=T[(c^b[i])&0xff]^(c>>>8);return (c^0xffffffff)>>>0;};
+  const enc=new TextEncoder(),parti=[],cen=[];let pos=0;
+  for(const [nm,txt] of Object.entries(F)){const n=enc.encode(nm),d=enc.encode(txt),c=crc(d);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,n.length,true);
+    parti.push(new Uint8Array(h.buffer),n,d);
+    const z=new DataView(new ArrayBuffer(46));z.setUint32(0,0x02014b50,true);z.setUint16(4,20,true);z.setUint16(6,20,true);z.setUint16(8,0x0800,true);z.setUint32(16,c,true);z.setUint32(20,d.length,true);z.setUint32(24,d.length,true);z.setUint16(28,n.length,true);z.setUint32(42,pos,true);
+    cen.push(new Uint8Array(z.buffer),n);pos+=30+n.length+d.length;}
+  const lung=cen.reduce((a,v)=>a+v.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,Object.keys(F).length,true);e.setUint16(10,Object.keys(F).length,true);e.setUint32(12,lung,true);e.setUint32(16,pos,true);
+  const url=URL.createObjectURL(new Blob([...parti,...cen,new Uint8Array(e.buffer)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const a=document.createElement('a');a.href=url;a.download=nome+'.xlsx';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+}
 const ORDINI=[
  ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
  ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
@@ -660,14 +705,22 @@ const A={
   cTelF:f=>{S.c.telF=f;},
   cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è nel posto '+ORDINI[+i][6]+'.';},
   cDdt:()=>{S.c.ordMsg='ddt';},
+  cNuovoL:()=>{S.c.nuovoL=!S.c.nuovoL; S.c.lottoMsg='';},
+  cStrada:v=>{S.c.strada=v;},
+  cApriL:()=>{const n=S.c.nl; if(!S.c.strada||!n.codice.trim()||!(+n.pezzi>0)) return; S.c.nuovi=S.c.nuovi||[]; const cod=n.codice.trim().toUpperCase();
+    if(LOTTI.concat(S.c.nuovi).some(l=>l[0]===cod)){S.c.lottoMsg='esiste'; return;}
+    S.c.nuovi.unshift([cod,S.c.strada,'Nov 2026',+n.pezzi,'€ '+(+String(n.costo).replace(',','.')||0).toLocaleString('it-IT'),0,'€ 0','0%']);
+    S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
+    S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',pezzi:'',costo:''};},
+  cXls:cod=>{const r=righeExcel(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} scaricaExcel('Lotto '+cod,XCOL,r);},
   /* carico */
-  kGo:s=>{S.k.scr=s; if(s==='scan') S.k.banc=null;},
+  kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};} S.k.scr=s; if(s==='scan') S.k.banc=null;},
   kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
   kDif:l=>{S.k.difetti[l]=!S.k.difetti[l];},
   kCan:l=>{S.k.canali[l]=!S.k.canali[l];},
   kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
   kPiu:()=>{S.k.prezzo+=10;},
-  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.n+=1;},
+  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.n+=1; if(S.k.ex==='lettura'&&!S.k.lettFatto){S.k.lettFatto=true; S.c.lettCaricati=2;}},
   kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto='S11-2-1';},
   kNbStampa:()=>{S.k.nb.stampata=true;},
   kNbPosto:()=>{if(S.k.nb.stampata)S.k.nb.posto='S11-3-2';},
@@ -748,6 +801,7 @@ hook('tPresFix',i=>evt('Presenze',`Uscita di ${PRES_IERI[i][0]} sistemata da Ang
 hook('cDdt',()=>evt('Lotti','DDT del lotto L-015 letto: 609 seriali su 612 trovati, 3 da verificare.'));
 hook('cEtichetta',i=>evt('Ordini',`Etichetta del corriere pronta per ${ORDINI[+i][3]}: prendi il PC in ${ORDINI[+i][6]}.`));
 hook('kFatto',()=>{const att=Object.keys(S.k.canali).filter(x=>S.k.canali[x]); evt('Inventario',`ThinkPad T14 Gen 2 grado ${S.k.grado} in vendita a € ${S.k.prezzo} su ${att.length} siti.`);});
+hook('cApriL',()=>{const n=(S.c.nuovi||[])[0]; if(n&&S.c.lottoMsg&&S.c.lottoMsg!=='esiste') evt('Lotti',`Lotto ${n[0]} aperto · strada ${n[1]}.`);});
 hook('kNbStampa',()=>evt('Magazzino','Etichetta B-0147 stampata sulla Zebra.'));
 hook('cLic',()=>evt('Stage','Richiesta licenze Certus inviata.'));
 hook('tTp',()=>{});
@@ -1550,18 +1604,28 @@ function corp(){
     body=mailView(C_MAILS,c,'c',ab,['In arrivo','Vendite','Lotti','Stage','Inviate']);
   }
   if(s==='lotti'){
-    title='Lotti'; hintTxt='la colonna «Incassato finora» sale a ogni computer venduto del lotto.';
-    const L=[['L-015','Ott 2026',612,'€ 36.700',12,'€ 2.202','6%'],['L-014','Set 2026',480,'€ 28.800',131,'€ 20.736','72%'],['L-013','Ago 2026',320,'€ 19.500',298,'€ 31.980','164%']];
+    title='Lotti'; hintTxt='la colonna «Incassato finora» sale a ogni computer venduto del lotto. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto.';
+    const L=(c.nuovi||[]).concat(LOTTI);
+    const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
+    const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Costo medio reale per PC</div><div class="big">€ 61</div><div class="lbl">calcolato su tutti i lotti</div></div>
       <div class="glass card"><div class="lbl">Lotti aperti</div><div class="big">6</div></div>
       <div class="glass card"><div class="lbl">Fermi da oltre 60 giorni</div><div class="big">11</div><div class="lbl">conviene svendere</div></div>
     </div>
-    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato finora</th><th>Recuperato</th></tr></thead><tbody>
-    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><b>${r[5]}</b></td><td>${r[6]}</td></tr>`).join('')}
+    ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
+    ${c.nuovoL?`<div class="glass card stack">
+      <b>Nuovo lotto</b>
+      <div class="row" style="align-items:flex-end">${inp('codice','Codice',120)}${inp('fornitore','Fornitore')}<label class="field"><span class="lbl">Acquisto</span><input class="input" type="date" value="${new Date().toISOString().slice(0,10)}"></label>${inp('pezzi','Pezzi nel DDT',110,'numeric')}${inp('costo','Costo €',130,'decimal')}</div>
+      <div class="field"><span class="lbl">Strada</span><div class="row">${['Banco','Lettura','Pronto'].map(x=>chip(x,'cStrada',x,c.strada===x)).join('')}</div>${c.strada?`<span class="lbl">${STRADA_TXT[c.strada]}</span>`:''}</div>
+      ${c.lottoMsg==='esiste'?`<div class="warn">Il lotto ${String(nl.codice).trim().toUpperCase()} esiste già</div>`:''}
+      <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
+    </div>`:''}
+    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Strada</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato finora</th><th>Recuperato</th><th></th></tr></thead><tbody>
+    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td>${r[7]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
     </tbody></table></div>
     ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
-    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
+    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
   }
   if(s==='inv'){
     title='Inventario'; hintTxt='prova i tasti «Schede» e «Tabella» in alto a destra, e i filtri per marchio e grado.';
@@ -1584,7 +1648,7 @@ function corp(){
     </tbody></table></div>`;
   }
   if(s==='stage'){
-    title='Stage Computer'; hintTxt='tocca una postazione del banco per vedere a che punto è. Le due rosse si sono interrotte.';
+    title='Stage Computer'; hintTxt='tocca una postazione del banco per vedere a che punto è. Le due rosse si sono interrotte. Proposta: il riquadro «Lettura» segue i PC già formattati letti al banco.';
     const sel=c.banco;
     body=`<div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass card" style="flex:2 1 440px;min-width:0">
@@ -1599,6 +1663,11 @@ function corp(){
         ${sel?`<div style="margin-top:14px">${msg('Postazione '+sel+': '+BANCO_TXT[banchiState(sel)]+'.')}</div>`:''}
       </div>
       <div class="stack" style="flex:1 1 260px;min-width:0">
+        <div class="glass card"><div class="lbl">Lettura</div>
+          <div class="row between" style="margin-top:8px;flex-wrap:nowrap;gap:10px"><div style="line-height:1.6">Lotto <b>L-016</b><br>Letti <b>3</b> di 3 · Caricati <b>${c.lettCaricati}</b> · <b class="miss">1 da guardare</b></div>${b('Excel','cXls','L-016','ghost sm')}</div>
+          <div class="lbl" style="margin-top:10px">PF4L0003: disco guasto e password nel BIOS</div>
+          <div class="lbl" style="margin-top:10px">Banco stage: collegato, ultima lettura 2 min fa</div>
+        </div>
         <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>430</b> · Formattati <b>412</b> · Interrotti <b>2</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
         <div class="glass card"><div class="lbl">Licenze Certus</div><div style="margin-top:6px">Chiavetta 3: <b class="miss">40 licenze rimaste</b></div>${c.licOk?`<div style="margin-top:10px">${msg('Mail di richiesta licenze inviata.')}</div>`:`<div style="margin-top:12px">${b('Invia la mail già pronta','cLic')}</div>`}</div>
       </div></div>`;
@@ -1869,7 +1938,19 @@ function caricoApp(){
       <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="bigbtn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.cam}Foto</button><button class="bigbtn ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.pen}Manuale</button></div>
     </div>`;
   }
-  if(k.scr==='scheda'){
+  if(k.scr==='scheda'&&k.ex==='lettura'){
+    inner=`<div class="pscr">
+      ${kSteps('scheda')}
+      <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF4L0002</b></div>${pill('Verificato su Lenovo','ok')}</div>
+      <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Letto al banco')}</div>
+      <div class="ptitle" style="font-size:24px">Lenovo ThinkPad T14 Gen 2</div>
+      <div class="pcard" style="padding:4px 14px">
+        <div class="kvp"><span>Processore</span><b>Intel Core i5-1145G7</b></div><div class="kvp"><span>RAM</span><b>16 GB DDR4</b></div><div class="kvp"><span>Disco</span><b>SSD NVMe 256 GB</b></div><div class="kvp"><span>Schermo</span><b>14" 1920×1080</b></div><div class="kvp"><span>Salute disco</span><b>Buono</b></div><div class="kvp" style="border:0"><span>Batteria</span><b>74% · 410 cicli</b></div>
+      </div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kGo" data-arg="grado">Avanti</button>
+    </div>`;
+  } else if(k.scr==='scheda'){
     inner=`<div class="pscr">
       ${kSteps('scheda')}
       <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXXX</b></div>${pill('Verificato su Lenovo','ok')}</div>
@@ -1943,7 +2024,7 @@ function caricoApp(){
       <div class="lbl">Mettilo sul bancale ${k.banc}, posto ${k.bancPosto}. È già nell’inventario della Corporation e nell’Excel.</div>
       <div class="pcard row" style="padding:16px;gap:14px;flex-wrap:nowrap">
         <svg width="76" height="76" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges" style="flex:none;background:#ffffff;border-radius:6px"><g fill="#111214"><rect x="0" y="0" width="7" height="7"></rect><rect x="14" y="0" width="7" height="7"></rect><rect x="0" y="14" width="7" height="7"></rect></g><g fill="#ffffff"><rect x="1" y="1" width="5" height="5"></rect><rect x="15" y="1" width="5" height="5"></rect><rect x="1" y="15" width="5" height="5"></rect></g><g fill="#111214"><rect x="2" y="2" width="3" height="3"></rect><rect x="16" y="2" width="3" height="3"></rect><rect x="2" y="16" width="3" height="3"></rect><rect x="9" y="1" width="2" height="2"></rect><rect x="8" y="5" width="3" height="1"></rect><rect x="9" y="8" width="4" height="2"></rect><rect x="14" y="9" width="2" height="3"></rect><rect x="17" y="10" width="3" height="2"></rect><rect x="8" y="12" width="2" height="3"></rect><rect x="11" y="14" width="3" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect><rect x="18" y="17" width="2" height="3"></rect><rect x="9" y="17" width="3" height="3"></rect><rect x="1" y="9" width="3" height="2"></rect></g></svg>
-        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">PF3XXXXX · lotto L-015 · ${k.banc}</div></div>
+        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">${k.ex==='lettura'?'PF4L0002 · lotto L-016':'PF3XXXXX · lotto L-015'} · ${k.banc}</div></div>
       </div>
       <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}. Quando si vende su un sito, sparisce dagli altri.</div>
       <div style="flex:1"></div>
@@ -1951,7 +2032,7 @@ function caricoApp(){
     </div>`;
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>App Corporation</h2><p style="margin:8px 0 0"><b>Entrate</b>: caricare un computer o un telefono in magazzino.</p><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p>
+    <div class="appinfo glass"><h2>App Corporation</h2><p style="margin:8px 0 0"><b>Entrate</b>: caricare un computer o un telefono in magazzino.</p><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p><p class="lbl" style="margin:8px 0 0">Proposta: la prima foto è un PC del lotto L-016 già letto al banco (strada Lettura): la scheda è già piena con i dati veri del PC.</p>
       <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Conferma»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
     <div class="phone"><div class="screen">${inner}</div></div>
   </div>`;
@@ -2046,6 +2127,10 @@ function analizzaFoto(file){
   document.addEventListener('pointermove',e=>{const c=e.target; if(!disegna||c.id!=='firmaPad')return; const p=pos(c,e), x=c.getContext('2d'); x.lineWidth=5; x.lineCap='round'; x.strokeStyle='#111214'; x.beginPath(); x.moveTo(ultimo[0],ultimo[1]); x.lineTo(p[0],p[1]); x.stroke(); ultimo=p;});
   document.addEventListener('pointerup',e=>{const c=e.target; if(!disegna)return; disegna=false; if(c.id==='firmaPad'){S.a.firmaImg=c.toDataURL('image/png'); const k=document.querySelector('[data-act="aFirmaOk"]'); if(k){k.disabled=false; k.removeAttribute('style'); k.style.flex='1';}}});
 })();
+/* proposta 23/11: i campi del nuovo lotto (si scrive senza ridisegnare; «Apri» si accende quando è tutto compilato) */
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.nl; if(!k) return; S.c.nl[k]=e.target.value;
+  const n=S.c.nl, ok=S.c.strada&&String(n.codice).trim()&&+n.pezzi>0&&String(n.costo).trim(), bt=document.querySelector('button[data-act="cApriL"]');
+  if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';}});
 document.addEventListener('change',e=>{
   if(e.target.dataset&&e.target.dataset.mez!==undefined){S.mezAut[e.target.dataset.mez]=e.target.value; evt('Mezzi',`${e.target.value==='—'?'Mezzo senza autista fisso':e.target.value+' è l’autista fisso di questo mezzo'}: giri, Telepass e satellitare si collegano a lui.`); render(); return;}
   if(e.target.id==='fotoBolla'&&e.target.files&&e.target.files[0]) analizzaFoto(e.target.files[0]);
