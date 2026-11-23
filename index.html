@@ -178,7 +178,7 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 .shopbody{padding:22px 18px 30px}
 .shoph1{font-size:clamp(34px,6vw,64px);font-weight:900;letter-spacing:-.05em;line-height:1;margin:16px 0 24px}
 .prod{border:1px solid var(--glass-edge);background:var(--glass);border-radius:22px;padding:14px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
-.ph{aspect-ratio:4/3;max-width:100%;border-radius:16px;background:var(--soft);display:flex;align-items:center;justify-content:center}
+.ph{position:relative;aspect-ratio:4/3;max-width:100%;border-radius:16px;background:var(--soft);display:flex;align-items:center;justify-content:center}
 .pdet{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
 .pdet > *{flex:1 1 360px;min-width:0}
 .gradebox{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -498,13 +498,13 @@ const C_MAILS=[
  {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0142.',azGo:'ordini'}
 ];
 const DEVICES=[
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',sn:'PF3XXXXX',shelf:'S11-2-1',banc:'B-0142',costo:'€ 61',price:'€ 249',stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Subito',gpu:'Intel Iris Xe',gg:9},
- {brand:'HP',model:'EliteBook 840 G8',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-014',sn:'5CGXXXXX',shelf:'S11-3-2',banc:'B-0139',costo:'€ 61',price:'€ 329',stato:'Venduto',siti:'eBay',gpu:'Intel Iris Xe',gg:3},
- {brand:'Dell',model:'Latitude 5420',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',screen:'14"',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',sn:'JXXXXXX',shelf:'S12-1-1',banc:'B-0121',costo:'€ 61',price:'€ 179',stato:'Fermo',siti:'Back Market, eBay, Subito',gpu:'Intel Iris Xe',gg:64},
- {brand:'Apple',model:'MacBook Air M1',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',screen:'13,3"',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',sn:'C02XXXXX',shelf:'S11-1-3',banc:'B-0145',costo:'€ 61',price:'€ 449',stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gpu:'Apple M1 7 core',gg:12},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',screen:'14"',grade:'A',dif:'—',lotto:'L-015',sn:'PF2XXXXX',shelf:'S11-2-3',banc:'B-0144',costo:'€ 61',price:'€ 399',stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon',gpu:'Intel Iris Xe',gg:5},
- {brand:'HP',model:'ProBook 450 G8',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',screen:'15,6"',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',sn:'5CDXXXXX',shelf:'Ricevimento',banc:'B-0146',costo:'€ 61',price:'€ 219',stato:'Reso',siti:'—',gpu:'Intel UHD',gg:1},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',sn:'PF3XXXX8',shelf:'S11-1-2',banc:'B-0145',costo:'€ 61',price:'€ 159',stato:'Disponibile',siti:'eBay, Subito',gpu:'Intel Iris Xe',gg:4}
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'',ore:null,bat:86,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',costo:60,price:249,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Subito',gg:9,banc:'B-0142',shelf:'S11-2-1',post:'',letto:'',car:'14/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXXX'},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'Intel Core i7-1165G7',ram:'16 GB',disk:'SSD 512 GB',sal:'',ore:null,bat:91,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:60,price:329,stato:'Venduto',siti:'eBay',gg:3,banc:'B-0139',shelf:'S11-3-2',post:'',letto:'',car:'20/11/2026',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXXX'},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'Intel Core i5-1145G7',ram:'8 GB',disk:'SSD 256 GB',sal:'',ore:null,bat:83,cicli:null,screen:'14" 1366×768',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Fermo',siti:'Back Market, eBay, Subito',gg:64,banc:'B-0121',shelf:'S12-1-1',post:'',letto:'',car:'20/09/2026',foto:'',sn:'JXXXXXX'},
+ {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'SSD 256 GB',sal:'Buono',ore:2900,bat:89,cicli:312,screen:'13,3" 2560×1600',gpu:'Apple M1 7 core',pw:'No',canc:'Certificata',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:60,price:449,stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gg:12,banc:'B-0145',shelf:'S11-1-3',post:'',letto:'',car:'11/11/2026',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX'},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'Intel Core i7-1185G7',ram:'16 GB',disk:'SSD 512 GB',sal:'Buono',ore:5400,bat:92,cicli:150,screen:'14" 1920×1200',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'A',dif:'',lotto:'L-015',costo:60,price:399,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon',gg:5,banc:'B-0144',shelf:'S11-2-3',post:'',letto:'',car:'18/11/2026',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX'},
+ {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'Intel Core i5-1135G7',ram:'8 GB',disk:'SSD 256 GB',sal:'Buono',ore:7100,bat:76,cicli:480,screen:'15,6" 1920×1080',gpu:'Intel UHD',pw:'No',canc:'Certificata',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',costo:60,price:219,stato:'Reso',siti:'',gg:1,banc:'B-0146',shelf:'Ricevimento',post:'',letto:'',car:'22/11/2026',foto:'hp-2x7x3ea.jpg',sn:'5CDXXXXX'},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:6300,bat:85,cicli:230,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',costo:60,price:159,stato:'Disponibile',siti:'eBay, Subito',gg:4,banc:'B-0145',shelf:'S11-1-2',post:'',letto:'',car:'19/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX8'}
 ];
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
 const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
@@ -513,13 +513,39 @@ const LETTURE=[
  {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0142',shelf:'S11-2-1'},
  {sn:'PF4L0002',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:9120,bat:74,cicli:410,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:4,letto:'14:41'},
  {sn:'PF4L0003',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Guasto',ore:21300,bat:81,cicli:260,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'Sì',post:5,letto:'14:47'}];
-const XCOL=['Seriale','Marca','Modello','Codice modello','Processore','RAM','Disco','Salute disco','Ore disco','Batteria %','Cicli batteria','Schermo','Scheda video','Password BIOS','Cancellazione','Grado','Difetti','Prezzo','Bancale','Posto','Postazione','Letto il','Caricato il'];
-function righeExcel(cod){
-  const oggi=new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-  if(cod==='L-016') return LETTURE.map((l,i)=>{const car=i===0||(i===1&&S.k.lettFatto);const d=i===1&&S.k.lettFatto?{grado:S.k.grado,prezzo:S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto}:l;
-    return [l.sn,'Lenovo','ThinkPad T14 Gen 2',l.cod,l.cpu,l.ram,l.disk,l.sal,l.ore,l.bat,l.cicli,l.screen,l.gpu,l.pw,null,car?d.grado:null,car&&i===1&&S.k.difetti['Batteria sotto 80%']?'Batteria sotto 80%':null,car?d.prezzo:null,car?d.banc:null,car?d.shelf:null,l.post,oggi+' '+l.letto,car?oggi+' 15:4'+i:null];});
-  const nuovo=S.c.nuovi&&S.c.nuovi.find(x=>x[0]===cod); if(nuovo) return [];
-  return DEVICES.filter(d=>d.lotto===cod).map(d=>[d.sn,d.brand,d.model,null,d.cpu,d.ram,d.disk,null,null,d.dif.indexOf('Batteria')>=0?76:null,null,d.screen,d.gpu,null,cod==='L-015'?'Certificata':null,d.grade,d.dif==='—'?null:d.dif,+d.price.replace(/\D/g,''),d.banc,d.shelf,null,null,oggi]);
+/* proposta 23/11: una lista sola di colonne per la tabella di Inventario, l'Excel di Inventario e l'Excel del lotto.
+   Il CSV è per il cliente: niente dati nostri (lotto, costo, stato, siti, giorni, bancale, posto, postazione, date), solo i PC in vendita. */
+const XCOL=['Seriale','Marca','Modello','Codice modello','Processore','RAM','Disco','Salute disco','Ore disco','Batteria %','Cicli batteria','Schermo','Scheda video','Password BIOS','Cancellazione','Grado','Difetti','Lotto','Costo','Prezzo','Stato','Siti','Giorni','Bancale','Posto','Postazione','Letto il','Caricato il','Foto'];
+const CCOL=['Seriale','Marca','Modello','Codice modello','Processore','RAM','Disco','Salute disco','Ore disco','Batteria %','Cicli batteria','Schermo','Scheda video','Password BIOS','Cancellazione','Grado','Difetti','Prezzo','Foto'];
+const FOTO_URL='https://[progetto].supabase.co/storage/v1/object/public/modelli/';
+const oggiIt=()=>new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+/* i PC del lotto L-016 letti al banco: caricati (in Inventario) o ancora da caricare (solo nel file del lotto) */
+function pcLetti(){
+  const oggi=oggiIt();
+  return LETTURE.map((l,i)=>{const car=i===0||(i===1&&S.k.lettFatto);
+    const d=i===1&&S.k.lettFatto?{grado:S.k.grado,prezzo:+S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),siti:Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', ')}:{grado:l.grado,prezzo:l.prezzo,banc:l.banc,shelf:l.shelf,dif:'',siti:'Back Market, Refurbed, eBay, Subito'};
+    return {sn:l.sn,brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:l.cod,cpu:l.cpu,ram:l.ram,disk:l.disk,sal:l.sal,ore:l.ore,bat:l.bat,cicli:l.cicli,screen:l.screen,gpu:l.gpu,pw:l.pw,canc:'',
+      grade:car?d.grado:'',dif:car?d.dif:'',lotto:'L-016',costo:150,price:car?d.prezzo:null,stato:car?'Disponibile':'',siti:car?d.siti:'',gg:car?0:null,banc:car?d.banc:'',shelf:car?d.shelf:'',
+      post:l.post,letto:oggi+' '+l.letto,car:car?oggi+' 15:4'+i:'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
+}
+/* Inventario: i PC caricati, di tutti i lotti */
+const pcInventario=()=>DEVICES.concat(pcLetti().filter(d=>d.caricato));
+const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado));
+const vuoto=v=>v===null||v===undefined||v===''?null:v;
+const fotoUrl=d=>d.foto?FOTO_URL+d.foto:null;
+const rigaPC=d=>[d.sn,d.brand,d.model,d.cod,d.cpu,d.ram,d.disk,d.sal,d.ore,d.bat,d.cicli,d.screen,d.gpu,d.pw,d.canc,d.grade,d.dif,d.lotto,d.costo,d.price,d.stato,d.siti,d.gg,d.banc,d.shelf,d.post,d.letto,d.car,fotoUrl(d)].map(vuoto);
+const rigaCliente=d=>[d.sn,d.brand,d.model,d.cod,d.cpu,d.ram,d.disk,d.sal,d.ore,d.bat,d.cicli,d.screen,d.gpu,d.pw,d.canc,d.grade,d.dif,d.price,fotoUrl(d)].map(vuoto);
+function pcLotto(cod){
+  if(cod==='L-016') return pcLetti();
+  if(S.c.nuovi&&S.c.nuovi.find(x=>x[0]===cod)) return [];
+  return DEVICES.filter(d=>d.lotto===cod);
+}
+/* CSV per il cliente e per il nostro sito: «;» e UTF-8, si apre bene anche col doppio clic in Excel italiano */
+function scaricaCsv(nome,col,righe){
+  const q=v=>{if(v===null||v===undefined)return ''; const t=typeof v==='number'?String(v).replace('.',','):String(v); return /[";\n]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t;};
+  const testo='﻿'+[col,...righe].map(r=>r.map(q).join(';')).join('\r\n')+'\r\n';
+  const url=URL.createObjectURL(new Blob([testo],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download=nome+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
 }
 /* file Excel vero (.xlsx), come packages/ui/src/excel.ts del programma */
 function scaricaExcel(nome,col,righe){
@@ -698,8 +724,8 @@ const A={
   cAssign:()=>{S.c.mailMsg='assegnata'; S.c.reply=false;},
   cVista:v=>{S.c.vista=v;},
   cPer:v=>{S.c.per=v;},
-  cBrand:v=>{S.c.brand=v;},
-  cGrado:v=>{S.c.grado=v;},
+  cBrand:v=>{S.c.brand=v;S.c.invMsg='';},
+  cGrado:v=>{S.c.grado=v;S.c.invMsg='';},
   cLic:()=>{S.c.licOk=true;},
   cBanco:i=>{S.c.banco=+i;},
   cTelF:f=>{S.c.telF=f;},
@@ -712,7 +738,10 @@ const A={
     {const co=+String(n.costo).replace(',','.')||0; S.c.nuovi.unshift([cod,S.c.strada,(n.data||'2026-10-19').split('-').reverse().join('/'),+n.pezzi,'€ '+co.toLocaleString('it-IT'),0,'€ 0','0%',co?'€ -'+co.toLocaleString('it-IT'):'€ 0',co?'-100%':'—']);}
     S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
     S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:'2026-10-19',pezzi:'',costo:''};},
-  cXls:cod=>{const r=righeExcel(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} scaricaExcel('Lotto '+cod,XCOL,r);},
+  cXls:cod=>{const r=pcLotto(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} S.c.lottoMsg=''; scaricaExcel('Lotto '+cod,XCOL,r.map(rigaPC));},
+  cCsv:cod=>{const r=pcLotto(cod).filter(d=>d.stato==='Disponibile'); if(!r.length){S.c.lottoMsg=(pcLotto(cod).length?'vendita:':'vuoto:')+cod; return;} S.c.lottoMsg=''; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
+  cInvXls:()=>{const r=invFiltrati(); if(!r.length) return; scaricaExcel('Inventario '+oggiIt().replace(/\//g,'-'),XCOL,r.map(rigaPC));},
+  cInvCsv:()=>{const r=invFiltrati().filter(d=>d.stato==='Disponibile'); S.c.invMsg=r.length?'':'vuoto'; if(!r.length) return; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   /* carico */
   kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};} S.k.scr=s; if(s==='scan') S.k.banc=null;},
   kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
@@ -1604,7 +1633,7 @@ function corp(){
     body=mailView(C_MAILS,c,'c',ab,['In arrivo','Vendite','Lotti','Stage','Inviate']);
   }
   if(s==='lotti'){
-    title='Lotti'; hintTxt='«Incassato» e «Margine» salgono a ogni computer venduto del lotto; «Rimasti» sono i pezzi ancora da vendere. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto.';
+    title='Lotti'; hintTxt='«Incassato» e «Margine» salgono a ogni computer venduto del lotto; «Rimasti» sono i pezzi ancora da vendere. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto (interno), «CSV» quello per il cliente, solo con i PC in vendita.';
     const L=(c.nuovi||[]).concat(LOTTI);
     const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
     const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
@@ -1614,7 +1643,7 @@ function corp(){
       <div class="glass card"><div class="lbl">Incassato</div><div class="big">€ ${L.reduce((a,r)=>a+(+String(r[6]).replace(/\D/g,'')),0).toLocaleString('it-IT')}</div><div class="lbl">dalle vendite di tutti i lotti</div></div>
       <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0).toLocaleString('it-IT')}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
     </div>
-    ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
+    ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0&&c.lottoMsg.indexOf('vendita:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vendita:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(8)} non c’è ancora nessun PC in vendita</div>`:''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
     ${c.nuovoL?`<div class="glass card stack">
       <b>Nuovo lotto</b>
       <div class="row" style="align-items:flex-end">${inp('codice','Codice',120)}${inp('fornitore','Fornitore')}<label class="field"><span class="lbl">Acquisto</span><input class="input" type="date" value="${nl.data}" data-nl="data"></label>${inp('pezzi','Pezzi nel DDT',110,'numeric')}${inp('costo','Costo €',130,'decimal')}</div>
@@ -1623,21 +1652,35 @@ function corp(){
       <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
     </div>`:''}
     <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Rimasti</th><th>Incassato</th><th>Margine</th><th>Margine %</th><th></th></tr></thead><tbody>
-    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
+    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap">${b('Excel','cXls',r[0],'ghost sm')}${b('CSV','cCsv',r[0],'ghost sm')}</div></td></tr>`).join('')}
     </tbody></table></div>
     ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
   }
   if(s==='inv'){
-    title='Inventario'; hintTxt='prova i tasti «Schede» e «Tabella» in alto a destra, e i filtri per marchio e grado.';
-    const list=DEVICES.filter(d=>(c.brand==='Tutti'||d.brand===c.brand)&&(c.grado==='Tutti'||d.grade===c.grado));
-    const toggle=`<div class="row" style="margin-left:auto;gap:4px;padding:4px;border-radius:999px" >${chip('Schede','cVista','schede',c.vista==='schede')}${chip('Tabella','cVista','tabella',c.vista==='tabella')}</div>`;
-    const filters=`<div class="row">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'cBrand',x,c.brand===x)).join('')}<span style="width:8px"></span>${['Tutti','A','B','C','D'].map(x=>chip(x==='Tutti'?'Tutti i gradi':'Grado '+x,'cGrado',x,c.grado===x)).join('')}${toggle}</div>`;
+    title='Inventario'; hintTxt='prova i tasti «Schede» e «Tabella» e i filtri per marca e grado. Proposta: la tabella ha le stesse colonne dell’Excel; «Excel» scarica il file interno, «CSV» il file per il cliente (solo i PC in vendita, senza lotto, costo e posti). La foto è quella della casa madre, una per modello.';
+    const list=invFiltrati();
+    const toggle=`<div class="row" style="margin-left:auto;gap:4px;padding:4px;border-radius:999px" >${chip('Schede','cVista','schede',c.vista==='schede')}${chip('Tabella','cVista','tabella',c.vista==='tabella')}${chip('Excel','cInvXls','',false)}${chip('CSV','cInvCsv','',false)}</div>`;
+    const filters=`<div class="row">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'cBrand',x,c.brand===x)).join('')}<span style="width:8px"></span>${['Tutti','A','B','C','D'].map(x=>chip(x==='Tutti'?'Tutti i gradi':'Grado '+x,'cGrado',x,c.grado===x)).join('')}${toggle}</div>${c.invMsg==='vuoto'?'<div class="warn">Con questi filtri non c’è nessun PC in vendita</div>':''}`;
     const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
+    const eur=n=>n===null||n===undefined?'—':'€ '+n.toLocaleString('it-IT');
+    const st=d=>d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato));
     if(c.vista==='schede'){
-      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${d.price}</span><span class="lbl">${d.stato}</span></div><div class="lbl">${d.siti}</div></div>`).join('')}</div>`:empty);
+      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}${d.foto?'':'<span class="miss" style="position:absolute;bottom:8px;font-size:12px;font-weight:700">Foto mancante</span>'}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${eur(d.price)}</span><span class="lbl">${d.stato}</span></div><div class="lbl">${d.siti||'—'}</div></div>`).join('')}</div>`:empty);
     } else {
-      body=filters+(list.length?`<div class="glass tbox"><table class="t nw" style="min-width:1700px"><thead><tr><th>Seriale</th><th>Marchio</th><th>Modello</th><th>Processore</th><th>Scheda video</th><th>RAM</th><th>Disco</th><th>Schermo</th><th>Grado</th><th>Difetti</th><th>Lotto</th><th>Bancale</th><th>Posto</th><th>Costo</th><th>Prezzo</th><th>Stato</th><th>Siti</th><th>Giorni</th></tr></thead><tbody>${list.map(d=>`<tr><td>${d.sn}</td><td>${d.brand}</td><td><b>${d.model}</b></td><td>${d.cpu}</td><td>${d.gpu}</td><td>${d.ram}</td><td>${d.disk}</td><td>${d.screen}</td><td>${pill(d.grade,'dark')}</td><td class="lbl">${d.dif}</td><td>${d.lotto}</td><td>${d.banc}</td><td>${d.shelf}</td><td>${d.costo}</td><td><b>${d.price}</b></td><td>${d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato))}</td><td class="lbl">${d.siti}</td><td>${d.gg}</td></tr>`).join('')}</tbody></table></div>`:empty);
+      const cella=(v,i,d)=>{const k=XCOL[i];
+        if(k==='Foto') return `<td>${d.foto?'<span class="lbl">Casa madre</span>':'<b class="miss">Mancante</b>'}</td>`;
+        if(v===null) return '<td class="lbl">—</td>';
+        if(k==='Modello') return `<td><b>${v}</b></td>`;
+        if(k==='Grado') return `<td>${pill(v,'dark')}</td>`;
+        if(k==='Stato') return `<td>${st(d)}</td>`;
+        if(k==='Costo') return `<td>${eur(v)}</td>`;
+        if(k==='Prezzo') return `<td><b>${eur(v)}</b></td>`;
+        if(k==='Salute disco'&&v!=='Buono') return `<td class="miss">${v}</td>`;
+        if(k==='Password BIOS'&&v==='Sì') return `<td class="miss">${v}</td>`;
+        if(k==='Difetti'||k==='Siti') return `<td class="lbl">${v}</td>`;
+        return `<td>${v}</td>`;};
+      body=filters+(list.length?`<div class="glass tbox"><table class="t nw" style="min-width:2900px"><thead><tr>${XCOL.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${list.map(d=>`<tr>${rigaPC(d).map((v,i)=>cella(v,i,d)).join('')}</tr>`).join('')}</tbody></table></div>`:empty);
     }
   }
   if(s==='ordini'){
