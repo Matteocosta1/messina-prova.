@@ -54,6 +54,11 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .grid{display:grid;gap:14px}
 .g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
 .g2{grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr))}
+.per3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.kpi{grid-template-columns:1fr}}
+.per3 .big{font-size:clamp(20px,2.3vw,28px);white-space:nowrap}
+@media (max-width:760px){.per3 .big{font-size:clamp(18px,5.6vw,26px)}}
 .pill{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);white-space:nowrap}
 .pill.dark{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 .pill.red{color:var(--alert);border-color:var(--alert);background:var(--alert-soft)}
@@ -522,6 +527,14 @@ const DEVICES=[
 ];
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
 const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
+/* proposta 24/11: tutto correlato. Una vendita nella prova (Negozio online) entra nel suo lotto: Lotti, Home, Inventario e Ordini leggono gli stessi dati */
+const nEur=x=>+String(x).replace(/[^\d-]/g,'');
+const fNum=n=>(n<0?'-':'')+String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fEur=n=>'€ '+fNum(n);
+function lottiVivi(){ const vn=S.c.vn||[];
+  return (S.c.nuovi||[]).concat(LOTTI).map(r=>{const x=vn.filter(v=>v.lotto===r[0]); if(!x.length) return r;
+    const costo=nEur(r[4]), inc=nEur(r[6])+x.reduce((a,v)=>a+v.prezzo,0), mar=inc-costo;
+    return [r[0],r[1],r[2],r[3],r[4],r[5]+x.length,fEur(inc),Math.round(inc/costo*100)+'%',fEur(mar),Math.round(mar/costo*100)+'%'];});}
 const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
 const LETTURE=[
  {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0142',shelf:'S11-2-1'},
@@ -543,7 +556,7 @@ function pcLetti(){
       post:l.post,letto:oggi+' '+l.letto,car:car?oggi+' 15:4'+i:'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
 }
 /* Inventario: i PC caricati, di tutti i lotti */
-const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn); return o?Object.assign({},d,{stato:'Venduto',siti:o[1]}):d;};
+const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:o[1]},n?{price:n.prezzo}:{});};
 const pcInventario=()=>DEVICES.map(vendita).concat(pcLetti().filter(d=>d.caricato));
 const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado));
 const vuoto=v=>v===null||v===undefined||v===''?null:v;
@@ -855,8 +868,9 @@ hook('tGiacChiedi',()=>evt('Posta','Mail al cliente pronta: giacenza, costo e ri
 A.nPay=()=>{S.n.view='pay';};
 A.nPaga=()=>{const tot=S.n.cart.reduce((a,c)=>a+c.p,0), c=S.n.cart[0]; S.n.ord={n:'SITO-1043',tot:tot,cosa:c?c.name:''}; S.n.view='ok';
   if(c){ORDINI.unshift([ora(),'Sito proprio',c.name.indexOf('ThinkPad')>=0?'Lenovo':(c.name.indexOf('MacBook')>=0?'Apple':(c.name.indexOf('Latitude')>=0?'Dell':'HP')),c.name,((c.det.match(/Grado ([A-D])/)||[])[1]||'B'),'PF3XXXX9','S11-2-1','Da preparare']);}
+  if(c){S.c.vn=(S.c.vn||[]).concat([{sn:'PF3XXXX9',lotto:'L-014',prezzo:tot,sito:'Sito proprio'}]);}
   S.n.cart=[]; S.n.added=false;
-  evt('Negozio',`Pagamento riuscito: ordine SITO-1043, € ${tot}. Il computer sparisce subito dagli altri siti.`);
+  evt('Negozio',`Pagamento riuscito: ordine SITO-1043, € ${tot}. Il PC è tolto subito dagli altri siti e in Inventario risulta venduto.`);
   setTimeout(()=>evt('Ordini','Nuovo ordine in Corporation › Ordini: prendi il PC in S11-2-1, bancale B-0142.'),1300);};
 
 /* portale clienti */
@@ -1616,14 +1630,21 @@ function trasp(){
 function corp(){
   const c=S.c, s=c.sec; let body='', title='', hintTxt='';
   if(s==='home'){
-    title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare alla pagina giusta.';
-    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',32],['Subito',30]];
-    body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Dispositivi in magazzino</div><div class="big">3.120</div><div class="lbl">1.840 in vendita</div></div>
-      <div class="glass card"><div class="lbl">Venduti questo mese</div><div class="big">214</div><div class="lbl">online 168 · di persona 46</div></div>
-      <div class="glass card"><div class="lbl">Ordini da spedire</div><div class="big">9</div><div class="lbl">entro le 16:00</div></div>
-      <div class="glass card"><div class="lbl">Incassato oggi</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
-      <div class="glass card"><div class="lbl">Incassato ottobre</div><div class="big">€ [importo]</div><div class="lbl">al netto delle commissioni</div></div>
+    title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare alla pagina giusta. Proposta: Magazzino è lo stesso numero di Lotti; prova a comprare un PC nel «Negozio online» e torna qui: salgono Venduti e Incassato, scende Magazzino, e in Lotti, Inventario e Ordini cambia tutto insieme.';
+    const LV=lottiVivi(), vn=S.c.vn||[], piu=vn.reduce((a,v)=>a+v.prezzo,0);
+    const magazzino=LV.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0);
+    const vendAnno=LV.reduce((a,r)=>a+r[5],0), incAnno=LV.reduce((a,r)=>a+nEur(r[6]),0);
+    const vendOggi=ORDINI.filter(o=>o[0]!=='Ieri').length, vendMese=214+vn.length;
+    const incOggi=757+piu, incMese=26840+piu;
+    const daSpedire=ORDINI.filter(o=>o[7]==='Da preparare').length;
+    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito proprio',2+vn.length]].sort((a,b)=>b[1]-a[1]);
+    const maxCan=Math.max(...can.map(x=>x[1]));
+    const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],['Ottobre',v[1]],['2026',v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
+    body=`<div class="kpi">
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(magazzino)}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
+      <div class="glass card"><div class="lbl">Ordini</div><div class="big">${daSpedire}</div><div class="lbl">da spedire entro le 16:00</div></div>
+      <div class="glass card"><div class="lbl">Venduti</div>${per3([fNum(vendOggi),fNum(vendMese),fNum(vendAnno)])}</div>
+      <div class="glass card"><div class="lbl">Incassato</div>${per3([fEur(incOggi),fEur(incMese),fEur(incAnno)])}</div>
     </div>
     <div class="glass card stack">
       <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
@@ -1637,7 +1658,7 @@ function corp(){
         <button class="li" data-act="cGo" data-arg="stage"><span class="row between" style="width:100%"><span>Licenze Certus: chiavetta 3 quasi finita</span>${pill('Stage Computer')}</span></button>
       </div></div>
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:12px">Venduti per sito, ottobre</h3><div class="stack" style="gap:10px">
-        ${can.map(x=>`<div class="row" style="flex-wrap:nowrap"><span style="width:96px;flex:none;font-size:14px">${x[0]}</span><div class="bar" style="flex:1"><i style="width:${Math.round(x[1]/62*100)}%"></i></div><b style="width:30px;text-align:right">${x[1]}</b></div>`).join('')}
+        ${can.map(x=>`<div class="row" style="flex-wrap:nowrap"><span style="width:96px;flex:none;font-size:14px">${x[0]}</span><div class="bar" style="flex:1"><i style="width:${Math.round(x[1]/maxCan*100)}%"></i></div><b style="width:30px;text-align:right">${x[1]}</b></div>`).join('')}
       </div></div>
     </div>`;
   }
@@ -1649,14 +1670,14 @@ function corp(){
   }
   if(s==='lotti'){
     title='Lotti'; hintTxt='«Incassato» e «Margine» salgono a ogni computer venduto del lotto; «Rimasti» sono i pezzi ancora da vendere. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto (interno), «CSV» quello per il cliente, solo con i PC in vendita.';
-    const L=(c.nuovi||[]).concat(LOTTI);
+    const L=lottiVivi();
     const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
     const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Media</div><div class="big">€ 61</div><div class="lbl">costo per PC, su tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Investito</div><div class="big">€ ${L.reduce((a,r)=>a+(+String(r[4]).replace(/\D/g,'')),0).toLocaleString('it-IT')}</div><div class="lbl">acquisto di tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Incassato</div><div class="big">€ ${L.reduce((a,r)=>a+(+String(r[6]).replace(/\D/g,'')),0).toLocaleString('it-IT')}</div><div class="lbl">dalle vendite di tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0).toLocaleString('it-IT')}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
+      <div class="glass card"><div class="lbl">Investito</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0))}</div><div class="lbl">acquisto di tutti i lotti</div></div>
+      <div class="glass card"><div class="lbl">Incassato</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[6]),0))}</div><div class="lbl">dalle vendite di tutti i lotti</div></div>
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0))}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
     </div>
     ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0&&c.lottoMsg.indexOf('vendita:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vendita:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(8)} non c’è ancora nessun PC in vendita</div>`:''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
     ${c.nuovoL?`<div class="glass card stack">
