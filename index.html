@@ -300,7 +300,7 @@ const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false, colliOk:false, accConf:false, firmaOpen:false, firmaImg:null},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:'2026-10-19',pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
@@ -507,7 +507,7 @@ const DEVICES=[
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',sn:'PF3XXXX8',shelf:'S11-1-2',banc:'B-0145',costo:'€ 61',price:'€ 159',stato:'Disponibile',siti:'eBay, Subito',gpu:'Intel Iris Xe',gg:4}
 ];
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
-const LOTTI=[['L-016','Lettura','Nov 2026',3,'€ 450',0,'€ 0','0%'],['L-015','Banco','Ott 2026',612,'€ 36.700',12,'€ 2.202','6%'],['L-014','Pronto','Set 2026',480,'€ 28.800',131,'€ 20.736','72%'],['L-013','Pronto','Ago 2026',320,'€ 19.500',298,'€ 31.980','164%']];
+const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%']];
 const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
 const LETTURE=[
  {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0142',shelf:'S11-2-1'},
@@ -709,9 +709,9 @@ const A={
   cStrada:v=>{S.c.strada=v;},
   cApriL:()=>{const n=S.c.nl; if(!S.c.strada||!n.codice.trim()||!(+n.pezzi>0)) return; S.c.nuovi=S.c.nuovi||[]; const cod=n.codice.trim().toUpperCase();
     if(LOTTI.concat(S.c.nuovi).some(l=>l[0]===cod)){S.c.lottoMsg='esiste'; return;}
-    S.c.nuovi.unshift([cod,S.c.strada,'Nov 2026',+n.pezzi,'€ '+(+String(n.costo).replace(',','.')||0).toLocaleString('it-IT'),0,'€ 0','0%']);
+    S.c.nuovi.unshift([cod,S.c.strada,(n.data||'2026-10-19').split('-').reverse().join('/'),+n.pezzi,'€ '+(+String(n.costo).replace(',','.')||0).toLocaleString('it-IT'),0,'€ 0','0%']);
     S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
-    S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',pezzi:'',costo:''};},
+    S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:'2026-10-19',pezzi:'',costo:''};},
   cXls:cod=>{const r=righeExcel(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} scaricaExcel('Lotto '+cod,XCOL,r);},
   /* carico */
   kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};} S.k.scr=s; if(s==='scan') S.k.banc=null;},
@@ -1604,7 +1604,7 @@ function corp(){
     body=mailView(C_MAILS,c,'c',ab,['In arrivo','Vendite','Lotti','Stage','Inviate']);
   }
   if(s==='lotti'){
-    title='Lotti'; hintTxt='la colonna «Incassato finora» sale a ogni computer venduto del lotto. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto.';
+    title='Lotti'; hintTxt='la colonna «Incassato» sale a ogni computer venduto del lotto. Proposta: «Nuovo» apre un lotto scegliendo la strada (Banco, Lettura, Pronto); «Excel» scarica il file del lotto.';
     const L=(c.nuovi||[]).concat(LOTTI);
     const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
     const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
@@ -1616,12 +1616,12 @@ function corp(){
     ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
     ${c.nuovoL?`<div class="glass card stack">
       <b>Nuovo lotto</b>
-      <div class="row" style="align-items:flex-end">${inp('codice','Codice',120)}${inp('fornitore','Fornitore')}<label class="field"><span class="lbl">Acquisto</span><input class="input" type="date" value="${new Date().toISOString().slice(0,10)}"></label>${inp('pezzi','Pezzi nel DDT',110,'numeric')}${inp('costo','Costo €',130,'decimal')}</div>
+      <div class="row" style="align-items:flex-end">${inp('codice','Codice',120)}${inp('fornitore','Fornitore')}<label class="field"><span class="lbl">Acquisto</span><input class="input" type="date" value="${nl.data}" data-nl="data"></label>${inp('pezzi','Pezzi nel DDT',110,'numeric')}${inp('costo','Costo €',130,'decimal')}</div>
       <div class="field"><span class="lbl">Strada</span><div class="row">${['Banco','Lettura','Pronto'].map(x=>chip(x,'cStrada',x,c.strada===x)).join('')}</div>${c.strada?`<span class="lbl">${STRADA_TXT[c.strada]}</span>`:''}</div>
       ${c.lottoMsg==='esiste'?`<div class="warn">Il lotto ${String(nl.codice).trim().toUpperCase()} esiste già</div>`:''}
       <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
     </div>`:''}
-    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Strada</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato finora</th><th>Recuperato</th><th></th></tr></thead><tbody>
+    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Strada</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato</th><th>Recuperato</th><th></th></tr></thead><tbody>
     ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td>${r[7]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
     </tbody></table></div>
     ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
