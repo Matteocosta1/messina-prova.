@@ -69,8 +69,8 @@ h1,h2,h3{text-wrap:balance;margin:0}
 .tb .sp{flex:1 1 0}
 .dl{display:inline-flex;align-items:center;gap:6px}
 .vline{width:1px;height:28px;background:var(--line)}
-.grp{display:flex;flex-direction:column;gap:6px;min-width:0;max-width:100%}
-@media (max-width:760px){.tb .vline{display:none}.tb .vista{order:-1;flex:1 1 100%;display:flex}.tb .vista button{flex:1}.tb .conta{order:1}.tb .sp{order:2}.tb .dl{order:3}.grp,.grp .seg{width:100%}.grp .seg button{flex:1}}
+.grp{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;max-width:100%}
+@media (max-width:760px){.grp .vista{display:flex}.grp .vista button{flex:1}.tb .vline{display:none}.tb .vista{order:-1;flex:1 1 100%;display:flex}.tb .vista button{flex:1}.tb .conta{order:1}.tb .sp{order:2}.tb .dl{order:3}.grp,.grp .seg,.grp>.row{width:100%}.grp .seg button{flex:1}}
 .chipbtn{font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--glass-strong);cursor:pointer;min-height:40px}
 .chipbtn.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 .msg{border-radius:14px;padding:12px 14px;font-weight:600;background:var(--solid);color:var(--on-solid);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -1674,8 +1674,12 @@ function corp(){
     const DL='<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>';
     const vista=`<div class="seg vista">${segb('Tabella','cVista','tabella',c.vista==='tabella')}${segb('Schede','cVista','schede',c.vista==='schede')}</div>`;
     const scarica=`<div class="dl"><button class="chipbtn" data-act="cInvXls" data-arg="">${DL} Excel</button><button class="chipbtn" data-act="cInvCsv" data-arg="">${DL} CSV</button></div>`;
-    const filters=`<div class="tb" style="align-items:flex-end;row-gap:12px"><div class="grp"><span class="lbl">Marca</span><div class="seg">${[['Tutti','Tutte'],['Lenovo','Lenovo'],['HP','HP'],['Dell','Dell'],['Apple','Apple']].map(([v,l])=>segb(l,'cBrand',v,c.brand===v)).join('')}</div></div><div class="grp"><span class="lbl">Grado</span><div class="seg">${['Tutti','A','B','C','D'].map(v=>segb(v,'cGrado',v,c.grado===v)).join('')}</div></div></div>
-      <div class="tb"><span class="lbl conta"><b style="color:var(--ink)">${list.length}</b> PC</span><span class="sp"></span>${vista}<span class="vline"></span>${scarica}</div>${c.invMsg==='vuoto'?'<div class="warn">Con questi filtri non c’è nessun PC in vendita</div>':''}`;
+    const filters=`<div class="stack" style="gap:14px">
+      <div class="grp"><span class="lbl">Marca</span><div class="seg">${[['Tutti','Tutte'],['Lenovo','Lenovo'],['HP','HP'],['Dell','Dell'],['Apple','Apple']].map(([v,l])=>segb(l,'cBrand',v,c.brand===v)).join('')}</div></div>
+      <div class="grp"><span class="lbl">Grado</span><div class="seg">${['Tutti','A','B','C','D'].map(v=>segb(v,'cGrado',v,c.grado===v)).join('')}</div></div>
+      <div class="grp"><span class="lbl">Vista</span>${vista}</div>
+      <div class="grp"><span class="lbl">Download</span><div class="row between" style="gap:10px">${scarica}<span class="lbl"><b style="color:var(--ink)">${list.length}</b> PC</span></div></div>
+    </div>${c.invMsg==='vuoto'?'<div class="warn">Con questi filtri non c’è nessun PC in vendita</div>':''}`;
     const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
     const eur=n=>n===null||n===undefined?'—':'€ '+n.toLocaleString('it-IT');
     const st=d=>d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato));
