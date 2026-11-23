@@ -507,7 +507,7 @@ const DEVICES=[
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',screen:'14"',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',sn:'PF3XXXX8',shelf:'S11-1-2',banc:'B-0145',costo:'€ 61',price:'€ 159',stato:'Disponibile',siti:'eBay, Subito',gpu:'Intel Iris Xe',gg:4}
 ];
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
-const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%','€ 0','—'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%','€ 1.482','67%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%','€ 12.876','62%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%','€ 13.821','43%']];
+const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
 const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
 const LETTURE=[
  {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0142',shelf:'S11-2-1'},
@@ -709,7 +709,7 @@ const A={
   cStrada:v=>{S.c.strada=v;},
   cApriL:()=>{const n=S.c.nl; if(!S.c.strada||!n.codice.trim()||!(+n.pezzi>0)) return; S.c.nuovi=S.c.nuovi||[]; const cod=n.codice.trim().toUpperCase();
     if(LOTTI.concat(S.c.nuovi).some(l=>l[0]===cod)){S.c.lottoMsg='esiste'; return;}
-    S.c.nuovi.unshift([cod,S.c.strada,(n.data||'2026-10-19').split('-').reverse().join('/'),+n.pezzi,'€ '+(+String(n.costo).replace(',','.')||0).toLocaleString('it-IT'),0,'€ 0','0%','€ 0','—']);
+    {const co=+String(n.costo).replace(',','.')||0; S.c.nuovi.unshift([cod,S.c.strada,(n.data||'2026-10-19').split('-').reverse().join('/'),+n.pezzi,'€ '+co.toLocaleString('it-IT'),0,'€ 0','0%',co?'€ -'+co.toLocaleString('it-IT'):'€ 0',co?'-100%':'—']);}
     S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
     S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:'2026-10-19',pezzi:'',costo:''};},
   cXls:cod=>{const r=righeExcel(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} scaricaExcel('Lotto '+cod,XCOL,r);},
@@ -1622,7 +1622,7 @@ function corp(){
       <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
     </div>`:''}
     <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Rimasti</th><th>Incassato</th><th>Margine</th><th>Margine %</th><th></th></tr></thead><tbody>
-    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td>${r[8]}</td><td>${r[9]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
+    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
     </tbody></table></div>
     ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
