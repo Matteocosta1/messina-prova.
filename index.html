@@ -1621,8 +1621,8 @@ function corp(){
       ${c.lottoMsg==='esiste'?`<div class="warn">Il lotto ${String(nl.codice).trim().toUpperCase()} esiste già</div>`:''}
       <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
     </div>`:''}
-    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Strada</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato</th><th>Recuperato</th><th></th></tr></thead><tbody>
-    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td>${r[7]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
+    <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Incassato</th><th>Recuperato</th><th></th></tr></thead><tbody>
+    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td>${r[7]}</td><td>${b('Excel','cXls',r[0],'ghost sm')}</td></tr>`).join('')}
     </tbody></table></div>
     ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
