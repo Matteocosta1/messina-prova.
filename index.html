@@ -748,7 +748,7 @@ const DEVICES=[
  {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, Tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Venduto',siti:'Subito',gg:64,banc:'B-0238',shelf:'S12-1-1',post:'',letto:'',foto:'',sn:'JXXXXXX',conf:true,uscito:true}
 ];
 /* la data di carico si conta dai giorni, come nel programma (i dati di prova sono relativi a oggi) */
-DEVICES.forEach(d=>{d.carMs=(d.sn==='PF5XXXX1'?CARICO_L016:caricatoGg(d.gg)).getTime(); d.gg=Math.max(0,Math.floor((Date.now()-d.carMs)/86400000)); d.car=dtFmt(d.carMs);});
+DEVICES.forEach(d=>{d.carMs=(d.sn==='PF5XXXX1'?CARICO_L016:caricatoGg(d.gg)).getTime(); d.gg=Math.max(0,Math.floor((Date.now()-d.carMs)/86400000)); d.car=dtFmt(d.carMs); if(d.sn==='PF5XXXX1') d.letto=dtFmt(CARICO_L016.getTime()-65*60000);});
 /* i PC in vendita allo stage del negozio (tutti tranne PF5XXXX1, arrivato dopo): la loro cancellazione conta nella giornata dello stage */
 const STAGE_NEG=DEVICES.filter(d=>d.stato==='Disponibile'&&d.sn!=='PF5XXXX1').map(d=>d.carMs);
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
@@ -802,7 +802,9 @@ const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o
 /* i PC formattati caricati dall'app nella prova (lotto L-015) */
 const pcApp=()=>(S.c.carApp||[]).map(x=>({brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:5200,bat:87,cicli:240,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:x.grade,dif:x.dif,lotto:'L-015',costo:60,price:x.price,stato:'Disponibile',siti:x.siti,gg:0,banc:x.banc,shelf:x.shelf,post:'',letto:'',car:oggiIt(),foto:'lenovo-20w000auix.jpg',sn:x.sn}));
 const pcInventario=()=>DEVICES.map(vendita).concat(pcLetti().filter(d=>d.caricato&&!DEVICES.some(x=>x.sn===d.sn))).concat(pcApp());
-const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado));
+/* dal più recente (data di carico), a parità per seriale: come public.inventario() del programma */
+const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado))
+  .map(d=>Object.assign({},d,{_t:d.carMs||Date.now()})).sort((a,b)=>(b._t-a._t)||String(a.sn).localeCompare(String(b.sn)));
 const vuoto=v=>v===null||v===undefined||v===''?null:v;
 const fotoUrl=d=>d.foto?FOTO_URL+d.foto:null;
 const rigaPC=d=>[d.sn,d.brand,d.model,d.cod,d.cpu,d.ram,d.disk,d.sal,d.ore,d.bat,d.cicli,d.screen,d.gpu,d.pw,d.canc,d.grade,d.dif,d.lotto,d.costo,d.price,d.stato,d.siti,d.gg,d.banc,d.shelf,d.post,d.letto,d.car,fotoUrl(d)].map(vuoto);
@@ -1046,7 +1048,7 @@ const A={
   cXls:cod=>{const r=pcLotto(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} S.c.lottoMsg=''; scaricaExcel('Lotto '+cod,XCOL,r.map(rigaPC));},
   cCsv:cod=>{const r=pcLotto(cod).filter(d=>d.stato==='Disponibile').sort((x,y)=>String(x.sn).localeCompare(String(y.sn))); if(!r.length){S.c.lottoMsg=(pcLotto(cod).length?'vendita:':'vuoto:')+cod; return;} S.c.lottoMsg=''; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   cInvXls:()=>{const r=invFiltrati(); if(!r.length) return; scaricaExcel('Inventario '+oggiIt().replace(/\//g,'-'),XCOL,r.map(rigaPC));},
-  cInvCsv:()=>{const r=invFiltrati().filter(d=>d.stato==='Disponibile'); S.c.invMsg=r.length?'':'vuoto'; if(!r.length) return; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
+  cInvCsv:()=>{const r=invFiltrati().filter(d=>d.stato==='Disponibile').sort((x,y)=>String(x.sn).localeCompare(String(y.sn))); S.c.invMsg=r.length?'':'vuoto'; if(!r.length) return; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   /* carico */
   kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};} S.k.scr=s; if(s==='scan') S.k.banc=null;},
   kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
@@ -2025,11 +2027,11 @@ function corp(){
       <div class="grp"><span class="lbl">Vista</span>${vista}</div>
       <div class="grp"><span class="lbl">Download</span><div class="row between" style="gap:10px">${scarica}<span class="lbl"><b style="color:var(--ink)">${list.length}</b> PC</span></div></div>
     </div>${c.invMsg==='vuoto'?'<div class="warn">Con questi filtri non c’è nessun PC in vendita</div>':''}`;
-    const empty='<div class="glass card lbl">Nessun computer con questi filtri negli esempi.</div>';
+    const empty='<div class="glass card lbl">Nessun computer con questi filtri.</div>';
     const eur=n=>n===null||n===undefined?'—':'€ '+n.toLocaleString('it-IT');
     const st=d=>d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato));
     if(c.vista==='schede'){
-      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}${d.foto?'':'<span class="miss" style="position:absolute;bottom:8px;font-size:12px;font-weight:700">Foto mancante</span>'}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc} · ${d.shelf}</div><div class="row between"><span style="font-size:20px;font-weight:800">${eur(d.price)}</span><span class="lbl">${d.conf===false&&d.stato!=='Venduto'?'Da confermare':d.stato}</span></div><div class="lbl">${d.siti||'—'}</div></div>`).join('')}</div>`:empty);
+      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}${d.foto?'':'<span class="miss" style="position:absolute;bottom:8px;font-size:12px;font-weight:700">Foto mancante</span>'}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc||'—'} · ${d.shelf||'—'}</div><div class="row between"><span style="font-size:20px;font-weight:800">${eur(d.price)}</span><span class="lbl">${d.conf===false&&d.stato!=='Venduto'?'Da confermare':d.stato}</span></div><div class="lbl">${d.siti||'—'}</div></div>`).join('')}</div>`:empty);
     } else {
       const cella=(v,i,d)=>{const k=XCOL[i];
         if(k==='Foto') return `<td>${d.foto?'<span class="lbl">Casa madre</span>':'<b class="miss">Mancante</b>'}</td>`;
