@@ -313,11 +313,21 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 
 <script>
 (function(){
+/* date vere (24/11): il mockup gira sulla data di oggi, come il programma. Le date d'esempio sono a scarti fissi da oggi */
+const _D=n=>{const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return d;};
+const cap=t=>t[0].toUpperCase()+t.slice(1);
+const isoG=n=>{const d=_D(n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const gLungo=n=>cap(_D(n).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}));
+const gBreve=n=>{const d=_D(n); return cap(d.toLocaleDateString('it-IT',{weekday:'short'}).replace('.',''))+' '+d.getDate()+' '+d.toLocaleDateString('it-IT',{month:'long'});};
+const gDM=n=>{const d=_D(n); return d.getDate()+' '+d.toLocaleDateString('it-IT',{month:'long'});};
+const gNum=n=>{const d=_D(n); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');};
+const gData=n=>_D(n).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+const mese=(n=0)=>{const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()+n); return d.toLocaleDateString('it-IT',{month:'long'});};
 const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false, colliOk:false, accConf:false, firmaOpen:false, firmaImg:null},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:'2026-10-19',pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
+  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:isoG(0),pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:600},
@@ -345,17 +355,17 @@ const msg=(text,btnLabel,act,arg)=>`<div class="msg"><span>${text}</span>${btnLa
 /* ---------- DATI ---------- */
 const T_MAILS=[
  {da:'Snam',ind:'logistica@[dominio]',ora:'08:12',ogg:'Ritiro 4 bancali domani',tag:'Ordine',cart:'Ordini',ant:'Domani mattina ritirare 4 bancali…',testo:'Buongiorno,\ndomani mattina ritirare 4 bancali dal nostro magazzino e consegnare in via [indirizzo], Milano, entro le 12. Serve la sponda.\nGrazie',all:'',bozza:'Buongiorno, confermiamo il ritiro di domani mattina con consegna entro le 12 e sponda. Ci indicate a che piano consegnare? Grazie'},
- {da:'Apple',ind:'ordini@[dominio]',ora:'08:05',ogg:'Consegne zona Nord del 20/10',tag:'Ordine',cart:'Ordini',ant:'In allegato l’elenco delle 32 consegne…',testo:'Buongiorno,\nin allegato l’elenco delle 32 consegne per martedì 20.\nCordiali saluti',all:'consegne_20-10.xlsx',bozza:'Buongiorno, ricevuto. Le 32 consegne sono pianificate per martedì 20. Cordiali saluti'},
+ {da:'Apple',ind:'ordini@[dominio]',ora:'08:05',ogg:'Consegne zona Nord del '+gNum(1),tag:'Ordine',cart:'Ordini',ant:'In allegato l’elenco delle 32 consegne…',testo:'Buongiorno,\nin allegato l’elenco delle 32 consegne per martedì 20.\nCordiali saluti',all:'consegne_20-10.xlsx',bozza:'Buongiorno, ricevuto. Le 32 consegne sono pianificate per martedì 20. Cordiali saluti'},
  {da:'Luxiona',ind:'magazzino@[dominio]',ora:'07:58',ogg:'Ordine magazzino',tag:'Ordine',cart:'Ordini',ant:'Vi giriamo l’ordine di oggi…',testo:'Ciao Anna,\nvi giriamo l’ordine di oggi, 3 bancali.\nGrazie',all:'ordine_luxiona.pdf',bozza:'Ciao, ricevuto, grazie. Anna'},
  {da:'[Cliente]',ind:'info@[dominio]',ora:'07:41',ogg:'Richiesta preventivo',tag:'Preventivo',cart:'Clienti',ant:'Vorremmo un preventivo per…',testo:'Buongiorno,\nvorremmo un preventivo per 10 bancali al mese verso Torino.\nGrazie',all:'',bozza:'Buongiorno, grazie della richiesta. Vi giro a Gianluca che vi preparerà il preventivo.'},
  {da:'Officina [nome]',ind:'officina@[dominio]',ora:'Ieri',ogg:'Tagliando motrice',tag:'Mezzi',cart:'In arrivo',ant:'La motrice è pronta da giovedì…',testo:'Buongiorno,\nla motrice è pronta da giovedì.\nSaluti',all:'',bozza:'Grazie, passiamo giovedì mattina.'}
 ];
 const BOLLE=[
- {cliente:'Snam',cosa:'Ritiro 4 bancali',ora:'08:12',chi:'Gabriele',stato:'Manca 1 dato',data:'Martedì 20 ottobre',fascia:'Entro le 12:00',colli:'4 bancali',acc:'Sponda',manca:'Piano di consegna'},
- {cliente:'Apple',cosa:'32 consegne zona Nord',ora:'08:05',chi:'Alberto',stato:'Pronta',data:'Martedì 20 ottobre',fascia:'10:00–12:00',colli:'32 consegne',acc:'—',manca:''},
- {cliente:'Luxiona',cosa:'Ordine magazzino',ora:'07:58',chi:'Anna',stato:'Pronta',data:'Martedì 20 ottobre',fascia:'9:00–13:00',colli:'3 bancali',acc:'Piano terra',manca:''},
- {cliente:'[Cliente]',cosa:'Consegna Torino',ora:'07:41',chi:'Christian',stato:'Nuova',data:'Mercoledì 21 ottobre',fascia:'Da definire',colli:'2 bancali',acc:'—',manca:''},
- {cliente:'[Cliente]',cosa:'Consegna sabato',ora:'07:30',chi:'Christian',stato:'Manca 2 dati',data:'Sabato 24 ottobre',fascia:'Da chiedere',colli:'1 bancale',acc:'Sabato',manca:'Indirizzo e fascia oraria'}
+ {cliente:'Snam',cosa:'Ritiro 4 bancali',ora:'08:12',chi:'Gabriele',stato:'Manca 1 dato',data:gLungo(1),fascia:'Entro le 12:00',colli:'4 bancali',acc:'Sponda',manca:'Piano di consegna'},
+ {cliente:'Apple',cosa:'32 consegne zona Nord',ora:'08:05',chi:'Alberto',stato:'Pronta',data:gLungo(1),fascia:'10:00–12:00',colli:'32 consegne',acc:'—',manca:''},
+ {cliente:'Luxiona',cosa:'Ordine magazzino',ora:'07:58',chi:'Anna',stato:'Pronta',data:gLungo(1),fascia:'9:00–13:00',colli:'3 bancali',acc:'Piano terra',manca:''},
+ {cliente:'[Cliente]',cosa:'Consegna Torino',ora:'07:41',chi:'Christian',stato:'Nuova',data:gLungo(2),fascia:'Da definire',colli:'2 bancali',acc:'—',manca:''},
+ {cliente:'[Cliente]',cosa:'Consegna sabato',ora:'07:30',chi:'Christian',stato:'Manca 2 dati',data:gLungo(5),fascia:'Da chiedere',colli:'1 bancale',acc:'Sabato',manca:'Indirizzo e fascia oraria'}
 ];
 const EXTRA=[
  ['Sponda','a consegna','Dalla bolla o aggiunta dall’autista'],
@@ -386,8 +396,8 @@ const TP=[
  {aut:'Autista 5',mezzo:'Furgone [targa]',oggi:'0,00',mese:'96,30',n:22,flag:1}
 ];
 const TP_MOV={
- 'Autista 3':[['Oggi','07:12','Milano Sud → Bergamo','14,20','Bilico [targa]',''],['Oggi','11:48','Bergamo → Brescia Ovest','8,60','Bilico [targa]',''],['Sab 17 ottobre','16:35','Milano Sud → Piacenza','7,90','Bilico [targa]','Giorno senza giro'],['Gio 15 ottobre','21:52','Agrate → Milano Est','2,70','Bilico [targa]','Fuori orario'],['Gio 15 ottobre','08:05','Milano Sud → Bergamo','14,20','Bilico [targa]','']],
- 'Autista 5':[['Dom 18 ottobre','10:20','Pavia → Milano Sud','3,40','Furgone [targa]','Giorno senza giro'],['Ven 16 ottobre','09:14','Milano Sud → Pavia','3,40','Furgone [targa]','']],
+ 'Autista 3':[['Oggi','07:12','Milano Sud → Bergamo','14,20','Bilico [targa]',''],['Oggi','11:48','Bergamo → Brescia Ovest','8,60','Bilico [targa]',''],[gBreve(-2),'16:35','Milano Sud → Piacenza','7,90','Bilico [targa]','Giorno senza giro'],[gBreve(-4),'21:52','Agrate → Milano Est','2,70','Bilico [targa]','Fuori orario'],[gBreve(-4),'08:05','Milano Sud → Bergamo','14,20','Bilico [targa]','']],
+ 'Autista 5':[[gBreve(-1),'10:20','Pavia → Milano Sud','3,40','Furgone [targa]','Giorno senza giro'],[gBreve(-3),'09:14','Milano Sud → Pavia','3,40','Furgone [targa]','']],
  'Autista 1':[['Oggi','06:40','Milano Ovest → Rho','1,90','Sprinter [targa]',''],['Oggi','09:30','Rho → Milano Nord','2,10','Sprinter [targa]','']],
  'Autista 2':[['Oggi','07:05','Milano Sud → Milano Est','3,30','Motrice [targa]','']]
 };
@@ -410,7 +420,7 @@ const FERIE=[
 const ALLARMI=[
  {ora:'Oggi 07:52',badge:'Alberto',tel:'Telefono non registrato (Android)',ingresso:'Ingresso uffici',tipo:'Badge di un altro dipendente su un telefono diverso dal suo'},
  {ora:'Ieri 13:04',badge:'Autista 3',tel:'Telefono di Autista 5',ingresso:'Ingresso magazzino',tipo:'QR scaduto: probabilmente uno screenshot'},
- {ora:'12 ottobre 06:10',badge:'[Ex dipendente]',tel:'Telefono non registrato',ingresso:'Ingresso magazzino',tipo:'Badge chiuso il 30 settembre'}
+ {ora:gDM(-7)+' 06:10',badge:'[Ex dipendente]',tel:'Telefono non registrato',ingresso:'Ingresso magazzino',tipo:'Badge chiuso il '+gDM(-19)}
 ];
 const PRES_MESE=[
  ['Christian','40 h',128,4,0,0,'—'],
@@ -420,7 +430,6 @@ const PRES_MESE=[
  ['Autista 1','39 h',129,18,9,4,'—'],
  ['Magazziniere 1','40 h',132,14,22,8,'—']
 ];
-const CONT_BASE={Apple:[['Colli consegne Nord',24,'Codici collo','Pistola','Magazziniere 1','07:41']],Snam:[['Materiale con seriali',18,'Seriali Snam','Pistola','Magazziniere 1','07:44'],['Cavi e accessori',6,'—','Pistola','Magazziniere 1','07:45']],Luxiona:[['Lampade, ordine magazzino',32,'—','Pistola','Magazziniere 2','08:02']],Econocom:[['Motorola moto g',40,'IMEI + cespite','Pistola','Magazziniere 2','08:15'],['Caricabatterie',40,'—','Pistola','Magazziniere 2','08:16']],Corporation:[['Lenovo ThinkPad T14 Gen 2',14,'Seriali','Foto','Simone','09:20'],['HP EliteBook 840 G8',9,'Seriali','Foto','Simone','09:34']]};
 const STORICO=[
  ['10:41','Magazziniere 3','Uscita','4 bancali Snam','S03-2-1 → Motrice [targa]','Pistola'],
  ['10:12','Magazziniere 2','Modifica','Bancale Apple: colli da 32 a 31','Ricevimento','Manuale'],
@@ -431,12 +440,185 @@ const STORICO=[
  ['08:15','Magazziniere 2','Entrata','1.000 telefoni Econocom','Ricevimento → S08-1-1','Pistola'],
  ['07:40','Magazziniere 1','Entrata','40 colli Snam','Ricevimento → S04-2-3','Pistola']
 ];
-const MAGCLI=['Tutti','Apple','Snam','Luxiona','Econocom','Corporation'];
-const SC_CLI=['Apple','Snam','Snam','Snam','Luxiona','Luxiona','Econocom','Econocom','Apple','Snam','Corporation','Corporation'];
-const scCell=(sc,pi,po)=>((sc*7+pi*3+po*5)%10)<7;
-const SC_CONT={Apple:'Colli consegne Nord',Snam:'Bancale materiale con seriali',Luxiona:'Bancale ordine magazzino',Econocom:'Telefoni con IMEI e cespite',Corporation:'Bancale computer Messina Corporation'};
-const SC_ART={Apple:['10 iPhone, 10 iPad','24 colli MacBook','12 iPhone, 6 Apple Watch','8 iMac'],Snam:['18 apparati con seriale','6 cavi, 4 sensori','12 contatori','2 armadi tecnici'],Luxiona:['32 lampade','14 plafoniere','40 faretti','20 alimentatori'],Econocom:['1.000 telefoni Motorola','500 telefoni Samsung','300 caricabatterie','200 cover'],Corporation:['40 portatili','12 PC fissi','20 monitor','35 portatili Lenovo']};
-const scArrivo=(sel,pi,po)=>{const d=new Date(); const lungo=(sel*7+pi*3+po)%11===0; d.setDate(d.getDate()-((sel+pi+po)%9+1)-(lungo?420:0)); return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});};
+const MAGCLI=['Tutti','Apple','Econocom','Luxiona','Messina Corporation','Snam','Velier'];
+/* come «quando» del programma: oggi solo l'ora, ieri «Ieri», poi giorno e data */
+const quandoH=h=>{const x=new Date(Date.now()-h*3600000), o=new Date(), i=new Date(o); i.setDate(o.getDate()-1); const hh=x.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if(x.toDateString()===o.toDateString()) return hh; if(x.toDateString()===i.toDateString()) return 'Ieri '+hh; return cap(x.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'long'}))+' '+hh;};
+const dataH=h=>new Date(Date.now()-h*3600000).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+const codiciC=c=>!c||!c.length?'—':(c.length<=2?c.join(', '):c.slice(0,2).join(', ')+' +'+(c.length-2));
+/* i bancali al loro posto: quelli della pianta più il bancale nuovo fatto con l'App Corporation */
+const bancaliVivi=()=>MAG.concat(S.k&&S.k.nbFatto?[[S.k.nbFatto.posto,'Scaffale','Messina Corporation','B-0303',(Date.now()-S.k.nbFatto.t)/3600000,[]]]:[]);
+/* i PC della Corporation ancora sul bancale (non spediti né consegnati a mano): li legge l'Inventario */
+const pcSulBancale=cod=>pcInventario().filter(d=>d.banc===cod&&!d.uscito&&!ORDINI.some(o=>o[5]===d.sn&&(o[7]==='Spedito'||o[7]==='Consegnato'))).map(d=>({articolo:d.brand+' '+d.model,seriale:d.sn,h:(d.gg||0)*24}));
+/* magazzino (24/11): la stessa pianta del programma; i PC della Corporation sui bancali si leggono dall'Inventario */
+const MAG=[
+ ['S01-1-2','Scaffale','Apple','B-0100',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-2-1','Scaffale','Apple','B-0101',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-2-2','Scaffale','Apple','B-0102',120,[['iPhone',10,[],'Pistola','Magazziniere 1',21],['iPad',10,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-2-3','Scaffale','Apple','B-0103',144,[['Colli MacBook',24,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-3-1','Scaffale','Apple','B-0104',120,[['iPhone',10,[],'Pistola','Magazziniere 1',21],['iPad',10,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-3-3','Scaffale','Apple','B-0105',168,[['iPhone',12,[],'Pistola','Magazziniere 1',21],['Apple Watch',6,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-4-2','Scaffale','Apple','B-0106',168,[['iPhone',12,[],'Pistola','Magazziniere 1',21],['Apple Watch',6,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-5-1','Scaffale','Apple','B-0107',168,[['iPhone',12,[],'Pistola','Magazziniere 1',21],['Apple Watch',6,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-5-2','Scaffale','Apple','B-0108',192,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-5-3','Scaffale','Apple','B-0109',216,[['iPhone',10,[],'Pistola','Magazziniere 1',21],['iPad',10,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-6-1','Scaffale','Apple','B-0110',192,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
+ ['S01-6-3','Scaffale','Apple','B-0111',24,[['Colli MacBook',24,[],'Pistola','Magazziniere 1',21]]],
+ ['S02-1-1','Scaffale','Snam','B-0112',10176,[['Contatori',12,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-1-2','Scaffale','Snam','B-0113',120,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-1-3','Scaffale','Snam','B-0114',144,[['Apparati con seriale',18,['SN21301','SN21302'],'Pistola','Magazziniere 1',22]]],
+ ['S02-2-2','Scaffale','Snam','B-0115',144,[['Apparati con seriale',18,['SN22201','SN22202'],'Pistola','Magazziniere 1',22]]],
+ ['S02-3-1','Scaffale','Snam','B-0116',144,[['Apparati con seriale',18,['SN23101','SN23102'],'Pistola','Magazziniere 1',22]]],
+ ['S02-3-2','Scaffale','Snam','B-0117',168,[['Cavi',6,[],'Pistola','Magazziniere 1',22],['Sensori',4,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-3-3','Scaffale','Snam','B-0118',192,[['Contatori',12,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-4-1','Scaffale','Snam','B-0119',168,[['Cavi',6,[],'Pistola','Magazziniere 1',22],['Sensori',4,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-4-3','Scaffale','Snam','B-0120',10296,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-5-2','Scaffale','Snam','B-0121',216,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-6-1','Scaffale','Snam','B-0122',216,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',22]]],
+ ['S02-6-2','Scaffale','Snam','B-0123',24,[['Apparati con seriale',18,['SN26201','SN26202'],'Pistola','Magazziniere 1',22]]],
+ ['S02-6-3','Scaffale','Snam','B-0124',48,[['Cavi',6,[],'Pistola','Magazziniere 1',22],['Sensori',4,[],'Pistola','Magazziniere 1',22]]],
+ ['S03-1-1','Scaffale','Snam','B-0125',120,[['Contatori',12,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-1-3','Scaffale','Snam','B-0126',168,[['Apparati con seriale',18,['SN31301','SN31302'],'Pistola','Magazziniere 1',23]]],
+ ['S03-2-1','Scaffale','Snam','B-0127',144,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-2-2','Scaffale','Snam','B-0128',10248,[['Apparati con seriale',18,['SN32201','SN32202'],'Pistola','Magazziniere 1',23]]],
+ ['S03-2-3','Scaffale','Snam','B-0129',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-3-2','Scaffale','Snam','B-0130',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-4-1','Scaffale','Snam','B-0131',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-4-2','Scaffale','Snam','B-0132',216,[['Contatori',12,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-4-3','Scaffale','Snam','B-0133',24,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-5-1','Scaffale','Snam','B-0134',216,[['Contatori',12,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-5-3','Scaffale','Snam','B-0135',48,[['Apparati con seriale',18,['SN35301','SN35302'],'Pistola','Magazziniere 1',23]]],
+ ['S03-6-2','Scaffale','Snam','B-0136',48,[['Apparati con seriale',18,['SN36201','SN36202'],'Pistola','Magazziniere 1',23]]],
+ ['S04-1-2','Scaffale','Snam','B-0137',168,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-2-1','Scaffale','Snam','B-0138',168,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-2-3','Scaffale','Snam','B-0139',216,[['Cavi',6,[],'Pistola','Magazziniere 1',24],['Sensori',4,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-3-1','Scaffale','Snam','B-0140',192,[['Apparati con seriale',18,['SN43101','SN43102'],'Pistola','Magazziniere 1',24]]],
+ ['S04-3-2','Scaffale','Snam','B-0141',216,[['Cavi',6,[],'Pistola','Magazziniere 1',24],['Sensori',4,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-3-3','Scaffale','Snam','B-0142',10104,[['Contatori',12,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-4-2','Scaffale','Snam','B-0143',24,[['Contatori',12,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-5-1','Scaffale','Snam','B-0144',24,[['Contatori',12,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-5-2','Scaffale','Snam','B-0145',48,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-5-3','Scaffale','Snam','B-0146',72,[['Apparati con seriale',18,['SN45301','SN45302'],'Pistola','Magazziniere 1',24]]],
+ ['S04-6-1','Scaffale','Snam','B-0147',48,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',24]]],
+ ['S04-6-3','Scaffale','Snam','B-0148',96,[['Cavi',6,[],'Pistola','Magazziniere 1',24],['Sensori',4,[],'Pistola','Magazziniere 1',24]]],
+ ['S05-1-1','Scaffale','Luxiona','B-0149',168,[['Faretti',40,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-1-2','Scaffale','Luxiona','B-0150',10272,[['Alimentatori',20,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-1-3','Scaffale','Luxiona','B-0151',216,[['Lampade',32,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-2-2','Scaffale','Luxiona','B-0152',216,[['Lampade',32,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-3-1','Scaffale','Luxiona','B-0153',216,[['Lampade',32,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-3-3','Scaffale','Luxiona','B-0154',48,[['Faretti',40,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-4-1','Scaffale','Luxiona','B-0155',24,[['Plafoniere',14,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-4-2','Scaffale','Luxiona','B-0156',48,[['Faretti',40,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-4-3','Scaffale','Luxiona','B-0157',72,[['Alimentatori',20,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-5-2','Scaffale','Luxiona','B-0158',72,[['Alimentatori',20,[],'Pistola','Magazziniere 1',25]]],
+ ['S05-6-1','Scaffale','Luxiona','B-0159',72,[['Alimentatori',20,[],'Manuale','Magazziniere 1',25]]],
+ ['S05-6-2','Scaffale','Luxiona','B-0160',96,[['Lampade',32,[],'Manuale','Magazziniere 1',25]]],
+ ['S05-6-3','Scaffale','Luxiona','B-0161',120,[['Plafoniere',14,[],'Manuale','Magazziniere 1',25]]],
+ ['S06-1-1','Scaffale','Luxiona','B-0162',192,[['Faretti',40,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-1-3','Scaffale','Luxiona','B-0163',24,[['Lampade',32,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-2-1','Scaffale','Luxiona','B-0164',216,[['Alimentatori',20,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-2-2','Scaffale','Luxiona','B-0165',24,[['Lampade',32,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-2-3','Scaffale','Luxiona','B-0166',10128,[['Plafoniere',14,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-3-2','Scaffale','Luxiona','B-0167',48,[['Plafoniere',14,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-4-1','Scaffale','Luxiona','B-0168',48,[['Plafoniere',14,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-4-3','Scaffale','Luxiona','B-0169',96,[['Alimentatori',20,[],'Pistola','Magazziniere 1',26]]],
+ ['S06-5-1','Scaffale','Luxiona','B-0170',72,[['Faretti',40,[],'Manuale','Magazziniere 1',26]]],
+ ['S06-5-2','Scaffale','Luxiona','B-0171',96,[['Alimentatori',20,[],'Manuale','Magazziniere 1',26]]],
+ ['S06-5-3','Scaffale','Luxiona','B-0172',120,[['Lampade',32,[],'Manuale','Magazziniere 1',26]]],
+ ['S06-6-2','Scaffale','Luxiona','B-0173',10200,[['Lampade',32,[],'Pistola','Magazziniere 1',26]]],
+ ['S07-1-1','Scaffale','Econocom','B-0174',216,[['Notebook Lenovo T14',2,['SN71101','SN71102'],'Pistola','Magazziniere 1',27],['Docking Lenovo',1,['SN71103'],'Pistola','Magazziniere 1',27]]],
+ ['S07-1-2','Scaffale','Econocom','B-0175',24,[['Monitor Dell 24″',3,['SN71201','SN71202','SN71203'],'Pistola','Magazziniere 1',27]]],
+ ['S07-1-3','Scaffale','Econocom','B-0176',48,[['Telefoni Motorola',1000,['IMEI71301','IMEI71302'],'Pistola','Magazziniere 1',27],['Scatole imballo',10,[],'Pistola','Magazziniere 1',0]]],
+ ['S07-2-1','Scaffale','Econocom','B-0177',24,[['Notebook HP EliteBook',2,['SN72101','SN72103'],'Pistola','Magazziniere 1',27],['Alimentatore HP',1,['SN72102'],'Pistola','Magazziniere 1',27]]],
+ ['S07-2-3','Scaffale','Econocom','B-0178',72,[['Telefoni Samsung',500,['IMEI72301','IMEI72302'],'Pistola','Magazziniere 1',27]]],
+ ['S07-3-1','Scaffale','Econocom','B-0179',48,[['Scatola tastiere ×10',1,['SN73101'],'Pistola','Magazziniere 1',27],['Scatola mouse ×10',1,['SN73102'],'Pistola','Magazziniere 1',27]]],
+ ['S07-3-2','Scaffale','Econocom','B-0180',72,[['Notebook Lenovo T14',3,['SN73201','SN73202','SN73203'],'Pistola','Magazziniere 1',27]]],
+ ['S07-3-3','Scaffale','Econocom','B-0181',96,[['Caricabatterie',300,[],'Pistola','Magazziniere 1',27]]],
+ ['S07-4-2','Scaffale','Econocom','B-0182',96,[['Caricabatterie',300,[],'Manuale','Magazziniere 1',27]]],
+ ['S07-5-1','Scaffale','Econocom','B-0183',96,[['Caricabatterie',300,[],'Pistola','Magazziniere 1',27]]],
+ ['S07-5-3','Scaffale','Econocom','B-0184',144,[['Telefoni Motorola',1000,['IMEI75301','IMEI75302'],'Pistola','Magazziniere 1',27]]],
+ ['S07-6-1','Scaffale','Econocom','B-0185',120,[['Cover',200,[],'Pistola','Magazziniere 1',27]]],
+ ['S07-6-2','Scaffale','Econocom','B-0186',144,[['Telefoni Motorola',1000,['IMEI76201','IMEI76202'],'Pistola','Magazziniere 1',27]]],
+ ['S07-6-3','Scaffale','Econocom','B-0187',168,[['Telefoni Samsung',500,['IMEI76301','IMEI76302'],'Pistola','Magazziniere 1',27]]],
+ ['S08-1-2','Scaffale','Econocom','B-0188',48,[['Cover',200,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-2-1','Scaffale','Econocom','B-0189',48,[['Cover',200,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-2-2','Scaffale','Econocom','B-0190',72,[['Telefoni Motorola',1000,['IMEI82201','IMEI82202'],'Pistola','Magazziniere 1',28]]],
+ ['S08-2-3','Scaffale','Econocom','B-0191',96,[['Telefoni Samsung',500,['IMEI82301','IMEI82302'],'Pistola','Magazziniere 1',28]]],
+ ['S08-3-1','Scaffale','Econocom','B-0192',72,[['Telefoni Motorola',1000,['IMEI83101','IMEI83102'],'Manuale','Magazziniere 1',28]]],
+ ['S08-3-3','Scaffale','Econocom','B-0193',120,[['Caricabatterie',300,[],'Manuale','Magazziniere 1',28]]],
+ ['S08-4-1','Scaffale','Econocom','B-0194',96,[['Telefoni Samsung',500,['IMEI84101','IMEI84102'],'Pistola','Magazziniere 1',28]]],
+ ['S08-4-2','Scaffale','Econocom','B-0195',120,[['Caricabatterie',300,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-4-3','Scaffale','Econocom','B-0196',144,[['Cover',200,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-5-2','Scaffale','Econocom','B-0197',10224,[['Cover',200,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-6-1','Scaffale','Econocom','B-0198',144,[['Cover',200,[],'Pistola','Magazziniere 1',28]]],
+ ['S08-6-3','Scaffale','Econocom','B-0199',192,[['Telefoni Samsung',500,['IMEI86301','IMEI86302'],'Pistola','Magazziniere 1',28]]],
+ ['S09-1-1','Scaffale','Apple','B-0200',48,[['iPhone',12,[],'Pistola','Magazziniere 1',29],['Apple Watch',6,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-1-3','Scaffale','Apple','B-0201',96,[['iPhone',10,[],'Pistola','Magazziniere 1',29],['iPad',10,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-2-2','Scaffale','Apple','B-0202',96,[['iPhone',10,[],'Manuale','Magazziniere 1',29],['iPad',10,[],'Manuale','Magazziniere 1',29]]],
+ ['S09-3-1','Scaffale','Apple','B-0203',10176,[['iPhone',10,[],'Pistola','Magazziniere 1',29],['iPad',10,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-3-2','Scaffale','Apple','B-0204',120,[['Colli MacBook',24,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-3-3','Scaffale','Apple','B-0205',144,[['iPhone',12,[],'Pistola','Magazziniere 1',29],['Apple Watch',6,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-4-1','Scaffale','Apple','B-0206',120,[['Colli MacBook',24,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-4-3','Scaffale','Apple','B-0207',168,[['iMac',8,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-5-1','Scaffale','Apple','B-0208',144,[['iPhone',12,[],'Pistola','Magazziniere 1',29],['Apple Watch',6,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-5-2','Scaffale','Apple','B-0209',168,[['iMac',8,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-5-3','Scaffale','Apple','B-0210',192,[['iPhone',10,[],'Pistola','Magazziniere 1',29],['iPad',10,[],'Pistola','Magazziniere 1',29]]],
+ ['S09-6-2','Scaffale','Apple','B-0211',192,[['iPhone',10,[],'Pistola','Magazziniere 1',29],['iPad',10,[],'Pistola','Magazziniere 1',29]]],
+ ['S10-1-1','Scaffale','Snam','B-0212',72,[['Contatori',12,[],'Manuale','Magazziniere 1',30]]],
+ ['S10-1-2','Scaffale','Snam','B-0213',96,[['Armadi tecnici',2,[],'Manuale','Magazziniere 1',30]]],
+ ['S10-1-3','Scaffale','Snam','B-0214',120,[['Apparati con seriale',18,['SN101301','SN101302'],'Manuale','Magazziniere 1',30]]],
+ ['S10-2-1','Scaffale','Snam','B-0215',96,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-2-3','Scaffale','Snam','B-0216',144,[['Cavi',6,[],'Pistola','Magazziniere 1',30],['Sensori',4,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-3-2','Scaffale','Snam','B-0217',144,[['Cavi',6,[],'Pistola','Magazziniere 1',30],['Sensori',4,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-4-1','Scaffale','Snam','B-0218',144,[['Cavi',6,[],'Pistola','Magazziniere 1',30],['Sensori',4,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-4-2','Scaffale','Snam','B-0219',10248,[['Contatori',12,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-4-3','Scaffale','Snam','B-0220',192,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-5-1','Scaffale','Snam','B-0221',168,[['Contatori',12,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-5-3','Scaffale','Snam','B-0222',216,[['Apparati con seriale',18,['SN105301','SN105302'],'Pistola','Magazziniere 1',30]]],
+ ['S10-6-1','Scaffale','Snam','B-0223',192,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',30]]],
+ ['S10-6-2','Scaffale','Snam','B-0224',216,[['Apparati con seriale',18,['SN106201','SN106202'],'Pistola','Magazziniere 1',30]]],
+ ['S10-6-3','Scaffale','Snam','B-0225',24,[['Cavi',6,[],'Pistola','Magazziniere 1',30],['Sensori',4,[],'Pistola','Magazziniere 1',30]]],
+ ['S11-1-2','Scaffale','Messina Corporation','B-0226',120,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-2-1','Scaffale','Messina Corporation','B-0227',10200,[]],
+ ['S11-2-2','Scaffale','Messina Corporation','B-0228',144,[['Portatili',40,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-2-3','Scaffale','Messina Corporation','B-0229',168,[]],
+ ['S11-3-1','Scaffale','Messina Corporation','B-0230',144,[['Portatili',40,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-3-3','Scaffale','Messina Corporation','B-0231',192,[['Monitor',20,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-4-2','Scaffale','Messina Corporation','B-0232',192,[['Monitor',20,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-5-1','Scaffale','Messina Corporation','B-0233',192,[['Monitor',20,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-5-2','Scaffale','Messina Corporation','B-0234',216,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-5-3','Scaffale','Messina Corporation','B-0235',10104,[['Portatili',40,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-6-1','Scaffale','Messina Corporation','B-0236',216,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',31]]],
+ ['S11-6-3','Scaffale','Messina Corporation','B-0237',48,[['PC fissi',12,[],'Pistola','Magazziniere 1',31]]],
+ ['S12-1-2','Scaffale','Messina Corporation','B-0239',144,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-1-3','Scaffale','Messina Corporation','B-0240',168,[['Portatili',40,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-2-2','Scaffale','Messina Corporation','B-0241',168,[['Portatili',40,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-3-1','Scaffale','Messina Corporation','B-0242',168,[['Portatili',40,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-3-2','Scaffale','Messina Corporation','B-0243',10272,[['PC fissi',12,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-3-3','Scaffale','Messina Corporation','B-0244',216,[['Monitor',20,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-4-1','Scaffale','Messina Corporation','B-0245',192,[['PC fissi',12,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-4-3','Scaffale','Messina Corporation','B-0246',24,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-5-2','Scaffale','Messina Corporation','B-0247',24,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-6-1','Scaffale','Messina Corporation','B-0248',24,[['Portatili Lenovo',35,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-6-2','Scaffale','Messina Corporation','B-0249',48,[['Portatili',40,[],'Pistola','Magazziniere 1',32]]],
+ ['S12-6-3','Scaffale','Messina Corporation','B-0250',72,[['PC fissi',12,[],'Pistola','Magazziniere 1',32]]],
+ ['S07-2-2','Scaffale','Econocom','B-0251',48,[['Notebook Dell Latitude',3,['SN72201','SN72202','SN72204'],'Pistola','Magazziniere 1',27],['Docking Dell',1,['SN72203'],'Pistola','Magazziniere 1',27]]],
+ ['RIC','Ricevimento','Snam','B-0252',3,[]],
+ ['RIC','Ricevimento','Snam','B-0253',4,[]],
+ ['RIC','Ricevimento','Snam','B-0254',5,[]],
+ ['PAS','Passaggio Apple','Apple','B-0255',3,[]],
+ ['PAS','Passaggio Apple','Apple','B-0256',4,[]],
+ ['GIA','Giacenze','Velier','B-0257',3,[]],
+ ['GIA','Giacenze','Velier','B-0258',4,[]],
+ ['GIA','Giacenze','Velier','B-0259',5,[]],
+ ['GIA','Giacenze','Velier','B-0260',6,[]],
+ ['RES','Resi','Luxiona','B-0261',3,[]],
+ ['RES','Resi','Luxiona','B-0262',4,[]],
+ ['S08-6-3','Scaffale','UniCredit','B-0190',70,[['iPhone 13 con cespite',3,['35XXXXXXXXXX101','35XXXXXXXXXX102','35XXXXXXXXXX103'],'Pistola','Magazziniere 1',70]]],
+ ['S11-3-2','Scaffale','Messina Corporation','B-0300',72,[]],
+ ['S11-1-3','Scaffale','Messina Corporation','B-0301',288,[]],
+ ['S11-1-1','Scaffale','Messina Corporation','B-0302',24,[]]
+];
 const CONTROLLO=[
  {bolla:'[n. bolla]',cli:'Snam',tipo:'Entrata',attesi:40,letti:40,chi:'Magazziniere 1',ora:'07:40'},
  {bolla:'[n. bolla]',cli:'Econocom',tipo:'Entrata',attesi:1000,letti:1000,chi:'Magazziniere 2',ora:'08:15'},
@@ -465,9 +647,9 @@ const CONTA_EXTRA='Notebook HP ProBook';
 const CONTA_PLAN=i=>i===3?[1,'X',0,3]:CONTA_IT[i].map((x,j)=>j).reverse();
 const USCITA=[['Collo 1 di 4','S03-2-1'],['Collo 2 di 4','S03-2-1'],['Collo 3 di 4','S03-2-2'],['Collo 4 di 4','S03-2-2']];
 const GIACENZE=[
- {sped:'[n. spedizione]',cliente:'Apple',dest:'[Destinatario], Rozzano',motivo:'Destinatario assente',dal:'Ven 16 ottobre',gg:3,rico:'Da prenotare'},
- {sped:'[n. spedizione]',cliente:'Snam',dest:'[Destinatario], Milano',motivo:'Chiuso o fuori orario',dal:'Gio 15 ottobre',gg:4,rico:'Prenotata · gio 22 ottobre'},
- {sped:'[n. spedizione]',cliente:'Luxiona',dest:'[Destinatario], Assago',motivo:'Merce rifiutata',dal:'Lun 12 ottobre',gg:7,rico:'Il cliente decide: riconsegna o reso'},
+ {sped:'[n. spedizione]',cliente:'Apple',dest:'[Destinatario], Rozzano',motivo:'Destinatario assente',dal:gBreve(-3),gg:3,rico:'Da prenotare'},
+ {sped:'[n. spedizione]',cliente:'Snam',dest:'[Destinatario], Milano',motivo:'Chiuso o fuori orario',dal:gBreve(-4),gg:4,rico:'Prenotata · '+gBreve(3).toLowerCase()},
+ {sped:'[n. spedizione]',cliente:'Luxiona',dest:'[Destinatario], Assago',motivo:'Merce rifiutata',dal:gBreve(-7),gg:7,rico:'Il cliente decide: riconsegna o reso'},
  {sped:'[n. spedizione]',cliente:'[Cliente]',dest:'[Destinatario], Opera',motivo:'Indirizzo sbagliato',dal:'Ieri',gg:1,rico:'Da prenotare'}
 ];
 const CLIENTI=[
@@ -512,32 +694,32 @@ const C_MAILS=[
  {da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’[percentuale] dal test. Se ordini oggi spediamo entro [giorno]. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
  {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
  {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'},
- {da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0300.',azGo:'ordini'}
+ {da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0227.',azGo:'ordini'}
 ];
 const DEVICES=[
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:null,cicli:190,screen:'14\'',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0300',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:349,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0239',shelf:'S11-2-3',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG001',conf:true},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:309,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG002',conf:true},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-015',costo:61,price:169,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0237',shelf:'S11-1-3',post:'',letto:'',foto:'',sn:'NJX003',conf:true},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:229,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0239',shelf:'S11-2-3',post:'',letto:'',foto:'',sn:'NJX004',conf:true},
- {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6\'',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-3-2',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'N5CD005',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0237',shelf:'S11-1-3',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'NPF3006',conf:true},
- {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6\'',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',costo:61,price:219,stato:'Reso',siti:'',gg:1,banc:'B-0235',shelf:'S11-1-1',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'5CDXXXXX',conf:true},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:329,stato:'Venduto',siti:'eBay',gg:3,banc:'B-0301',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXXX',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:289,stato:'Disponibile',siti:'Back Market, Sito',gg:4,banc:'B-0300',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX2',conf:true},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:84,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:399,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon, Sito',gg:5,banc:'B-0239',shelf:'S11-2-3',post:'',letto:'',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-014',costo:61,price:209,stato:'Disponibile',siti:'Sito, Subito',gg:7,banc:'B-0300',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX3',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',costo:61,price:249,stato:'Venduto',siti:'Back Market',gg:9,banc:'B-0300',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXXX',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:289,stato:'Venduto',siti:'Back Market',gg:10,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1000',conf:true},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:260,stato:'Venduto',siti:'',gg:11,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1001',conf:true},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:239,stato:'Venduto',siti:'eBay',gg:12,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1002',conf:true},
- {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:88,cicli:null,screen:'13,3\'',gpu:'Apple M1 7 core',pw:'',canc:'',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:61,price:449,stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gg:12,banc:'B-0237',shelf:'S11-1-3',post:'',letto:'',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:299,stato:'Venduto',siti:'Refurbed',gg:13,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1003',conf:true},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:199,stato:'Venduto',siti:'Subito',gg:14,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1004',conf:true},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:349,stato:'Venduto',siti:'Back Market',gg:15,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1005',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:219,stato:'Venduto',siti:'eBay',gg:16,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1006',conf:true},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',costo:61,price:159,stato:'Fermo',siti:'',gg:64,banc:'B-0235',shelf:'S11-1-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX8',conf:true},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14\'',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, Tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Venduto',siti:'Subito',gg:64,banc:'B-0302',shelf:'S12-1-1',post:'',letto:'',foto:'',sn:'JXXXXXX',conf:true}
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:null,cicli:190,screen:'14"',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0227',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false,uscito:false},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:349,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG001',conf:true,uscito:false},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:309,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG002',conf:true,uscito:false},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-015',costo:61,price:169,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'',sn:'NJX003',conf:true,uscito:false},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:229,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'',sn:'NJX004',conf:true,uscito:false},
+ {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6"',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'N5CD005',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'NPF3006',conf:true,uscito:false},
+ {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6"',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',costo:61,price:219,stato:'Reso',siti:'',gg:1,banc:'B-0302',shelf:'S11-1-1',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'5CDXXXXX',conf:true,uscito:false},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:329,stato:'Venduto',siti:'eBay',gg:3,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXXX',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:289,stato:'Disponibile',siti:'Back Market, Sito',gg:4,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX2',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:84,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:399,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon, Sito',gg:5,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-014',costo:61,price:209,stato:'Disponibile',siti:'Sito, Subito',gg:7,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX3',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',costo:61,price:249,stato:'Venduto',siti:'Back Market',gg:9,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXXX',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:289,stato:'Venduto',siti:'Back Market',gg:10,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1000',conf:true,uscito:true},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:260,stato:'Venduto',siti:'',gg:11,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1001',conf:true,uscito:true},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:239,stato:'Venduto',siti:'eBay',gg:12,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1002',conf:true,uscito:true},
+ {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:88,cicli:null,screen:'13,3"',gpu:'Apple M1 7 core',pw:'',canc:'',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:61,price:449,stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gg:12,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:299,stato:'Venduto',siti:'Refurbed',gg:13,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1003',conf:true,uscito:true},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:199,stato:'Venduto',siti:'Subito',gg:14,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1004',conf:true,uscito:true},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:349,stato:'Venduto',siti:'Back Market',gg:15,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1005',conf:true,uscito:true},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:219,stato:'Venduto',siti:'eBay',gg:16,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1006',conf:true,uscito:true},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',costo:61,price:159,stato:'Fermo',siti:'',gg:64,banc:'B-0302',shelf:'S11-1-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX8',conf:true,uscito:false},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, Tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Venduto',siti:'Subito',gg:64,banc:'B-0238',shelf:'S12-1-1',post:'',letto:'',foto:'',sn:'JXXXXXX',conf:true,uscito:true}
 ];
 /* la data di carico si conta dai giorni, come nel programma (i dati di prova sono relativi a oggi) */
 DEVICES.forEach(d=>{const x=new Date(Date.now()-d.gg*86400000); d.car=x.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});});
@@ -777,9 +959,9 @@ const A={
   cStrada:v=>{S.c.strada=v;},
   cApriL:()=>{const n=S.c.nl; if(!S.c.strada||!n.codice.trim()||!(+n.pezzi>0)) return; S.c.nuovi=S.c.nuovi||[]; const cod=n.codice.trim().toUpperCase();
     if(LOTTI.concat(S.c.nuovi).some(l=>l[0]===cod)){S.c.lottoMsg='esiste'; return;}
-    {const co=+String(n.costo).replace(',','.')||0; S.c.nuovi.unshift([cod,S.c.strada,(n.data||'2026-10-19').split('-').reverse().join('/'),+n.pezzi,'€ '+co.toLocaleString('it-IT'),0,'€ 0','0%',co?'€ -'+co.toLocaleString('it-IT'):'€ 0',co?'-100%':'—']);}
+    {const co=+String(n.costo).replace(',','.')||0; S.c.nuovi.unshift([cod,S.c.strada,(n.data||isoG(0)).split('-').reverse().join('/'),+n.pezzi,'€ '+co.toLocaleString('it-IT'),0,'€ 0','0%',co?'€ -'+co.toLocaleString('it-IT'):'€ 0',co?'-100%':'—']);}
     S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
-    S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:'2026-10-19',pezzi:'',costo:''};},
+    S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:isoG(0),pezzi:'',costo:''};},
   cXls:cod=>{const r=pcLotto(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} S.c.lottoMsg=''; scaricaExcel('Lotto '+cod,XCOL,r.map(rigaPC));},
   cCsv:cod=>{const r=pcLotto(cod).filter(d=>d.stato==='Disponibile'); if(!r.length){S.c.lottoMsg=(pcLotto(cod).length?'vendita:':'vuoto:')+cod; return;} S.c.lottoMsg=''; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   cInvXls:()=>{const r=invFiltrati(); if(!r.length) return; scaricaExcel('Inventario '+oggiIt().replace(/\//g,'-'),XCOL,r.map(rigaPC));},
@@ -794,10 +976,10 @@ const A={
   kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto';
     if(S.k.ex==='lettura'&&!S.k.lettFatto){S.k.lettFatto=true; S.c.lettCaricati=2;}
     else if(S.k.ex==='certus'){S.k.n+=1; const siti=Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', '); S.c.carApp=(S.c.carApp||[]).concat([{sn:'PF3XXXX'+(5+(S.c.carApp||[]).length+1),grade:S.k.grado,price:+S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),siti}]);}},
-  kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto='S11-2-1';},
+  kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto=(bancaliVivi().find(m=>m[3]===v)||['S11-2-1'])[0];},
   kNbStampa:()=>{S.k.nb.stampata=true;},
-  kNbPosto:()=>{if(S.k.nb.stampata)S.k.nb.posto='S11-3-2';},
-  kNbFatto:()=>{if(!S.k.nb.posto)return; S.k.banc='B-0147'; S.k.bancPosto=S.k.nb.posto; S.k.scr='bancale';},
+  kNbPosto:()=>{if(S.k.nb.stampata)S.k.nb.posto='S11-4-1';},
+  kNbFatto:()=>{if(!S.k.nb.posto)return; S.k.banc='B-0303'; S.k.bancPosto=S.k.nb.posto; S.k.nbFatto={posto:S.k.nb.posto,t:Date.now()}; S.k.scr='bancale';},
   /* negozio */
   nHome:()=>{S.n.view='home'; S.n.payMsg=false;},
   nCart:()=>{S.n.view='cart'; S.n.payMsg=false;},
@@ -874,7 +1056,7 @@ hook('cDdt',()=>evt('Lotti','DDT del lotto L-015 letto: 609 seriali su 612 trova
 hook('cEtichetta',i=>evt('Ordini',`Etichetta del corriere pronta per ${ORDINI[+i][3]}: prendi il PC in ${ORDINI[+i][6]}.`));
 hook('kFatto',()=>{const att=Object.keys(S.k.canali).filter(x=>S.k.canali[x]); evt('Inventario',`ThinkPad T14 Gen 2 grado ${S.k.grado} in vendita a € ${S.k.prezzo} su ${att.length} siti.`);});
 hook('cApriL',()=>{const n=(S.c.nuovi||[])[0]; if(n&&S.c.lottoMsg&&S.c.lottoMsg!=='esiste') evt('Lotti',`Lotto ${n[0]} aperto · strada ${n[1]}.`);});
-hook('kNbStampa',()=>evt('Magazzino','Etichetta B-0147 stampata sulla Zebra.'));
+hook('kNbStampa',()=>evt('Magazzino','Etichetta B-0303 stampata sulla Zebra.'));
 hook('cLic',()=>evt('Stage','Richiesta licenze Certus inviata.'));
 hook('tTp',()=>{});
 hook('tGiacChiedi',()=>evt('Posta','Mail al cliente pronta: giacenza, costo e richiesta della data di riconsegna.'));
@@ -917,7 +1099,7 @@ function portaleBody(){
         ${S.live.feed.filter(x=>/Snam/.test(x.testo)).slice(0,5).map(x=>`<div class="li"><span class="row between" style="width:100%"><span>${x.testo}</span><span class="lbl">${x.t}</span></span></div>`).join('')||'<div class="lbl" style="padding:12px">Nessun movimento oggi.</div>'}
       </div></div>`
     :`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Device UniCredit ricevuti</div><div class="big">1.000</div><div class="lbl">lotto Fastweb del 14 ottobre</div></div>
+      <div class="glass card"><div class="lbl">Device UniCredit ricevuti</div><div class="big">1.000</div><div class="lbl">lotto Fastweb del ${gDM(-5)}</div></div>
       <div class="glass card"><div class="lbl">Preparati</div><div class="big">640</div><div class="lbl">doppio cespite applicato</div></div>
       <div class="glass card"><div class="lbl">Spediti</div><div class="big">410</div><div class="lbl">con busta di reso</div></div>
       <div class="glass card"><div class="lbl">Resi rientrati</div><div class="big">37</div><div class="lbl">telefoni usati in deposito</div></div></div>
@@ -949,14 +1131,14 @@ function portaleBody(){
   }
   if(s==='giacenze'){
     body=snam?`<div class="glass card stack"><div class="row between"><b>26-000031 · Snam, Milano</b>${pill('Giacenza','red')}</div>
-      <div class="lbl">Destinatario assente · da giovedì 15 ottobre · € 5 al giorno</div>
+      <div class="lbl">Destinatario assente · da ${gLungo(-4).toLowerCase()} · € 5 al giorno</div>
       ${p.rich.g1?msg('Richiesta inviata: riconsegna giovedì. Ti arriva la conferma appena l’ufficio la mette in giro.'):`<div class="row">${b('Riconsegna giovedì','pRich','g1')}${b('Reso al mittente','noop','','ghost')}</div>`}</div>`
     :'<div class="glass card lbl">Nessuna giacenza.</div>';
   }
   if(s==='fatture'){
     body=`<div class="glass tbox"><table class="t"><thead><tr><th>Fattura</th><th>Periodo</th><th>Importo</th><th>Stato</th><th></th></tr></thead><tbody>
-      <tr><td><b>FPR 112/26</b></td><td>Settembre</td><td>€ [importo]</td><td>${pill('Pagata','ok')}</td><td>${b('PDF','noop','','ghost sm')}</td></tr>
-      <tr><td><b>FPR 131/26</b></td><td>Ottobre</td><td>€ [importo]</td><td>${S.t.pagate[1]?pill('Pagata','ok'):pill('Da pagare')}</td><td>${b('PDF','noop','','ghost sm')}</td></tr></tbody></table></div>
+      <tr><td><b>FPR 112/26</b></td><td>${cap(mese(-1))}</td><td>€ [importo]</td><td>${pill('Pagata','ok')}</td><td>${b('PDF','noop','','ghost sm')}</td></tr>
+      <tr><td><b>FPR 131/26</b></td><td>${cap(mese())}</td><td>€ [importo]</td><td>${S.t.pagate[1]?pill('Pagata','ok'):pill('Da pagare')}</td><td>${b('PDF','noop','','ghost sm')}</td></tr></tbody></table></div>
       <p class="lbl" style="margin:0">Ogni riga della fattura rimanda alla sua spedizione, con la prova di consegna.</p>`;
   }
   const testa=`<div class="glass portbar"><div class="row between"><b style="font-size:17px">Messina Autotrasporti <span style="font-weight:500">· Area clienti</span></b><span class="lbl">portale.[dominio] · entra ${p.cli}</span></div>
@@ -988,7 +1170,7 @@ function j7(){
       <div class="row">${fatto?'':b(j.run?'Importo…':'Importa','j7Import')}<span class="lbl">I file li esporta J7 in Excel o CSV. Prima si importa nel progetto di prova, poi una sera a magazzino fermo nel sistema vero.</span></div>
       ${fatto?`<div class="grid g2">
         <div class="glass"><div style="padding:14px 14px 0;font-weight:700">Colonne abbinate</div><div class="tbox"><table class="t" style="min-width:520px"><thead><tr><th>Colonna J7</th><th>Campo nuovo</th><th>Esempio</th></tr></thead><tbody>
-          <tr><td>RAG_SOC</td><td><b>Cliente</b></td><td>Snam S.p.A.</td></tr><tr><td>UBICAZ</td><td><b>Posto</b></td><td>S07-2-1</td></tr><tr><td>MATRICOLA</td><td><b>Seriale</b></td><td>SN72201</td></tr><tr><td>NR_COLLI</td><td><b>Colli</b></td><td>4</td></tr><tr><td>DT_CONS</td><td><b>Data consegna</b></td><td>21/10/2026</td></tr></tbody></table></div></div>
+          <tr><td>RAG_SOC</td><td><b>Cliente</b></td><td>Snam S.p.A.</td></tr><tr><td>UBICAZ</td><td><b>Posto</b></td><td>S07-2-1</td></tr><tr><td>MATRICOLA</td><td><b>Seriale</b></td><td>SN72201</td></tr><tr><td>NR_COLLI</td><td><b>Colli</b></td><td>4</td></tr><tr><td>DT_CONS</td><td><b>Data consegna</b></td><td>${gData(2)}</td></tr></tbody></table></div></div>
         <div class="glass card stack"><div class="row between"><b>Da chiarire</b>${J7ISS.filter(x=>!j.ris[x[0]]).length?badge(J7ISS.filter(x=>!j.ris[x[0]]).length):pill('Tutto chiaro','ok')}</div>
           ${J7ISS.map(x=>`<div class="row between" style="gap:10px;${j.ris[x[0]]?'opacity:.5':''}"><div style="flex:1;min-width:0"><b>${x[1]}</b><div class="lbl">${x[2]}</div></div>${j.ris[x[0]]?pill('Fatto','ok'):b(x[3],'j7Ris',x[0],'ghost sm')}</div>`).join('')}</div></div>`:''}`;
   }
@@ -1105,7 +1287,7 @@ function satellitare(t){
       <div class="glass card"><div class="lbl">Mezzi in giro</div><div class="big">${SAT.length}</div><div class="lbl">posizione dal satellitare</div></div>
       <div class="glass card"><div class="lbl">Km oggi</div><div class="big">${SAT.reduce((n,x)=>n+x.kmF,0)}</div><div class="lbl">previsti ${SAT.reduce((n,x)=>n+x.kmP,0)}</div></div>
       <div class="glass card"><div class="lbl">Da guardare</div><div class="big">${bad}</div><div class="lbl">deviazioni, soste, rifornimenti</div></div>
-      <div class="glass card"><div class="lbl">Gasolio a ottobre</div><div class="big">€ [importo]</div><div class="lbl">carte carburante e km a confronto</div></div>
+      <div class="glass card"><div class="lbl">Gasolio a ${mese()}</div><div class="big">€ [importo]</div><div class="lbl">carte carburante e km a confronto</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass tbox" style="flex:1 1 520px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Giro</th><th>Km previsti</th><th>Km fatti</th><th>Litri/100 km</th><th>Controllo</th></tr></thead><tbody>
@@ -1242,7 +1424,7 @@ function shell(company,navList,cur,act,title,body,searchPh){
       ${navList.map(n=>`<button class="nav ${cur===n[0]?'on':''}" data-act="${act}" data-arg="${n[0]}">${n[1]}</button>`).join('')}
     </nav>
     <div class="content">
-      <div class="chead"><div><div class="lbl">${company==='Corporation'?oggiLungo():'Lunedì 19 ottobre 2026'} · ${company}</div><h2>${title}</h2></div><div class="row">${srch('Cerca','s-'+act)}</div></div>
+      <div class="chead"><div><div class="lbl">${oggiLungo()} · ${company}</div><h2>${title}</h2></div><div class="row">${srch('Cerca','s-'+act)}</div></div>
       ${body}
     </div></div>`;
 }
@@ -1296,7 +1478,7 @@ function trasp(){
     </div>
     <div class="grid g4">
       <div class="glass card"><div class="lbl">Fatturato oggi</div><div class="big">€ ${(4860+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div><div class="lbl">bolle di oggi × tariffe</div></div>
-      <div class="glass card"><div class="lbl">Fatturato ottobre</div><div class="big">€ ${(61240+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div><div class="lbl">dal 1° ottobre</div></div>
+      <div class="glass card"><div class="lbl">Fatturato ${mese()}</div><div class="big">€ ${(61240+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div><div class="lbl">dal 1° ${mese()}</div></div>
       <div class="glass card incassato"><div class="lbl">Incassato</div><div class="big">€ ${(38900+[1240,2310,480].reduce((a,v,i)=>a+(t.pagate[i]?v:0),0)).toLocaleString('it-IT')}</div><div class="lbl">${(n=>n===1?'1 fattura pagata':n+' fatture pagate')(Object.keys(t.pagate).length)}</div></div>
     </div>
     <div class="grid g2">
@@ -1368,25 +1550,41 @@ function trasp(){
     const ko=CONTROLLO.filter(r=>r.letti!==r.attesi).length;
     let inner='';
     if(t.magTab==='pianta'){
-      const sel=t.scaf, cli=SC_CLI[sel];
+      /* la stessa pianta del programma: bancali al posto, con il loro contenuto e i PC della Corporation ancora sopra */
+      const BV=bancaliVivi().map(m=>({posto:m[0],zona:m[1],cli:m[2],cod:m[3],h:m[4],cont:m[5],pc:m[2]==='Messina Corporation'?pcSulBancale(m[3]):[]}));
+      const inPosto=c=>BV.filter(b=>b.posto===c);
+      const code=(n,pi,po)=>`S${String(n).padStart(2,'0')}-${pi}-${po}`;
+      const prevalente=n=>{const c={}; for(let pi=1;pi<=6;pi++) for(let po=1;po<=3;po++) inPosto(code(n,pi,po)).forEach(b=>{c[b.cli]=(c[b.cli]||0)+1;}); const e=Object.entries(c).sort((x,y)=>y[1]-x[1])[0]; return e?e[0]:'Libero';};
+      const articoli=b=>{const q=new Map(); b.forEach(x=>x.cont.forEach(c=>q.set(c[0],(q.get(c[0])||0)+c[1]))); b.flatMap(x=>x.pc).map(x=>x.articolo).sort((m,n)=>m.localeCompare(n)).forEach(a=>q.set(a,(q.get(a)||0)+1));
+        return q.size?[...q].map(([a,n])=>fNum(n)+' '+a).join(', '):b.map(x=>'Bancale '+x.cod).join(', ');};
+      const arrivo=b=>dataH(Math.max(...b.map(x=>x.h)));
+      const sel=t.scaf+1, nSel=prevalente(sel);
       const rows=[];
-      for(let pi=6;pi>=1;pi--) for(let po=1;po<=3;po++){ const full=scCell(sel,pi,po); const code=`S${String(sel+1).padStart(2,'0')}-${pi}-${po}`; rows.push(`<tr ${full?`class="click" data-act="tPosto" data-arg="${code}"`:''} style="${t.posto===code?'background:var(--soft)':''}"><td><b>${code}</b></td><td>Piano ${pi}</td><td>${full?cli:'<span class="lbl">Libero</span>'}</td><td>${full?SC_ART[cli][(pi+po)%4]:'—'}</td><td>${full?scArrivo(sel,pi,po):'—'}</td></tr>`); }
+      for(let pi=6;pi>=1;pi--) for(let po=1;po<=3;po++){ const c=code(sel,pi,po), b=inPosto(c), full=b.length>0; rows.push(`<tr ${full?`class="click" data-act="tPosto" data-arg="${c}"`:''} style="${t.posto===c?'background:var(--soft)':''}"><td><b>${c}</b></td><td>Piano ${pi}</td><td>${full?b[0].cli:'<span class="lbl">Libero</span>'}</td><td>${full?articoli(b):'—'}</td><td>${full?arrivo(b):'—'}</td></tr>`); }
+      const zone=['Ricevimento','Passaggio Apple','Giacenze','Resi'].map(z=>{const n=BV.filter(b=>b.zona===z).length; return `<div><b>${z}</b><br>${n===1?'1 bancale':n+' bancali'}</div>`;}).join('');
       inner=`<div class="row" style="align-items:flex-start;gap:16px">
         <div class="glass card" style="flex:1 1 420px;min-width:0">
           <div class="row between"><b>Pianta del capannone</b><span class="lbl">12 scaffali · 6 piani · 3 posti</span></div>
-          <div class="scaf" style="margin-top:12px">${SC_CLI.map((c,i)=>`<button class="sc ${sel===i?'on':''}" data-act="tScaf" data-arg="${i}" aria-label="Scaffale ${i+1}"><span>S${String(i+1).padStart(2,'0')}</span><span class="lv">${[6,5,4,3,2,1].map(pi=>`<span>${[1,2,3].map(po=>`<i class="${scCell(i,pi,po)?(match(c)?'f':'dim'):''}"></i>`).join('')}</span>`).join('')}</span><span class="lbl" style="font-size:11px">${c}</span></button>`).join('')}</div>
+          <div class="scaf" style="margin-top:12px">${Array.from({length:12},(_,i)=>i+1).map(n=>`<button class="sc ${sel===n?'on':''}" data-act="tScaf" data-arg="${n-1}" aria-label="Scaffale ${n}"><span>S${String(n).padStart(2,'0')}</span><span class="lv">${[6,5,4,3,2,1].map(pi=>`<span>${[1,2,3].map(po=>{const b=inPosto(code(n,pi,po)); return `<i class="${b.length?(b.some(x=>match(x.cli))?'f':'dim'):''}"></i>`;}).join('')}</span>`).join('')}</span><span class="lbl" style="font-size:11px">${prevalente(n)}</span></button>`).join('')}</div>
           <div class="lbl" style="margin:14px 0 8px">Zone a terra</div>
-          <div class="zone"><div><b>Ricevimento</b><br>3 bancali da sistemare</div><div><b>Passaggio Apple</b><br>entra ed esce in giornata</div><div><b>Giacenze</b><br>4 spedizioni</div><div><b>Resi</b><br>2 colli</div></div>
+          <div class="zone">${zone}</div>
         </div>
-        <div class="glass" style="flex:1 1 380px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Scaffale S${String(sel+1).padStart(2,'0')} · ${cli}</div><div class="tbox"><table class="t"><thead><tr><th>Posto</th><th>Piano</th><th>Cliente</th><th>Articoli</th><th>Arrivo</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>
+        <div class="glass" style="flex:1 1 380px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Scaffale S${String(sel).padStart(2,'0')} · ${nSel}</div><div class="tbox"><table class="t"><thead><tr><th>Posto</th><th>Piano</th><th>Cliente</th><th>Articoli</th><th>Arrivo</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>
       </div>`;
-      if(t.posto){
-        const base=(CONT_BASE[cli]||[]).map(x=>x.slice()); if(t.contMan&&t.contMan[t.posto]&&base[0]){ base[0][1]=base[0][1]-2; base[0][3]='Manuale'; base[0][4]='Tu'; const ml=t.log.find(r=>r[4]===t.posto&&r[5]==='Manuale'); if(ml) base[0][5]=ml[0]; }
-        const items=base.concat(t.cont[t.posto]||[]);
+      const bp=t.posto?inPosto(t.posto):[];
+      if(bp.length){
+        /* righe del contenuto in ordine di inserimento; a mano: la prima riga scende di 2 ed è in rosso */
+        const righe=bp.flatMap(x=>x.cont.map(c=>c.slice())).sort((x,y)=>y[5]-x[5]).map(c=>({art:c[0],q:c[1],cod:codiciC(c[2]),ins:c[3],chi:c[4],ora:quandoH(c[5])}));
+        if(t.contMan&&t.contMan[t.posto]&&righe[0]){ righe[0].q=righe[0].q-2; righe[0].ins='Manuale'; righe[0].chi='Tu'; const ml=t.log.find(r=>r[4]===t.posto&&r[5]==='Manuale'); if(ml) righe[0].ora=ml[0]; }
+        (t.cont[t.posto]||[]).forEach(x=>righe.push({art:x[0],q:x[1],cod:x[2],ins:x[3],chi:x[4],ora:x[5]}));
+        const pc=bp.flatMap(x=>x.pc).sort((x,y)=>y.h-x.h||x.seriale.localeCompare(y.seriale));
+        const perModello=[...new Set(pc.map(x=>x.articolo))].sort((m,n)=>m.localeCompare(n)).map(a=>{const xs=pc.filter(x=>x.articolo===a); return {art:a,q:xs.length,cod:codiciC(xs.map(x=>x.seriale)),ora:quandoH(Math.min(...xs.map(x=>x.h)))};});
         inner=`<div class="glass card stack">
-          <div class="row between"><h3 style="font-size:20px">Articoli · ${t.posto}</h3><span class="lbl">${cli}</span></div>
+          <div class="row between"><h3 style="font-size:20px">Articoli · ${t.posto}</h3><span class="lbl">${bp[0].cli} · ${bp.map(x=>x.cod).join(', ')}</span></div>
           <div class="tbox"><table class="t nw"><thead><tr><th>Articolo</th><th>Quantità</th><th>Codici</th><th>Inserito</th><th>Chi</th><th>Ora</th></tr></thead><tbody>
-          ${items.map(x=>`<tr class="${x[3]==='Manuale'?'korow':''}"><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]==='Manuale'?'Manuale':(x[3]==='Foto'?'Foto':'Pistola')}</td><td>${x[4]}</td><td>${x[5]}</td></tr>`).join('')}
+          ${righe.map(x=>`<tr class="${x.ins==='Manuale'?'korow':''}"><td><b>${x.art}</b></td><td>${x.q}</td><td>${x.cod}</td><td>${x.ins}</td><td>${x.chi}</td><td>${x.ora}</td></tr>`).join('')}
+          ${perModello.map(x=>`<tr><td><b>${x.art}</b></td><td>${x.q}</td><td>${x.cod}</td><td>App</td><td>Corporation</td><td>${x.ora}</td></tr>`).join('')}
+          ${!righe.length&&!perModello.length?'<tr><td colspan="6" class="lbl">Bancale vuoto.</td></tr>':''}
           </tbody></table></div>
           <div class="row">${b('Aggiungi con la pistola','tContScan')}${b('Modifica a mano','tContMan','','ghost')}<span class="lbl">Ogni modifica finisce nello Storico con chi l’ha fatta e quando. Quelle a mano sono in rosso.</span></div>
         </div>`+inner;
@@ -1450,7 +1648,7 @@ function trasp(){
       <div class="glass card"><div class="lbl">Spedizioni in giacenza</div><div class="big">${G.length}</div><div class="lbl">merce tornata a Lacchiarella</div></div>
       <div class="glass card"><div class="lbl">Riconsegne da prenotare</div><div class="big">${daPren}</div><div class="lbl">aspettano una data dal cliente</div></div>
       <div class="glass card"><div class="lbl">Giorni medi in giacenza</div><div class="big">${(G.reduce((a,g)=>a+g.gg,0)/G.length).toFixed(1).replace('.',',')}</div></div>
-      <div class="glass card"><div class="lbl">Giacenze da fatturare a ottobre</div><div class="big">€ [importo]</div><div class="lbl">con la tariffa di ogni cliente</div></div>
+      <div class="glass card"><div class="lbl">Giacenze da fatturare a ${mese()}</div><div class="big">€ [importo]</div><div class="lbl">con la tariffa di ogni cliente</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass" style="flex:1 1 280px;padding:8px;min-width:0"><div class="row between" style="padding:8px 10px"><b>In magazzino</b><span class="lbl">${G.length} spedizioni</span></div><div class="list">
@@ -1487,12 +1685,12 @@ function trasp(){
     const cur=TP[t.tpSel], mov=TP_MOV[cur.aut]||[];
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Spesa di oggi</div><div class="big">€ 92,30</div></div>
-      <div class="glass card"><div class="lbl">Spesa di ottobre</div><div class="big">€ 2.031,60</div><div class="lbl">va nei costi dei mezzi</div></div>
-      <div class="glass card"><div class="lbl">Passaggi a ottobre</div><div class="big">297</div></div>
+      <div class="glass card"><div class="lbl">Spesa di ${mese()}</div><div class="big">€ 2.031,60</div><div class="lbl">va nei costi dei mezzi</div></div>
+      <div class="glass card"><div class="lbl">Passaggi a ${mese()}</div><div class="big">297</div></div>
       <div class="glass card"><div class="lbl">Da controllare</div><div class="big">3</div><div class="lbl">fuori orario o senza giro</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
-      <div class="glass tbox" style="flex:1 1 600px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Oggi</th><th>Ottobre</th><th>Passaggi</th><th>Controllo</th></tr></thead><tbody>
+      <div class="glass tbox" style="flex:1 1 600px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Oggi</th><th>${cap(mese())}</th><th>Passaggi</th><th>Controllo</th></tr></thead><tbody>
         ${TP.map((r,i)=>`<tr class="click" data-act="tTp" data-arg="${i}" style="${t.tpSel===i?'background:var(--soft)':''}"><td><b>${r.aut}</b></td><td>${r.mezzo}</td><td>€ ${r.oggi}</td><td>€ ${r.mese}</td><td>${r.n}</td><td>${r.flag?pill(String(r.flag),'red'):'<span class="lbl">—</span>'}</td></tr>`).join('')}
       </tbody></table></div>
       <div class="glass" style="flex:1 1 600px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Passaggi di ${cur.aut}</div><div class="tbox"><table class="t nw"><thead><tr><th>Giorno</th><th>Ora</th><th>Tratta</th><th>Importo</th><th>Nota</th></tr></thead><tbody>
@@ -1502,8 +1700,8 @@ function trasp(){
     <p class="lbl" style="margin:0">Ogni apparato Telepass è legato al suo mezzo, e dal giro del giorno il programma sa chi guidava. I passaggi arrivano da Telepass (collegamento da chiedere al referente Telepass Business, almeno ogni mezz’ora) e finiscono nei costi. Da scrivere nell’informativa e da far vedere al consulente del lavoro prima di usarli per valutare gli autisti.</p>`;
   }
   if(s==='presenze'){
-    title='Presenze'; hintTxt='apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «Ottobre» per i conteggi del mese.';
-    const tabsP=[['oggi','Oggi'],['fix','Correzioni'],['allarmi','Allarmi'],['riep','Riepiloghi'],['ferie','Ferie'],['mese','Ottobre']];
+    title='Presenze'; hintTxt='apri «Allarmi» per i badge usati da altri telefoni, «Riepiloghi» per ritardi e uscite anticipate, «Ferie» per ferie e permessi, «'+cap(mese())+'» per i conteggi del mese.';
+    const tabsP=[['oggi','Oggi'],['fix','Correzioni'],['allarmi','Allarmi'],['riep','Riepiloghi'],['ferie','Ferie'],['mese',cap(mese())]];
     const nFix=PRES_IERI.filter((x,i)=>!t.presFix[i]).length;
     const nAll=(S.b.finto?1:0)+ALLARMI.length-Object.keys(t.allVisti).length;
     let inner='';
@@ -1535,8 +1733,8 @@ function trasp(){
       <p class="lbl" style="margin:0">Ogni badge è legato a un solo telefono, registrato quando il dipendente attiva l’app. Un badge su un altro telefono, uno screenshot vecchio o un badge chiuso non timbrano: il programma li riconosce sempre e sa a chi appartenevano.</p>`;
     }
     if(t.presTab==='riep'){
-      inner=`<div class="glass card row between"><span><b>Ottobre</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Riservato','dark')}</div>
-      <div class="glass tbox"><table class="t nw" style="min-width:820px"><thead><tr><th>Dipendente</th><th>Ritardi</th><th>Minuti di ritardo</th><th>Uscite anticipate</th><th>Minuti in meno</th><th>Rispetto a settembre</th></tr></thead><tbody>
+      inner=`<div class="glass card row between"><span><b>${cap(mese())}</b> <span class="lbl">ritardi e uscite anticipate di ognuno, dalle timbrature</span></span>${pill('Riservato','dark')}</div>
+      <div class="glass tbox"><table class="t nw" style="min-width:820px"><thead><tr><th>Dipendente</th><th>Ritardi</th><th>Minuti di ritardo</th><th>Uscite anticipate</th><th>Minuti in meno</th><th>Rispetto a ${mese(-1)}</th></tr></thead><tbody>
       ${RIEP.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]} min</td><td>${r[3]}</td><td>${r[4]} min</td><td>${r[5]==='In peggioramento'?pill(r[5],'red'):(r[5]==='In miglioramento'?pill(r[5],'ok'):'<span class="lbl">'+r[5]+'</span>')}</td></tr>`).join('')}
       </tbody></table></div>
       <p class="lbl" style="margin:0">Ogni dipendente vede solo i suoi orari nella sua app, mai quelli dei colleghi. Prima di attivarlo: informativa firmata dai dipendenti e verifica del consulente del lavoro.</p>`;
@@ -1551,7 +1749,7 @@ function trasp(){
       inner=`<div class="glass tbox"><table class="t" style="min-width:860px"><thead><tr><th>Dipendente</th><th>Contratto</th><th>Ore ordinarie</th><th>Straordinari</th><th>Notturne</th><th>Festive</th><th>Assenze</th></tr></thead><tbody>
       ${PRES_MESE.map(x=>`<tr><td><b>${x[0]}</b></td><td>${x[1]}</td><td>${x[2]} h</td><td>${x[3]} h</td><td>${x[4]} h</td><td>${x[5]} h</td><td class="lbl">${x[6]}</td></tr>`).join('')}
       </tbody></table></div>
-      ${t.presMsg==='exp'?msg('Conteggi di ottobre pronti per Angela e per il consulente del lavoro, divisi secondo il contratto di ognuno.'):''}
+      ${t.presMsg==='exp'?msg('Conteggi di '+mese()+' pronti per Angela e per il consulente del lavoro, divisi secondo il contratto di ognuno.'):''}
       ${nFix&&t.presMsg!=='exp'?warnW('Uscite',nFix):''}
       <div class="row">${t.presMsg==='exp'?'':(nFix?'<button class="btn" disabled style="opacity:.35;cursor:not-allowed">Prepara</button><span class="lbl">Si sblocca quando le uscite sono corrette.</span>':b('Prepara','tPresExp'))}<span class="lbl">Contributi e tasse: da decidere con la Direzione se li prepara il programma o il consulente.</span></div>`;
     }
@@ -1592,7 +1790,7 @@ function trasp(){
       <div class="row between"><h3 style="font-size:20px">Nuova fattura</h3><span class="lbl">Numero e data li assegna Fatture in Cloud</span></div>
       <div class="kv"><div><div class="lbl">Cliente</div><b>Snam</b></div><div><div class="lbl">Partita IVA</div><b>[dal cliente]</b></div><div><div class="lbl">Pagamento</div><b>[dal contratto]</b></div></div>
       <div class="tbox"><table class="t"><thead><tr><th>Voce</th><th>Quantità</th><th>Prezzo</th><th>Totale</th></tr></thead><tbody>
-        <tr><td><b>Ritiro e consegna</b> <span class="lbl">dalle bolle di ottobre</span></td><td>[n] bancali</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
+        <tr><td><b>Ritiro e consegna</b> <span class="lbl">dalle bolle di ${mese()}</span></td><td>[n] bancali</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
         <tr><td><b>Sponda</b></td><td>12</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
         <tr><td><b>Stoccaggio</b></td><td>[n] bancali al mese</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
         <tr><td><b>Giacenza</b></td><td>1</td><td>€ [tariffa]</td><td>€ [importo]</td></tr>
@@ -1813,7 +2011,7 @@ function autistiApp(){
   if(a.scr==='lista'){
     const n=Object.keys(a.done).length;
     inner=`<div class="pscr">
-      <div class="pcard" style="padding:16px"><div class="lbl">Martedì 20 ottobre · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Consegne</div>
+      <div class="pcard" style="padding:16px"><div class="lbl">${gLungo(1)} · Motrice con sponda</div><div class="ptitle" style="margin-top:2px">Consegne</div>
         <div class="bar" style="margin-top:12px"><i style="width:${n*20}%"></i></div><div class="lbl" style="margin-top:6px">${n} di 5 fermate fatte</div></div>
       ${STOPS.map((s,i)=>{const d=a.done[i];return `<button class="stop ${d?'done':''}" data-act="aOpen" data-arg="${i}"><span class="n">${i+1}</span><span style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px">${s.cliente}</b><span class="lbl">${s.ind} · ${s.fascia}</span></span><b style="font-size:12px">${d==='ok'?'Fatta':(d==='giac'?'Giacenza':(d==='rico'?'Riconsegna fissata':(d==='dopo'?'Riprovo dopo':'')))}</b></button>`;}).join('')}
       ${n===5?`<div class="pcard" style="padding:14px;text-align:center"><b>Giro chiuso</b><div class="lbl" style="margin-top:4px">Ogni consegna ha la sua bolla fotografata e leggibile: in ufficio non serve la chiusura a fine giornata.</div><div style="margin-top:10px">${b('Ricomincia la prova','aReset','','ghost sm')}</div></div>`:''}
@@ -1940,8 +2138,8 @@ function presApp(){
     <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="bigbtn" style="flex:1" data-act="bTimbra" data-arg="Entrata" ${dentro?'disabled style="flex:1;opacity:.35;cursor:not-allowed"':''}>Entrata</button><button class="bigbtn" style="flex:1" data-act="bTimbra" data-arg="Uscita" ${dentro?'':'disabled style="flex:1;opacity:.35;cursor:not-allowed"'}>Uscita</button></div>
     ${S.b.finto?`<div class="pcard" style="padding:14px;border:2px solid var(--alert);background:var(--alert-soft)"><b style="color:var(--alert)">Lettore: timbratura rifiutata</b><div style="font-size:14px;margin-top:4px">Badge di Christian passato da un telefono non registrato. Allarme inviato ad Angela e alla Direzione.</div></div>`:b('Simula: un collega prova con il mio badge','bFinto','','ghost')}
     <div class="pcard" style="padding:12px 14px"><b>Oggi</b>${t.length?t.map(x=>`<div class="kvp"><span>${x[0]}</span><b>${x[1]}</b></div>`).join(''):'<div class="lbl" style="margin-top:4px">Nessuna timbratura ancora</div>'}</div>
-    <div class="pcard" style="padding:12px 14px"><b>Ottobre</b><div class="kvp"><span>Ore ordinarie</span><b>128 h</b></div><div class="kvp"><span>Straordinari</span><b>4 h</b></div><div class="kvp" style="border:0"><span>Ferie</span><b>11 gg</b></div></div>
-    <div class="pcard" style="padding:12px 14px"><b>I miei orari</b><div class="lbl" style="margin-top:2px">Solo tu vedi i tuoi</div><div class="kvp"><span>Ritardi a ottobre</span><b>1 · 6 min</b></div><div class="kvp"><span>Uscite anticipate</span><b>0</b></div><div class="kvp" style="border:0"><span>Permessi</span><b>26 h</b></div></div>
+    <div class="pcard" style="padding:12px 14px"><b>${cap(mese())}</b><div class="kvp"><span>Ore ordinarie</span><b>128 h</b></div><div class="kvp"><span>Straordinari</span><b>4 h</b></div><div class="kvp" style="border:0"><span>Ferie</span><b>11 gg</b></div></div>
+    <div class="pcard" style="padding:12px 14px"><b>I miei orari</b><div class="lbl" style="margin-top:2px">Solo tu vedi i tuoi</div><div class="kvp"><span>Ritardi a ${mese()}</span><b>1 · 6 min</b></div><div class="kvp"><span>Uscite anticipate</span><b>0</b></div><div class="kvp" style="border:0"><span>Permessi</span><b>26 h</b></div></div>
   </div>`;
   return `<div class="appsec">
     <div class="appinfo glass"><h2>App presenze</h2><p class="muted" style="margin:8px 0 0">Il badge virtuale sul telefono di ogni dipendente, al posto della tessera.</p>
@@ -1958,7 +2156,7 @@ function magApp(){
   if(m.scr==='home'){
     const done=Object.keys(m.conta).length;
     inner=`<div class="pscr">
-      <div><div class="lbl">Martedì 20 ottobre · Magazziniere 1</div><div class="ptitle">Magazzino</div></div>
+      <div><div class="lbl">${gLungo(1)} · Magazziniere 1</div><div class="ptitle">Magazzino</div></div>
       ${S.t.invOn&&done<CONTA.length?`<button class="pcard" style="padding:14px;text-align:left;border:2px solid var(--alert);background:var(--alert-soft);cursor:pointer" data-act="mGo" data-arg="conta"><b style="color:var(--alert)">Missione · Scaffale S07</b><div style="font-size:14px;margin-top:2px">${done} di ${CONTA.length} posti fatti. Tocca per ${done?'riprendere':'iniziare'}.</div></button>`:''}
       ${big('Entrata','mGo','entrata','Scarico dal camion e metto a posto',true)}
       ${big('Uscita','mGo','uscita','Preparo e carico una spedizione')}
@@ -2103,7 +2301,7 @@ function caricoApp(){
       ${k.banc?`<div class="pcard row between" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.bancPosto} · ${k.banc==='B-0300'?'14 computer':'nuovo'}</div></div><b style="color:var(--ok);font-size:20px">✓</b></div>`
       :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
       <div style="flex:1"></div>
-      <button class="bigbtn ghost" data-act="kBanc" data-arg="B-0300" style="display:flex;align-items:center;justify-content:center;gap:10px">${KI.cam}Scansiona</button>
+      <button class="bigbtn ghost" data-act="kBanc" data-arg="B-0227" style="display:flex;align-items:center;justify-content:center;gap:10px">${KI.cam}Scansiona</button>
       <button class="bigbtn ghost" data-act="kBanc" data-arg="nuovo" style="display:flex;align-items:center;justify-content:center;gap:10px">${KI.pal}Nuovo</button>
       <button class="bigbtn" data-act="kFatto" ${k.banc?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Conferma</button>
     </div>`;
@@ -2113,7 +2311,7 @@ function caricoApp(){
     const num=(n,done)=>`<span style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;${done?'background:var(--ok);color:#fff':'border:2px solid currentColor'}">${done?'✓':n}</span>`;
     inner=`<div class="pscr">
       <button class="back" data-act="kGo" data-arg="bancale">Indietro</button>
-      <div><div class="lbl">Bancale nuovo</div><div class="ptitle">B-0147</div></div>
+      <div><div class="lbl">Bancale nuovo</div><div class="ptitle">B-0303</div></div>
       <div class="pcard stack" style="padding:14px;gap:10px;${st(nb.stampata,true)}"><div class="row" style="gap:10px;flex-wrap:nowrap">${num(1,nb.stampata)}<b style="font-size:20px">Etichetta</b></div>
         <div style="font-size:17px">${nb.stampata?'Stampata: attaccala sul bancale.':'Stampa l’etichetta con il QR e attaccala sul bancale.'}</div>
         ${nb.stampata?'':`<button class="bigbtn" data-act="kNbStampa">Stampa</button>`}</div>
