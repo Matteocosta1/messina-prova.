@@ -756,7 +756,15 @@ const LOTTI=[['L-016','Lettura',ultimaLav(9,0).toLocaleDateString('it-IT',{day:'
 /* proposta 24/11: tutto correlato. Una vendita nella prova (Negozio online) entra nel suo lotto: Lotti, Home, Inventario e Ordini leggono gli stessi dati */
 /* controllo del DDT (come carica_ddt del programma): i seriali del DDT confrontati con l'archivio dei PC lavorati allo stage.
    L-015: 609 formattati da noi per Accenture, 3 sconosciuti; L-016: 3 PC già formattati da altri */
-const DDT_LOTTI={'L-016':{nel_ddt:3,lavorati:0,da_verificare:3},'L-015':{nel_ddt:612,lavorati:609,da_verificare:3},'L-014':{nel_ddt:480,lavorati:0,da_verificare:480},'L-013':{nel_ddt:320,lavorati:0,da_verificare:320}};
+/* i seriali del DDT che non sono nell'archivio dei PC lavorati (come ddt_da_verificare del programma, in ordine) */
+const ddtSeriali=(pre,n)=>Array.from({length:n},(_,i)=>pre+String(i+1).padStart(4,'0'));
+const DDT_LOTTI={'L-016':{nel_ddt:3,lavorati:0,da_verificare:3,seriali:['PF4L0002','PF4L0003','PF5XXXX1']},'L-015':{nel_ddt:612,lavorati:609,da_verificare:3,seriali:['PF3T1609','PF3T1610','PF3T1611']},};
+/* gli altri lotti (anche quelli nuovi): nessun seriale nel nostro archivio, come nel programma */
+const ddtDi=cod=>DDT_LOTTI[cod]||(n=>({nel_ddt:n,lavorati:0,da_verificare:n,seriali:ddtSeriali('DD'+cod.replace(/-/g,''),n)}))(+(lottiVivi().find(r=>r[0]===cod)||[])[3]||0);
+/* il lotto scelto in Lotti: quello toccato, se no il primo */
+const lottoScelto=()=>{const L=lottiVivi(); return L.find(r=>r[0]===S.c.lotSel)||L[0];};
+/* «Da verificare»: i primi 12 seriali, poi quanti ne restano */
+const VERIF_MAX=12;
 const nEur=x=>+String(x).replace(/[^\d-]/g,'');
 const fNum=n=>(n<0?'-':'')+String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fEur=n=>'€ '+fNum(n);
@@ -1025,7 +1033,8 @@ const A={
   cBanco:i=>{S.c.banco=+i;},
   cTelF:f=>{S.c.telF=f;},
   cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è nel posto '+ORDINI[+i][6]+'.';},
-  cDdt:()=>{S.c.ordMsg='ddt';},
+  cDdt:()=>{S.c.ordMsg='ddt'; S.c.ddtLotto=lottoScelto()[0];},
+  cLotSel:cod=>{S.c.lotSel=cod; S.c.ordMsg=''; S.c.lottoMsg='';},
   cNuovoL:()=>{S.c.nuovoL=!S.c.nuovoL; S.c.lottoMsg='';},
   cStrada:v=>{S.c.strada=v;},
   cApriL:()=>{const n=S.c.nl; if(!S.c.strada||!n.codice.trim()||!(+n.pezzi>0)) return; S.c.nuovi=S.c.nuovi||[]; const cod=n.codice.trim().toUpperCase();
@@ -1124,7 +1133,7 @@ hook('bTimbra',()=>{const x=S.b.timb[0]; if(x)evt('Presenze',`Christian · ${x[0
 hook('bFinto',()=>evt('Presenze','Allarme: badge di Christian passato da un telefono non registrato. Timbratura rifiutata, avvisati Angela e la Direzione.'));
 hook('tAllVisto',()=>evt('Presenze','Messaggio pronto per il dipendente.'));
 hook('tPresFix',i=>evt('Presenze',`Uscita di ${PRES_IERI[i][0]} sistemata da Angela.`));
-hook('cDdt',()=>{const l=lottiVivi()[0], d=DDT_LOTTI[l[0]]; evt('Lotti',`DDT del lotto ${l[0]} letto: ${fNum(d.lavorati)} seriali su ${fNum(d.nel_ddt)} trovati, ${fNum(d.da_verificare)} da verificare.`);});
+hook('cDdt',()=>{const l=lottoScelto(), d=ddtDi(l[0]); evt('Lotti',`DDT del lotto ${l[0]} letto: ${fNum(d.lavorati)} seriali su ${fNum(d.nel_ddt)} trovati, ${fNum(d.da_verificare)} da verificare.`);});
 hook('cEtichetta',i=>evt('Ordini',`Etichetta del corriere pronta per ${ORDINI[+i][3]}: prendi il PC in ${ORDINI[+i][6]}.`));
 hook('kFatto',()=>{const att=Object.keys(S.k.canali).filter(x=>S.k.canali[x]); evt('Inventario',`ThinkPad T14 Gen 2 grado ${S.k.grado} in vendita a € ${S.k.prezzo} su ${att.length} siti.`);});
 hook('cApriL',()=>{const n=(S.c.nuovi||[])[0]; if(n&&S.c.lottoMsg&&S.c.lottoMsg!=='esiste') evt('Lotti',`Lotto ${n[0]} aperto · strada ${n[1]}.`);});
@@ -1994,10 +2003,11 @@ function corp(){
       <div class="row"><button class="btn" data-act="cApriL" data-arg="" ${pronto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Apri</button>${b('Annulla','cNuovoL','','ghost')}</div>
     </div>`:''}
     <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Rimasti</th><th>Incassato</th><th>Margine</th><th>Margine %</th><th></th></tr></thead><tbody>
-    ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap">${b('Excel','cXls',r[0],'ghost sm')}${b('CSV','cCsv',r[0],'ghost sm')}</div></td></tr>`).join('')}
+    ${L.map(r=>`<tr class="click" data-act="cLotSel" data-arg="${r[0]}" style="${lottoScelto()[0]===r[0]?'background:var(--soft)':''}"><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap">${b('Excel','cXls',r[0],'ghost sm')}${b('CSV','cCsv',r[0],'ghost sm')}</div></td></tr>`).join('')}
     </tbody></table></div>
-    ${c.ordMsg==='ddt'?msg(`Fattura e DDT caricati: ${fNum(DDT_LOTTI[L[0][0]].lavorati)} seriali trovati nell’archivio dei PC lavorati, ${fNum(DDT_LOTTI[L[0][0]].da_verificare)} da verificare.`):''}
-    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
+    ${c.ordMsg==='ddt'?(d=>msg(`Fattura e DDT caricati nel lotto ${c.ddtLotto}: ${fNum(d.lavorati)} seriali trovati nell’archivio dei PC lavorati, ${fNum(d.da_verificare)} da verificare.`)
+      +(d.seriali.length?`<div class="row" style="gap:6px"><span class="lbl">Da verificare</span>${d.seriali.slice(0,VERIF_MAX).map(x=>pill(x,'red')).join('')}${d.seriali.length>VERIF_MAX?`<span class="lbl">e altri ${fNum(d.seriali.length-VERIF_MAX)}</span>`:''}</div>`:''))(ddtDi(c.ddtLotto)):''}
+    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Nel lotto <b style="color:var(--ink)">${lottoScelto()[0]}</b>: il programma confronta i seriali del DDT con l’archivio dei PC lavorati. Tocca un altro lotto per cambiarlo.</span></div>`;
   }
   if(s==='inv'){
     title='Inventario'; hintTxt='scegli marca e grado: il numero dei PC si aggiorna subito. Proposta: la tabella ha le stesse colonne dell’Excel; «Excel» scarica il file interno, «CSV» il file per il cliente (solo i PC in vendita, senza lotto, costo e posti). La foto è quella della casa madre, una per modello.';
