@@ -300,6 +300,17 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 @media (max-width:640px){.g-siti{grid-template-columns:1fr}}
 .portbar{display:flex;flex-direction:column;gap:12px;padding:14px 16px;margin-bottom:14px}
 @media (max-width:760px){.sitoframe{height:calc(100dvh - 190px);min-height:460px}}
+/* Guida e Chiedi accanto al titolo di ogni sezione, e i loro pannelli (24/11/2026) */
+.trow{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap}
+.aiuti{display:inline-flex;gap:8px;flex-wrap:wrap}
+.aiuto{display:inline-flex;align-items:center;gap:7px;font:700 16px var(--font);padding:8px 16px 8px 12px;border:1.5px solid var(--ink);border-radius:999px;background:var(--glass-strong);color:var(--ink);cursor:pointer;min-height:40px}
+.aiuto.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.pannello{position:fixed;top:90px;right:24px;width:420px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);overflow:auto;z-index:60;gap:14px;background:rgba(255,255,255,.97);box-shadow:0 30px 60px -20px rgba(0,0,0,.35)}
+.passi{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.bolla{padding:10px 12px;border-radius:14px;background:var(--soft);white-space:pre-wrap;max-width:92%}
+.bolla.io{align-self:flex-end;background:var(--solid);color:var(--on-solid)}
+.guida-tit{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:space-between;align-items:center;width:100%}
+@media (max-width:760px){.aiuto{font-size:14px;padding:6px 12px 6px 10px;min-height:36px}.pannello{top:auto;bottom:12px;right:16px;left:16px;width:auto;max-width:none;max-height:78vh}}
 </style>
 
 <div class="wrap">
@@ -328,8 +339,25 @@ const lavorativo=d=>d.getDay()>=1&&d.getDay()<=5&&!FESTE.includes(d.getFullYear(
 const ultimaLav=(h,m=0,prima=0,adesso=Date.now())=>{const d=new Date(adesso); d.setHours(h,m,0,0); if(d.getTime()>adesso) d.setDate(d.getDate()-1); while(!lavorativo(d)) d.setDate(d.getDate()-1); for(let i=0;i<prima;i++){do d.setDate(d.getDate()-1); while(!lavorativo(d));} return d;};
 const minFa=n=>new Date(Date.now()-n*60000);
 const giorniFa=(gg,h,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return d;};
-/* quanti giorni il sistema delle telecamere conserva avvisi e foto (proposta: 7 giorni, la decide la Direzione) */
-const CONSERVA_GIORNI=7;
+/* quanti giorni il sistema delle telecamere conserva avvisi e foto: li sceglie la Direzione nella Guida di Telecamere (proposta 7) */
+const consGiorni=()=>S.perm.giorni;
+/* GUIDA:inizio (generato da sorgenti/guida.py: non modificare qui) */
+const GUIDA=[{"id": "home", "titolo": "Home", "serve": "La giornata in un colpo d’occhio: magazzino, ordini da spedire, vendite, incassi, stage e le cose da fare oggi.", "uso": ["In alto: Magazzino (pezzi ancora da vendere), Ordini (da spedire), Venduti e Incassato di oggi, del mese e dell’anno.", "Stage: i numeri della cancellazione dei PC. «Oggi» o «Mese» cambiano il periodo.", "«Da guardare oggi»: le cose da fare. Toccane una e vai dritto alla pagina giusta. Compaiono solo quando c’è davvero qualcosa da fare.", "«Venduti per sito»: quanti PC si sono venduti questo mese su ogni sito e in azienda."], "parole": [["Incassato", "quello che resta a noi di ogni vendita: prezzo meno commissione del sito, spese e IVA sul margine."], ["Magazzino", "i pezzi dei lotti non ancora venduti."], ["Interrotti", "le cancellazioni che si sono fermate a metà: hanno il loro report per il cliente."]]}, {"id": "mail", "titolo": "Mail", "serve": "Le mail delle caselle della Corporation (vendite, stage, acquisti), divise per cartella, con il tasto giusto per ogni tipo di mail.", "uso": ["A sinistra le cartelle: «In arrivo» le mostra tutte, le altre solo il loro tipo.", "Tocca una mail per aprirla: diventa letta e sotto trovi la risposta già scritta.", "Il tasto principale cambia con la mail: «Apri l’annuncio» per una domanda su un PC (lo trova in Inventario), «Apri l’ordine» per un nuovo ordine (ti dice in che posto è il PC), «Allega il riepilogo di ieri» per la richiesta di Econocom (prepara il riepilogo dell’ultimo giorno di lavoro, poi «Invia»).", "«Rispondi» usa la risposta già scritta, «Inoltra» la manda a un altro indirizzo, «Assegna a un collega» la passa a chi se ne occupa."], "parole": [["Da leggere", "mail non ancora aperte: le conta anche la Home."], ["Riepilogo", "per Econocom: PC formattati e cancellazioni interrotte dell’ultimo giorno in cui lo stage ha lavorato."]]}, {"id": "lotti", "titolo": "Lotti", "serve": "I lotti di PC comprati: quanto sono costati, quanti se ne sono venduti, quanto hanno incassato e se si sono ripagati.", "uso": ["In alto: costo medio per PC, quanto si è investito, quanto si è incassato, quanti pezzi restano da vendere.", "Nella tabella tocca un lotto: la riga diventa grigia. È il lotto scelto.", "«Carica fattura d’acquisto e DDT» mette i documenti nel lotto scelto. Il programma legge i seriali del DDT e li confronta con l’archivio dei PC lavorati: sotto vedi quanti sono stati trovati e l’elenco di quelli da verificare.", "«Excel» scarica il file interno del lotto, con tutte le nostre colonne.", "«CSV» scarica il file per il cliente: solo i PC in vendita e solo le sue colonne. Le nostre (lotto, costo, posti, date) le toglie il programma da solo.", "«Nuovo» apre un lotto: codice, fornitore, data d’acquisto, pezzi nel DDT, costo e strada, poi «Apri»."], "parole": [["Margine", "incassato meno il costo di tutto il lotto. È rosso finché il lotto non si è ripagato."], ["Strada", "come si lavora il lotto. Banco: si formatta allo stage con Certus. Lettura: PC già formattati, al banco si leggono soltanto. Pronto: i dati arrivano dal fornitore."], ["Da verificare", "seriali del DDT che non abbiamo mai lavorato: quando arriva la merce vanno controllati a mano."]]}, {"id": "inv", "titolo": "Inventario", "serve": "Tutti i PC caricati, di tutti i lotti, con i dati dell’Excel: cosa sono, dove sono, quanto costano e a quanto si vendono.", "uso": ["Scegli Marca e Grado: il numero dei PC si aggiorna subito. «Vista» passa dalla tabella alle schede.", "Tocca un PC per aprire la sua scheda: grado, prezzo e siti dove è in vendita. Cambi e premi «Salva»: cambia ovunque, anche sul negozio.", "«Conferma» compare quando il prezzo l’ha messo il magazzino dall’app: lo confermano le Vendite e solo allora il PC va sul nostro sito.", "«Vendi» registra una vendita fatta fuori dal nostro negozio (Back Market, eBay, Refurbed, Subito, Amazon o in azienda): scegli dove, scrivi prezzo, commissione, spese e numero d’ordine, poi «Conferma». Il PC diventa «Venduto», sparisce dagli altri siti e l’ordine arriva in Ordini.", "«Excel» scarica il file interno con tutte le colonne; «CSV» il file per il cliente, solo i PC in vendita e solo le sue colonne, con i filtri di marca e grado."], "parole": [["Da confermare", "prezzo messo dal magazzino che le Vendite devono ancora confermare."], ["Proposto", "il prezzo delle ultime vendite dello stesso modello e grado."], ["Reso", "PC venduto e rimandato indietro dal cliente."], ["Giorni", "da quanti giorni il PC è caricato."], ["Foto", "la foto della casa madre, una per modello. «Mancante» se non c’è ancora."]]}, {"id": "ordini", "titolo": "Ordini", "serve": "Gli ordini dei siti e le vendite registrate a mano, con il posto dove prendere il PC.", "uso": ["Ogni riga: quando, da quale sito, che PC, seriale, posto in magazzino e stato.", "Su un ordine «Da preparare» premi «Etichetta spedizione»: esce l’etichetta del corriere e il programma ti dice in che posto prendere il PC.", "Le vendite fatte in azienda risultano già spedite."], "parole": [["Da preparare", "ordine pagato, il PC è ancora in magazzino."], ["Spedito", "il PC è partito, o è stato consegnato in azienda."], ["Annullato", "ordine annullato dal cliente o dal sito: il PC torna in vendita."]]}, {"id": "stage", "titolo": "Stage Computer", "serve": "Il banco dove si cancellano i dati dei PC con Certus: postazioni, PC ricevuti, formattati e interrotti.", "uso": ["Il banco ha 60 postazioni. Nero: cancellazione finita. Grigio: in corso. Bianco: libera. Rosso: interrotta. Tocca una postazione per vedere a che punto è.", "«Lettura»: i lotti di PC già formattati che al banco si leggono soltanto. Vedi quanti sono letti e caricati e quali sono da guardare (disco guasto, password nel BIOS). «Excel» scarica il file del lotto.", "«Oggi»: ricevuti, formattati e interrotti. «Riscontro giornaliero a Econocom» porta alla mail del riepilogo.", "«Licenze Certus»: quante licenze restano sulla chiavetta. Quando stanno per finire, «Invia la mail già pronta» le richiede."], "parole": [["Interrotta", "la cancellazione si è fermata: il report dell’interruzione è pronto per il cliente."], ["Certificata", "cancellazione finita con il certificato di Certus."], ["Da guardare", "PC letto al banco con un problema da controllare prima di venderlo."]]}, {"id": "stageTel", "titolo": "Stage Cellulari", "serve": "I telefoni dei clienti da resettare e sbloccare, con i ticket.", "uso": ["In alto: quanti telefoni sono arrivati oggi e quanti sono in ogni fase.", "Tocca un filtro, per esempio «Sblocco», per vedere solo quei telefoni.", "I ticket arrivano dal portale del cliente; lo sblocco (account iCloud o Google e MDM) si fa sul loro sistema Habble."], "parole": [["Reset", "il telefono va riportato alle impostazioni di fabbrica."], ["Sblocco", "c’è ancora un account iCloud o Google, o il blocco MDM, da togliere."], ["Ticket", "c’è un ticket aperto sul portale del cliente."], ["Chiuso", "lavoro finito, pronto da riconsegnare."]]}, {"id": "telecamere", "titolo": "Telecamere", "serve": "Le immagini dal vivo del capannone, gli avvisi e la foto salvata a ogni scansione del magazzino. La vede solo la Direzione.", "uso": ["Tocca una telecamera per vederla grande. Le registrazioni restano sul registratore in capannone e si scorrono per ora da lì.", "«Avvisi»: quelli dei giorni che il sistema conserva, dal più recente. «Da guardare» sono quelli da controllare.", "«Foto delle scansioni»: a ogni scansione la telecamera più vicina salva una foto insieme al movimento. Se qualcosa non torna, si apre il movimento e si vede cos’è successo."], "parole": [["Conservazione", "dopo quanti giorni avvisi e foto si cancellano da soli, ogni notte."], ["Rete separata", "le telecamere stanno su una rete loro, staccata da quella degli uffici."]], "regole": ["Le telecamere riprendono anche i dipendenti: servono l’accordo sindacale o l’autorizzazione dell’Ispettorato del lavoro (art. 4 dello Statuto dei lavoratori). Finché non è scritto qui sotto, il programma non accetta né foto né avvisi.", "Si usano solo per la sicurezza del lavoro, la tutela della merce e le esigenze organizzative, non per controllare come lavorano le persone.", "Prima delle zone riprese ci va il cartello, che rimanda all’informativa completa.", "Immagini e avvisi si tengono pochi giorni: oltre le 72 ore va scritto il motivo, per noi la merce di valore in magazzino. Il registratore in capannone va impostato sugli stessi giorni.", "Niente audio. Niente telecamere in bagni, spogliatoi e zone di pausa.", "Le immagini le vede solo la Direzione. Il commercialista vede i numeri, non le immagini.", "Chi è ripreso può chiedere di vedere le sue immagini, finché sono conservate."]}];
+/* GUIDA:fine */
+/* «Chiedi» senza Claude (come cercaGuida di packages/dati/src/guida.ts): le parti della guida con le parole della domanda.
+   Nel programma vero risponde Claude Haiku 5.5. */
+const G_VUOTE=new Set(['come','cosa','dove','quando','quale','quali','perche','della','delle','dello','degli','dei','del','nel','nella','nelle','con','per','una','uno','che','non','sono','gli','fare','faccio','posso','devo','questo','questa','quello','quella','serve','servono','cos','quanti','quanto','quanta','quante','dire','vuol','vuole','significa','ancora','sempre','tutto','tutti']);
+const gNorm=x=>x.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const gParole=x=>gNorm(x).split(/[^a-z0-9]+/).filter(w=>w.length>=3&&!G_VUOTE.has(w));
+const gTrova=(q,ws)=>{const r=q.slice(0,q.length>=7?5:4); return ws.some(w=>w.startsWith(r)||(w.length>=4&&r.startsWith(w)));};
+function cercaGuida(domanda,sezione){const qs=[...new Set(gParole(domanda))];
+  if(!qs.length) return 'Scrivi una parola o una domanda: per esempio «reso», «DDT», «come vendo un PC».';
+  /* punti: le parole trovate; +1 se è la parola spiegata, +0,5 se nomina un tasto che corrisponde, +0,2 se è un passo di «Come si usa», +0,5 se è la sezione aperta */
+  const pezzi=[]; GUIDA.forEach(s=>[{t:s.serve,k:0},...s.uso.map(t=>({t,k:0.2})),...s.parole.map(([a,b])=>({t:`${a}: ${b}`,k:0,voce:a})),...(s.regole||[]).map(t=>({t,k:0}))].forEach(x=>{
+    const ws=gParole(x.t), n=qs.filter(q=>gTrova(q,ws)).length, tasti=gParole((x.t.match(/«[^»]+»/g)||[]).join(' '));
+    if(n) pezzi.push({s,t:x.t,n:n+x.k+(x.voce&&qs.some(q=>gTrova(q,gParole(x.voce)))?1:0)+(qs.some(q=>gTrova(q,tasti))?0.5:0)+(s.id===sezione?0.5:0)});}));
+  if(!pezzi.length) return 'Nella guida non ho trovato niente con queste parole. Prova con un’altra parola, oppure apri la Guida.';
+  const meglio=Math.max(...pezzi.map(p=>p.n)); return pezzi.filter(p=>p.n===meglio).slice(0,3).map(p=>`${p.s.titolo}: ${p.t}`).join('\n\n');}
 const caricatoGg=(gg,h=10,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); while(!lavorativo(d)||d.getTime()>Date.now()){d.setDate(d.getDate()-1); d.setHours(h,m,0,0);} return d;};
 const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(0,0,0,adesso).getTime(), fine=inizio+24*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
 const dtFmt=x=>new Date(x).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','');
@@ -347,7 +375,8 @@ const S = {
   view:'intro',
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false, colliOk:false, accConf:false, firmaOpen:false, firmaImg:null},
-  c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:isoG(0),pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
+  perm:{tipo:'Autorizzazione Ispettorato',data:'2025-06-10',rif:'[riferimento di prova]',giorni:7,apri:false,nTipo:'',nData:'',nRif:'',tempo:'',msg:'',err:''},
+  c:{sec:'home', aiuto:'', chat:[], gq:'', gAperte:{}, cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:isoG(0),pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:600},
@@ -356,7 +385,7 @@ const S = {
 
 const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App Corporation'],['negozio','Negozio online'],['sitoT','Sito Autotrasporti'],['sitoC','Sito Corporation']];
 const T_NAV=[['home','Home'],['anomalie','Anomalie'],['mail','Mail'],['bolle','Bolle'],['traffico','Traffico'],['magazzino','Magazzino'],['giacenze','Giacenze'],['clienti','Clienti'],['portale','Portale'],['fatture','Fatturazione'],['mezzi','Mezzi'],['autisti','Autisti'],['telepass','Telepass'],['satellitare','Satellitare'],['presenze','Presenze'],['telecamere','Telecamere'],['j7','J7']];
-const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari'],['telecamere','Telecamere']];
+const C_NAV=[['home','Home'],['mail','Mail'],['lotti','Lotti'],['inv','Inventario'],['ordini','Ordini'],['stage','Stage Computer'],['stageTel','Stage Cellulari'],['telecamere','Telecamere'],['guida','Guida']];
 
 const LAPTOP='<svg width="84" height="58" viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="10" y="4" width="44" height="28" rx="2"></rect><path d="M2 38h60l-4 4H6z"></path></svg>';
 const SEARCH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>';
@@ -369,7 +398,7 @@ const badge=n=>n>0?`<span class="badge">${n}</span>`:'';
 const warn=t=>`<div class="warn">${t}</div>`;
 const warnW=(w,n)=>`<div class="warn row" style="gap:0">${w}${badge(n)}</div>`;
 const pill=(t,c)=>`<span class="pill ${c||''}">${t}</span>`;
-const srch=(ph,id)=>`<label class="search">${SEARCH}<span class="sr">Cerca</span><input id="${id}" placeholder="${ph}"></label>`;
+const srch=(ph,id,val)=>`<label class="search">${SEARCH}<span class="sr">Cerca</span><input id="${id}" placeholder="${ph}"${val?` value="${val}"`:''}></label>`;
 const msg=(text,btnLabel,act,arg)=>`<div class="msg"><span>${text}</span>${btnLabel?b(btnLabel,act,arg,'sm'):''}</div>`;
 
 /* ---------- DATI ---------- */
@@ -827,6 +856,39 @@ function schedaPC(){const sc=S.c.sch, d=pcInventario().find(x=>x.sn===sc.sn); if
     ${sc.msg?msg(sc.msg):''}${sc.err?`<div class="warn">${sc.err}</div>`:''}
     <div class="row">${!venduto&&d.stato!=='Reso'&&d.stato!=='Fermo'?b('Salva','sSalva'):''}${daConf?b('Conferma','sConferma'):''}${d.stato==='Disponibile'&&!sc.apri?b('Vendi','sApri','vendi','ghost'):''}${b('Chiudi','sChiudi','','ghost')}</div>
   </div>`;}
+/* Guida e Chiedi (come apps/gestionale/src/guida.tsx): due tasti accanto al titolo di ogni sezione, nella Guida generale solo «Chiedi» */
+const LIBRO='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.5h6a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H4zM20 4.5h-6a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2h6z"/></svg>';
+const FUMETTO='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01" stroke-width="2.6" stroke-linecap="round"/></svg>';
+const gEsc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function aiutiHtml(sez){const g=sez!=='guida'&&GUIDA.find(x=>x.id===sez), a=S.c.aiuto;
+  return `<span class="aiuti">${g?`<button type="button" class="aiuto ${a==='guida'?'on':''}" data-act="aiApri" data-arg="guida">${LIBRO}Guida</button>`:''}<button type="button" class="aiuto ${a==='chiedi'?'on':''}" data-act="aiApri" data-arg="chiedi">${FUMETTO}Chiedi</button></span>`;}
+/* il permesso (art. 4) e i giorni di conservazione delle telecamere: come apps/gestionale/src/permesso.tsx */
+function permessoHtml(){const p=S.perm, d=x=>new Date(x+'T12:00:00').toLocaleDateString('it-IT');
+  return `<div class="glass card stack" style="gap:8px">
+    <div class="row between"><span><b>${p.tipo}</b> del ${d(p.data)} · ${gEsc(p.rif)}</span>${!p.apri?b('Cambia','pApri','','ghost sm'):''}</div>
+    ${p.apri?`<div class="stack" style="gap:8px"><div class="row">${['Accordo sindacale','Autorizzazione Ispettorato'].map(x=>chip(x,'pTipo',x,p.nTipo===x)).join('')}</div>
+      <div class="row" style="align-items:flex-end"><label class="field"><span class="lbl">Data</span><input class="input" type="date" value="${p.nData}" data-perm="nData"></label><label class="field"><span class="lbl">Riferimento</span><input class="input" style="max-width:220px" value="${gEsc(p.nRif)}" data-perm="nRif"></label>${b('Salva','pSalva')}${b('Annulla','pAnnulla','','ghost')}</div></div>`:''}
+    <div class="row" style="align-items:center"><span class="lbl">Foto: ${p.giorni?`si cancellano dopo ${p.giorni} giorni`:'non si cancellano'}</span><input class="input" style="max-width:90px" inputmode="numeric" aria-label="Dopo quanti giorni" placeholder="giorni" value="${p.tempo}" data-perm="tempo">${b('Salva','pTempo','','ghost sm')}</div>
+    ${p.msg?msg(p.msg):''}${p.err?`<div class="warn">${p.err}</div>`:''}
+  </div>`;}
+function testoSezione(g,conServe){return `${conServe?`<div class="stack" style="gap:6px"><b>A cosa serve</b><div>${g.serve}</div></div>`:''}
+  <div class="stack" style="gap:6px"><b>Come si usa</b><ol class="passi">${g.uso.map(x=>`<li>${x}</li>`).join('')}</ol></div>
+  <div class="stack" style="gap:6px"><b>Parole</b><div class="stack" style="gap:4px">${g.parole.map(([t,d])=>`<div><b>${t}</b>: ${d}</div>`).join('')}</div></div>
+  ${g.regole?`<div class="stack" style="gap:6px"><b>Regole</b><ul class="passi">${g.regole.map(x=>`<li>${x}</li>`).join('')}</ul></div>`:''}
+  ${g.id==='telecamere'?permessoHtml():''}`;}
+function pannelloAiuto(sez){const a=S.c.aiuto; if(!a) return '';
+  const testa=t=>`<div class="row between"><h3 style="font-size:20px">${t}</h3>${b('Chiudi','aiApri',a,'ghost sm')}</div>`;
+  if(a==='guida'){const g=GUIDA.find(x=>x.id===sez); if(!g) return '';
+    return `<div class="glass card stack pannello" role="dialog" aria-label="${g.titolo}">${testa(g.titolo)}${testoSezione(g,true)}<div class="row">${b('Apri la guida completa','aiCompleta',sez,'ghost')}</div></div>`;}
+  const chat=S.c.chat;
+  return `<div class="glass card stack pannello" role="dialog" aria-label="Chiedi">${testa('Chiedi')}
+    ${chat.length?`<div class="stack" style="gap:10px">${chat.map(m=>`<div class="bolla ${m.ruolo==='io'?'io':''}">${gEsc(m.testo)}</div>`).join('')}</div>`:''}
+    <div class="row" style="flex-wrap:nowrap"><input class="input" id="chiediIn" style="flex:1;min-width:0" placeholder="Scrivi una parola o una domanda" enterkeyhint="send" aria-label="Domanda">${bOff('Invia','aiInvia',false,'sm')}</div></div>`;}
+/* la Guida generale: una scheda per sezione; «Cerca» in alto cerca nella guida */
+function guidaLista(){const q=gNorm(S.c.gq.trim()), testo=g=>gNorm([g.titolo,g.serve,...g.uso,...g.parole.flat(),...(g.regole||[])].join(' '));
+  const lista=GUIDA.filter(g=>C_NAV.some(n=>n[0]===g.id)&&(!q||testo(g).includes(q)));
+  if(!lista.length) return `<div class="glass card lbl">Nessuna parte della guida contiene «${gEsc(S.c.gq.trim())}».</div>`;
+  return lista.map(g=>{const on=!!q||!!S.c.gAperte[g.id]; return `<div class="glass card stack" style="gap:10px"><button type="button" class="guida-tit" aria-expanded="${on}" data-act="gTog" data-arg="${g.id}"><b style="font-size:18px">${g.titolo}</b><span class="lbl">${on?'▲':'▼'}</span></button><div>${g.serve}</div>${on?testoSezione(g,false):''}</div>`;}).join('');}
 /* Inventario: i PC caricati, di tutti i lotti */
 const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:SITI_V.includes(o[1])?o[1]:''},n?{price:n.prezzo}:{});};
 /* le modifiche fatte dalla scheda del PC (grado, prezzo, siti, fermo, rimesso in vendita): valgono ovunque */
@@ -949,7 +1011,7 @@ const A={
   noop:()=>{},
   view:v=>{S.view=v; window.scrollTo(0,0);},
   tGo:s=>{S.view='trasp'; S.t.sec=s; S.t.giroSel=null; S.t.mailMsg=''; S.t.reply=false; S.t.bollaMsg=''; if(s==='clienti') S.t.cliente=null; if(s==='anomalie') S.t.anSez=null; window.scrollTo(0,0);},
-  cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; S.c.sch=null; window.scrollTo(0,0);},
+  cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; S.c.sch=null; S.c.aiuto=''; S.c.chat=[]; S.c.gq=''; if(s==='guida') S.c.gAperte={}; window.scrollTo(0,0);},
   /* trasporti */
   tCart:c=>{S.t.cart=c; S.t.mailMsg=''; S.t.reply=false; const f=T_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.t.mail=f;},
   tMail:i=>{S.t.mail=+i; S.t.mailMsg=''; S.t.reply=false;},
@@ -1061,6 +1123,18 @@ const A={
   cFwd:()=>{S.c.mailMsg='inoltrata'; S.c.reply=false;},
   cAssign:()=>{S.c.mailMsg='assegnata'; S.c.reply=false;},
   cVista:v=>{S.c.vista=v;},
+  aiApri:x=>{S.c.aiuto=S.c.aiuto===x?'':x;},
+  aiCompleta:sez=>{S.c.aiuto=''; S.c.sec='guida'; S.c.gq=''; S.c.gAperte={[sez]:true}; S.c.chat=[]; window.scrollTo(0,0);},
+  aiInvia:()=>{const el=document.getElementById('chiediIn'), d=el?el.value.trim():''; if(!d) return; S.c.chat=S.c.chat.concat([{ruolo:'io',testo:d},{ruolo:'claude',testo:cercaGuida(d,S.c.sec==='guida'?'':S.c.sec)}]);},
+  gTog:id=>{S.c.gAperte=Object.assign({},S.c.gAperte,{[id]:!S.c.gAperte[id]});},
+  pApri:()=>{const p=S.perm; p.apri=true; p.nTipo=p.tipo; p.nData=p.data; p.nRif=p.rif; p.msg=''; p.err='';},
+  pTipo:x=>{S.perm.nTipo=x;},
+  pAnnulla:()=>{S.perm.apri=false; S.perm.err='';},
+  pSalva:()=>{const p=S.perm; p.err='';
+    if(!p.nData||p.nData>isoG(0)){p.err='Scrivi la data del documento'; return;} if(!p.nRif.trim()){p.err='Scrivi il riferimento (protocollo o numero)'; return;}
+    p.tipo=p.nTipo; p.data=p.nData; p.rif=p.nRif.trim(); p.apri=false; p.msg='Scritto: da ora si raccolgono i dati.';},
+  pTempo:()=>{const p=S.perm, t=p.tempo.trim(), v=t===''?null:Number(t); p.err='';
+    if(v!==null&&!(v>=1&&v<=365)){p.err='Foto: da 1 a 365 giorni'; return;} p.giorni=v; p.tempo=''; p.msg=v?`Si cancellano dopo ${v} giorni.`:'Non si cancella niente.';},
   cInvApri:sn=>{if(S.c.sch&&S.c.sch.sn===sn) return; const d=pcInventario().find(x=>x.sn===sn); if(!d) return;
     S.c.sch={sn,g:d.grade||'B',p:d.price!=null?String(d.price):'',siti:String(d.siti||'').split(', ').filter(x=>SITI_V.includes(x)),apri:'',canale:'eBay',prezzo:d.price!=null?String(d.price):'',comm:'',spese:'',rif:'',motivo:'',bancale:d.banc||'',msg:'',err:''};},
   sChiudi:()=>{S.c.sch=null;},
@@ -1441,10 +1515,11 @@ function satellitare(t){
 
 /* telecamere: una sola sezione per tutto il capannone, visibile solo alla Direzione */
 const CAM=['Ingresso','Piazzale','Baie di carico','Corsia S03','Corsia S07','Stage'];
-/* avvisi: quelli che il sistema conserva (gli ultimi CONSERVA_GIORNI giorni), a qualsiasi ora, dal più recente; i più vecchi li cancella la pulizia di ogni notte */
-const CAM_AVVISI=[[giorniFa(0,2,14),'Piazzale','Persona vicino al cancello con l’allarme inserito','red'],[giorniFa(0,3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(7,30),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok'],
+/* avvisi: quelli che il sistema conserva (gli ultimi giorni scelti dalla Direzione), a qualsiasi ora, dal più recente; i più vecchi li cancella la pulizia di ogni notte */
+const CAM_AVVISI_TUTTI=[[giorniFa(0,2,14),'Piazzale','Persona vicino al cancello con l’allarme inserito','red'],[giorniFa(0,3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(7,30),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok'],
   [giorniFa(4,1,12),'Piazzale','Animale nel piazzale, nessun intervento','ok'],[ultimaLav(19,55,3),'Ingresso','Chiusura del magazzino: Magazziniere 2, badge regolare','ok']]
-  .filter(a=>a[0].getTime()>=Date.now()-CONSERVA_GIORNI*86400000).sort((x,y)=>y[0]-x[0]).map(a=>[quandoH((Date.now()-a[0].getTime())/3600000)].concat(a.slice(1)));
+  ;
+const camAvvisi=()=>CAM_AVVISI_TUTTI.filter(a=>!consGiorni()||a[0].getTime()>=Date.now()-consGiorni()*86400000).sort((x,y)=>y[0]-x[0]).map(a=>[quandoH((Date.now()-a[0].getTime())/3600000)].concat(a.slice(1)));
 /* le scansioni di stamattina sono gli stessi bancali della pianta: B-0128 lascia S03-2-1 per S03-2-2, poi in S03-2-1 entra B-0127 */
 const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[7,34],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,42],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,55],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
 function telecamere(t){
@@ -1454,7 +1529,7 @@ function telecamere(t){
     <div class="camgrid">${CAM.map(vivo).join('')}</div>
     ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div></div>`:''}
     <div class="row" style="align-items:flex-start;gap:16px">
-      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso.</div>'}</div></div>
+      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi</b><div class="list">${camAvvisi().length?camAvvisi().map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso.</div>'}</div></div>
       <div class="glass tbox" style="flex:2 1 520px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Foto delle scansioni</div><table class="t nw"><thead><tr><th>Cosa</th><th>Posto</th><th>Movimento</th><th>Chi</th><th>Ora</th><th>Telecamera</th><th></th></tr></thead><tbody>
         ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${quandoH(oreDa(r[4][0],r[4][1]))}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
       </tbody></table></div>
@@ -1561,14 +1636,14 @@ function intro(){
 
 const oggiLungo=()=>{const t=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return t[0].toUpperCase()+t.slice(1);};
 const meseOra=()=>{const m=new Date().toLocaleDateString('it-IT',{month:'long'});return m[0].toUpperCase()+m.slice(1);};
-function shell(company,navList,cur,act,title,body,searchPh){
+function shell(company,navList,cur,act,title,body,searchPh,aiuti){
   return `<div class="gest">
     <nav class="side glass" aria-label="Sezioni ${company}">
       <div class="co"><b>MESSINA</b><span class="lbl">${company}</span></div>
       ${navList.map(n=>`<button class="nav ${cur===n[0]?'on':''}" data-act="${act}" data-arg="${n[0]}">${n[1]}</button>`).join('')}
     </nav>
     <div class="content">
-      <div class="chead"><div><div class="lbl">${oggiLungo()} · ${company}</div><h2>${title}</h2></div><div class="row">${srch('Cerca','s-'+act)}</div></div>
+      <div class="chead"><div><div class="lbl">${oggiLungo()} · ${company}</div>${aiuti?`<div class="trow"><h2>${title}</h2>${aiuti}</div>`:`<h2>${title}</h2>`}</div><div class="row">${srch('Cerca','s-'+act,act==='cGo'&&S.c.sec==='guida'?gEsc(S.c.gq):'')}</div></div>
       ${body}
     </div></div>`;
 }
@@ -1944,7 +2019,7 @@ function trasp(){
     </div>`:''}`;
   }
   if(s==='satellitare'){ title='Satellitare'; hintTxt='tocca un autista: vedi il giro previsto e il percorso fatto, con le deviazioni e le soste da guardare.'; body=satellitare(t); }
-  if(s==='telecamere'){ title='Telecamere'; hintTxt='tocca una telecamera per vederla grande. Sotto: gli avvisi degli ultimi '+CONSERVA_GIORNI+' giorni (i più vecchi si cancellano da soli, per la privacy) e la foto salvata a ogni scansione del magazzino.'; body=telecamere(t); }
+  if(s==='telecamere'){ title='Telecamere'; hintTxt='tocca una telecamera per vederla grande. Sotto: gli avvisi degli ultimi giorni conservati (i più vecchi si cancellano da soli, per la privacy) e la foto salvata a ogni scansione del magazzino. Le regole e i giorni sono nella «Guida» della sezione.'; body=telecamere(t); }
   if(s==='mezzi'){
     title='Mezzi'; hintTxt='tocca un tipo di mezzo. Nella colonna Autista scegli l’autista fisso del mezzo: giri, Telepass e satellitare si collegano a lui.';
     const tipi=[['Sprinter','Sprinter'],['Furgone','Furgoni'],['Motrice','Motrici'],['Tre assi','Tre assi'],['Bilico','Bilici']];
@@ -2070,7 +2145,7 @@ function corp(){
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}</div>`;
   }
   if(s==='inv'){
-    title='Inventario'; hintTxt='scegli marca e grado: il numero dei PC si aggiorna subito. Proposta: la tabella ha le stesse colonne dell’Excel; «Excel» scarica il file interno, «CSV» il file per il cliente (solo i PC in vendita, senza lotto, costo e posti). La foto è quella della casa madre, una per modello.';
+    title='Inventario'; hintTxt='scegli marca e grado: il numero dei PC si aggiorna subito. Tocca un PC per aprire la sua scheda. Come funziona tutto: tasto «Guida» accanto al titolo.';
     const list=invFiltrati();
     const segb=(lab,act,arg,on)=>`<button class="${on?'on':''}" data-act="${act}" data-arg="${arg}">${lab}</button>`;
     const DL='<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>';
@@ -2154,7 +2229,8 @@ function corp(){
 `;
   }
   if(s==='telecamere'){ title='Telecamere'; hintTxt='la stessa sezione del gestionale Autotrasporti: il capannone è uno solo.'; body=telecamere(S.t); }
-  return hint(hintTxt)+shell('Corporation',C_NAV,s,'cGo',title,body,'Cerca');
+  if(s==='guida'){ title='Guida'; hintTxt='tocca una sezione per aprirla; scrivi una parola in «Cerca» per trovarla nella guida; «Chiedi» risponde alle domande.'; body=`<div class="stack" id="guidaLista" style="gap:16px">${guidaLista()}</div>`; }
+  return hint(hintTxt)+shell('Corporation',C_NAV,s,'cGo',title,body,'Cerca',aiutiHtml(s))+pannelloAiuto(s);
 }
 
 function autistiApp(){
@@ -2585,6 +2661,11 @@ function analizzaFoto(file){
   document.addEventListener('pointerup',e=>{const c=e.target; if(!disegna)return; disegna=false; if(c.id==='firmaPad'){S.a.firmaImg=c.toDataURL('image/png'); const k=document.querySelector('[data-act="aFirmaOk"]'); if(k){k.disabled=false; k.removeAttribute('style'); k.style.flex='1';}}});
 })();
 /* proposta 23/11: i campi del nuovo lotto (si scrive senza ridisegnare; «Apri» si accende quando è tutto compilato) */
+document.addEventListener('input',e=>{const t=e.target;
+  if(t.id==='chiediIn'){const bt=document.querySelector('button[data-act="aiInvia"]'), ok=!!t.value.trim(); if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';} return;}
+  if(t.dataset&&t.dataset.perm){S.perm[t.dataset.perm]=t.value; return;}
+  if(t.id==='s-cGo'&&S.view==='corp'&&S.c.sec==='guida'){S.c.gq=t.value; const l=document.getElementById('guidaLista'); if(l) l.innerHTML=guidaLista(); return;}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='chiediIn'&&e.target.value.trim()){e.preventDefault(); A.aiInvia(); render(); const el=document.getElementById('chiediIn'); if(el) el.focus();}});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sch; if(!k||!S.c.sch) return;
   if(k==='bancale') e.target.value=e.target.value.toUpperCase(); S.c.sch[k]=e.target.value;
   const sc=S.c.sch, ok={sVendi:numIt(sc.prezzo)>0};
