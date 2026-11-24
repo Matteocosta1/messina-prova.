@@ -797,11 +797,44 @@ function pcLetti(){
       grade:car?d.grado:'',dif:car?d.dif:'',lotto:'L-016',costo:150,price:car?d.prezzo:null,stato:car?'Disponibile':'',siti:car?d.siti:'',gg:car?0:null,banc:car?d.banc:'',shelf:car?d.shelf:'',
       post:l.post,letto,car:car?dtFmt(Date.now()):'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
 }
+/* scheda del PC (come Scheda del programma): si apre toccando una riga o una scheda dell'Inventario.
+   Grado, prezzo e siti si cambiano qui; conferma del prezzo, vendita, fermo e «rimetti in vendita» come le funzioni del database.
+   Chi la usa è Vendite: se cambia il prezzo, il prezzo è già confermato. */
+const SITI_V=['Sito','Back Market','Refurbed','eBay','Subito','Amazon'];
+const PREZZI_MOD={'ThinkPad T14 Gen 2|A':289,'ThinkPad T14 Gen 2|B':249,'ThinkPad T14 Gen 2|C':209};
+const prezzoProposto=(model,grade)=>{if(!model||!grade) return null; const k=PREZZI_MOD[model+'|'+grade]; if(k!=null) return k;
+  const v=pcInventario().filter(d=>d.stato==='Venduto'&&d.model===model&&d.grade===grade&&d.price!=null).slice(0,10); return v.length?Math.round(v.reduce((a,d)=>a+d.price,0)/v.length):null;};
+const numIt=v=>String(v).trim()===''?0:Number(String(v).replace(',','.'));
+const bOff=(label,act,ok,cls)=>`<button class="btn ${cls||''}" data-act="${act}" data-arg="" ${ok?'':'disabled style="opacity:.35;cursor:not-allowed"'}>${label}</button>`;
+function schedaPC(){const sc=S.c.sch, d=pcInventario().find(x=>x.sn===sc.sn); if(!d) return '';
+  const venduto=d.stato==='Venduto', daConf=!venduto&&d.price!=null&&d.conf===false, prop=prezzoProposto(d.model,d.grade);
+  const vOk=numIt(sc.prezzo)>0, fOk=!!sc.motivo.trim(), rOk=!!sc.bancale.trim()&&sc.p!=='';
+  return `<div class="glass card stack">
+    <div class="row between"><h3 style="font-size:20px">${d.brand} ${d.model}</h3><span class="lbl">Seriale ${d.sn} · ${d.stato}</span></div>
+    <div class="row"><b style="width:70px">Grado</b>${['A','B','C','D'].map(x=>chip(x,'sG',x,sc.g===x)).join('')}</div>
+    <label class="row"><b style="width:70px">Prezzo</b><input class="input" style="max-width:160px" inputmode="decimal" value="${sc.p}" data-sch="p" ${venduto?'disabled':''}>${prop!=null?`<span class="lbl">proposto ${fEur(prop)}</span>`:''}${daConf?pill('Da confermare','red'):''}</label>
+    <div class="row"><b style="width:70px">Siti</b>${SITI_V.map(x=>chip(x,'sSito',x,sc.siti.includes(x))).join('')}</div>
+    ${sc.apri==='vendi'?`<div class="stack" style="gap:8px">
+      <div class="row">${SITI_V.concat(['Azienda']).map(x=>chip(x,'sCanale',x,sc.canale===x)).join('')}</div>
+      <div class="row" style="align-items:flex-end">
+        <label class="field"><span class="lbl">Prezzo €</span><input class="input" style="max-width:110px" inputmode="decimal" value="${sc.prezzo}" data-sch="prezzo"></label>
+        <label class="field"><span class="lbl">Commissione €</span><input class="input" style="max-width:110px" inputmode="decimal" value="${sc.comm}" data-sch="comm"></label>
+        <label class="field"><span class="lbl">Spese €</span><input class="input" style="max-width:110px" inputmode="decimal" value="${sc.spese}" data-sch="spese"></label>
+        <label class="field"><span class="lbl">N. ordine</span><input class="input" style="max-width:140px" value="${sc.rif}" data-sch="rif"></label>
+      </div>
+      <div class="row">${bOff('Conferma','sVendi',vOk)}${b('Annulla','sAnnulla','','ghost')}</div></div>`:''}
+    ${sc.apri==='fermo'?`<div class="row"><input class="input" style="max-width:320px" placeholder="Perché è fermo" value="${sc.motivo}" data-sch="motivo">${bOff('Conferma','sFermo',fOk)}${b('Annulla','sAnnulla','','ghost')}</div>`:''}
+    ${sc.apri==='rimetti'?`<div class="row"><input class="input" style="max-width:200px" placeholder="Bancale" value="${sc.bancale}" data-sch="bancale">${bOff('Conferma','sRimetti',rOk)}${b('Annulla','sAnnulla','','ghost')}</div>`:''}
+    ${sc.msg?msg(sc.msg):''}${sc.err?`<div class="warn">${sc.err}</div>`:''}
+    <div class="row">${!venduto&&d.stato!=='Reso'&&d.stato!=='Fermo'?b('Salva','sSalva'):''}${daConf?b('Conferma','sConferma'):''}${d.stato==='Disponibile'&&!sc.apri?b('Vendi','sApri','vendi','ghost'):''}${(d.stato==='Reso'||d.stato==='Fermo')&&!sc.apri?b('Rimetti','sApri','rimetti'):''}${!venduto&&d.stato!=='Fermo'&&!sc.apri?b('Fermo','sApri','fermo','ghost'):''}${b('Chiudi','sChiudi','','ghost')}</div>
+  </div>`;}
 /* Inventario: i PC caricati, di tutti i lotti */
-const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:o[1]},n?{price:n.prezzo}:{});};
+const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:SITI_V.includes(o[1])?o[1]:''},n?{price:n.prezzo}:{});};
+/* le modifiche fatte dalla scheda del PC (grado, prezzo, siti, fermo, rimesso in vendita): valgono ovunque */
+const conMod=d=>S.c.mod&&S.c.mod[d.sn]?Object.assign({},d,S.c.mod[d.sn]):d;
 /* i PC formattati caricati dall'app nella prova (lotto L-015) */
 const pcApp=()=>(S.c.carApp||[]).map(x=>({brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:5200,bat:87,cicli:240,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:x.grade,dif:x.dif,lotto:'L-015',costo:60,price:x.price,stato:'Disponibile',siti:x.siti,gg:0,banc:x.banc,shelf:x.shelf,post:'',letto:'',car:oggiIt(),foto:'lenovo-20w000auix.jpg',sn:x.sn}));
-const pcInventario=()=>DEVICES.map(vendita).concat(pcLetti().filter(d=>d.caricato&&!DEVICES.some(x=>x.sn===d.sn))).concat(pcApp());
+const pcInventario=()=>DEVICES.map(conMod).map(vendita).concat(pcLetti().filter(d=>d.caricato&&!DEVICES.some(x=>x.sn===d.sn)).map(conMod)).concat(pcApp().map(conMod));
 /* dal più recente (data di carico), a parità per seriale: come public.inventario() del programma */
 const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado))
   .map(d=>Object.assign({},d,{_t:d.carMs||Date.now()})).sort((a,b)=>(b._t-a._t)||String(a.sn).localeCompare(String(b.sn)));
@@ -917,7 +950,7 @@ const A={
   noop:()=>{},
   view:v=>{S.view=v; window.scrollTo(0,0);},
   tGo:s=>{S.view='trasp'; S.t.sec=s; S.t.giroSel=null; S.t.mailMsg=''; S.t.reply=false; S.t.bollaMsg=''; if(s==='clienti') S.t.cliente=null; if(s==='anomalie') S.t.anSez=null; window.scrollTo(0,0);},
-  cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; window.scrollTo(0,0);},
+  cGo:s=>{S.view='corp'; S.c.sec=s; S.c.mailMsg=''; S.c.reply=false; S.c.ordMsg=''; S.c.sch=null; window.scrollTo(0,0);},
   /* trasporti */
   tCart:c=>{S.t.cart=c; S.t.mailMsg=''; S.t.reply=false; const f=T_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.t.mail=f;},
   tMail:i=>{S.t.mail=+i; S.t.mailMsg=''; S.t.reply=false;},
@@ -1029,6 +1062,36 @@ const A={
   cFwd:()=>{S.c.mailMsg='inoltrata'; S.c.reply=false;},
   cAssign:()=>{S.c.mailMsg='assegnata'; S.c.reply=false;},
   cVista:v=>{S.c.vista=v;},
+  cInvApri:sn=>{if(S.c.sch&&S.c.sch.sn===sn) return; const d=pcInventario().find(x=>x.sn===sn); if(!d) return;
+    S.c.sch={sn,g:d.grade||'B',p:d.price!=null?String(d.price):'',siti:String(d.siti||'').split(', ').filter(x=>SITI_V.includes(x)),apri:'',canale:'eBay',prezzo:d.price!=null?String(d.price):'',comm:'',spese:'',rif:'',motivo:'',bancale:d.banc||'',msg:'',err:''};},
+  sChiudi:()=>{S.c.sch=null;},
+  sG:x=>{const d=pcInventario().find(y=>y.sn===S.c.sch.sn); if(d&&d.stato!=='Venduto') S.c.sch.g=x;},
+  sSito:x=>{const d=pcInventario().find(y=>y.sn===S.c.sch.sn), sc=S.c.sch; if(!d||d.stato==='Venduto'||d.stato==='Reso'||d.stato==='Fermo') return; sc.siti=sc.siti.includes(x)?sc.siti.filter(y=>y!==x):sc.siti.concat([x]);},
+  sCanale:x=>{S.c.sch.canale=x;},
+  sApri:x=>{S.c.sch.apri=x; S.c.sch.msg=''; S.c.sch.err='';},
+  sAnnulla:()=>{S.c.sch.apri=''; S.c.sch.err='';},
+  sSalva:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn); sc.err=''; if(!d) return;
+    if(d.stato==='Disponibile'&&(sc.p===''||!sc.g)){sc.err='Servono grado e prezzo'; return;}
+    const prezzo=sc.p===''?null:numIt(sc.p), m=Object.assign({},(S.c.mod||{})[sc.sn]);
+    if(prezzo!==d.price) m.conf=true;   /* il prezzo cambiato dalle Vendite è già confermato, come il programma */
+    m.grade=sc.g; m.price=prezzo; m.siti=SITI_V.filter(x=>sc.siti.includes(x)).join(', ');
+    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:m}); sc.msg='Salvato: il prezzo e i siti sono aggiornati ovunque.';},
+  sConferma:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn); if(!d||d.price==null) return;
+    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:Object.assign({},(S.c.mod||{})[sc.sn],{conf:true})}); sc.msg=`Prezzo di ${fEur(d.price)} confermato: ora il PC si vede anche sul sito.`;},
+  sVendi:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn), pr=numIt(sc.prezzo); sc.err=''; if(!d||!(pr>0)) return;
+    if(d.stato!=='Disponibile'){sc.err=`Il PC ${d.sn} è «${d.stato}»: non si può vendere`; return;}
+    ORDINI.unshift([ora(),sc.canale,d.brand,d.model,d.grade,d.sn,d.shelf,sc.canale==='Azienda'?'Spedito':'Da preparare']);
+    S.c.vn=(S.c.vn||[]).concat([{sn:d.sn,lotto:d.lotto,prezzo:pr,netto:nettoVendita(pr,numIt(sc.comm)+numIt(sc.spese),d.costo),sito:sc.canale,banc:d.banc,shelf:d.shelf}]);
+    if(sc.canale==='Azienda') S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:Object.assign({},(S.c.mod||{})[sc.sn],{uscito:true})});
+    sc.apri=''; sc.msg=`Venduto su ${sc.canale}: tolto dagli altri siti, l’ordine è in Ordini.`;},
+  sFermo:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn); sc.err=''; if(!d||!sc.motivo.trim()) return;
+    if(d.stato==='Venduto'){sc.err='Questo PC non si può fermare'; return;}
+    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:Object.assign({},(S.c.mod||{})[sc.sn],{stato:'Fermo',siti:''})}); sc.apri=''; sc.motivo=''; sc.msg='PC fermo: tolto da tutti i siti.';},
+  sRimetti:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn), cod=sc.bancale.trim(); sc.err=''; if(!d||!cod||sc.p==='') return;
+    if(d.stato!=='Reso'&&d.stato!=='Fermo'){sc.err='Si rimette in vendita solo un PC reso o fermo'; return;}
+    const bk=MAG.find(m=>m[3]===cod); if(!bk){sc.err=`Bancale ${cod} non trovato: scansiona l'etichetta del bancale dove lo metti`; return;}
+    const m=Object.assign({},(S.c.mod||{})[sc.sn],{stato:'Disponibile',banc:bk[3],shelf:bk[0],uscito:false}), pr=numIt(sc.p); if(pr!==d.price) m.conf=true; m.price=pr;
+    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:m}); sc.apri=''; sc.msg='Di nuovo disponibile: scegli i siti e premi «Salva».';},
   cPer:v=>{S.c.per=v;},
   cBrand:v=>{S.c.brand=v;S.c.invMsg='';},
   cGrado:v=>{S.c.grado=v;S.c.invMsg='';},
@@ -1395,14 +1458,14 @@ const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[7,34],'Corsi
 function telecamere(t){
   const ora0=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const vivo=(n,i)=>`<button class="tcam ${t.camSel===i?'on':''}" data-act="camSel" data-arg="${i}"><span class="cam-img" aria-hidden="true"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${n}</span><span class="cam-ora">${ora0}</span></button>`;
-  return `<div class="glass card row between" style="padding:12px 16px"><span><b>Visibile solo alla Direzione</b> <span class="lbl">Tiziano, Sara, Matteo e Pierpaolo. Il commercialista vede i numeri, non le immagini.</span></span>${pill('Rete separata','dark')}</div>
+  return `<div class="glass card row between" style="padding:12px 16px"><span><b>Visibile solo alla Direzione</b></span>${pill('Rete separata','dark')}</div>
     <div class="camgrid">${CAM.map(vivo).join('')}</div>
-    ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div><div class="lbl">Registrazione degli ultimi ${CONSERVA_GIORNI} giorni sul registratore in capannone: si scorre per ora.</div></div>`:''}
+    ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div></div>`:''}
     <div class="row" style="align-items:flex-start;gap:16px">
-      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso.</div>'}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
+      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso.</div>'}</div></div>
       <div class="glass tbox" style="flex:2 1 520px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Foto delle scansioni</div><table class="t nw"><thead><tr><th>Cosa</th><th>Posto</th><th>Movimento</th><th>Chi</th><th>Ora</th><th>Telecamera</th><th></th></tr></thead><tbody>
         ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${quandoH(oreDa(r[4][0],r[4][1]))}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
-      </tbody></table><p class="lbl" style="margin:0;padding:0 14px 14px">A ogni scansione la telecamera più vicina salva una foto insieme al movimento: se qualcosa non torna, si apre il movimento e si vede cos’è successo.</p></div>
+      </tbody></table></div>
     </div>`;
 }
 
@@ -1956,7 +2019,7 @@ function corp(){
     const nMail=C_MAILS.filter((m,i)=>m.nuova&&!(c.lette||{})[i]).length;
     if(nMail) guarda.push([conta(nMail,'1 mail da leggere','mail da leggere'),'mail','Mail',false]);
     const inVendita=968-vn.length+(c.carApp||[]).filter(x=>x.siti).length+(S.k.lettFatto&&Object.keys(S.k.canali).some(x=>S.k.canali[x])?1:0);
-    const can=[['Back Market',62],['Azienda',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2+vn.length]].sort((a,b)=>b[1]-a[1]);
+    const can=[['Back Market',62],['Azienda',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2],['Amazon',0]].map(x=>[x[0],x[1]+vn.filter(v=>v.sito===x[0]).length]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
     const maxCan=Math.max(...can.map(x=>x[1]));
     const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],[meseOra(),v[1]],[String(new Date().getFullYear()),v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
     body=`<div class="kpi">
@@ -2012,7 +2075,7 @@ function corp(){
     </tbody></table></div>
     ${c.ordMsg==='ddt'?(d=>msg(`Fattura e DDT caricati nel lotto ${c.ddtLotto}: ${fNum(d.lavorati)} seriali trovati nell’archivio dei PC lavorati, ${fNum(d.da_verificare)} da verificare.`)
       +(d.seriali.length?`<div class="row" style="gap:6px"><span class="lbl">Da verificare</span>${d.seriali.slice(0,VERIF_MAX).map(x=>pill(x,'red')).join('')}${d.seriali.length>VERIF_MAX?`<span class="lbl">e altri ${fNum(d.seriali.length-VERIF_MAX)}</span>`:''}</div>`:''))(ddtDi(c.ddtLotto)):''}
-    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Nel lotto <b style="color:var(--ink)">${lottoScelto()[0]}</b>: il programma confronta i seriali del DDT con l’archivio dei PC lavorati. Tocca un altro lotto per cambiarlo.</span></div>`;
+    <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}</div>`;
   }
   if(s==='inv'){
     title='Inventario'; hintTxt='scegli marca e grado: il numero dei PC si aggiorna subito. Proposta: la tabella ha le stesse colonne dell’Excel; «Excel» scarica il file interno, «CSV» il file per il cliente (solo i PC in vendita, senza lotto, costo e posti). La foto è quella della casa madre, una per modello.';
@@ -2031,7 +2094,7 @@ function corp(){
     const eur=n=>n===null||n===undefined?'—':'€ '+n.toLocaleString('it-IT');
     const st=d=>d.stato==='Fermo'||d.stato==='Reso'?pill(d.stato,'red'):(d.stato==='Venduto'?pill(d.stato,'ok'):pill(d.stato));
     if(c.vista==='schede'){
-      body=filters+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px"><div class="ph">${LAPTOP}${d.foto?'':'<span class="miss" style="position:absolute;bottom:8px;font-size:12px;font-weight:700">Foto mancante</span>'}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc||'—'} · ${d.shelf||'—'}</div><div class="row between"><span style="font-size:20px;font-weight:800">${eur(d.price)}</span><span class="lbl">${d.conf===false&&d.stato!=='Venduto'?'Da confermare':d.stato}</span></div><div class="lbl">${d.siti||'—'}</div></div>`).join('')}</div>`:empty);
+      body=filters+(c.sch?schedaPC():'')+(list.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">${list.map(d=>`<div class="glass card stack" style="gap:8px;cursor:pointer" data-act="cInvApri" data-arg="${d.sn}"><div class="ph">${LAPTOP}${d.foto?'':'<span class="miss" style="position:absolute;bottom:8px;font-size:12px;font-weight:700">Foto mancante</span>'}</div><div class="row between"><b>${d.model}</b>${pill(d.grade,'dark')}</div><div class="lbl">${d.brand} · ${d.cpu} · ${d.gpu} · ${d.ram} · ${d.disk}</div><div class="lbl">Seriale ${d.sn} · ${d.banc||'—'} · ${d.shelf||'—'}</div><div class="row between"><span style="font-size:20px;font-weight:800">${eur(d.price)}</span><span class="lbl">${d.conf===false&&d.stato!=='Venduto'?'Da confermare':d.stato}</span></div><div class="lbl">${d.siti||'—'}</div></div>`).join('')}</div>`:empty);
     } else {
       const cella=(v,i,d)=>{const k=XCOL[i];
         if(k==='Foto') return `<td>${d.foto?'<span class="lbl">Casa madre</span>':'<b class="miss">Mancante</b>'}</td>`;
@@ -2045,7 +2108,7 @@ function corp(){
         if(k==='Password BIOS'&&v==='Sì') return `<td class="miss">${v}</td>`;
         if(k==='Difetti'||k==='Siti') return `<td class="lbl">${v}</td>`;
         return `<td>${v}</td>`;};
-      body=filters+(list.length?`<div class="glass tbox"><table class="t nw" style="min-width:2900px"><thead><tr>${XCOL.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${list.map(d=>`<tr>${rigaPC(d).map((v,i)=>cella(v,i,d)).join('')}</tr>`).join('')}</tbody></table></div>`:empty);
+      body=filters+(c.sch?schedaPC():'')+(list.length?`<div class="glass tbox"><table class="t nw" style="min-width:2900px"><thead><tr>${XCOL.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${list.map(d=>`<tr class="click" data-act="cInvApri" data-arg="${d.sn}"${c.sch&&c.sch.sn===d.sn?' style="background:var(--soft)"':''}>${rigaPC(d).map((v,i)=>cella(v,i,d)).join('')}</tr>`).join('')}</tbody></table></div>`:empty);
     }
   }
   if(s==='ordini'){
@@ -2096,7 +2159,7 @@ function corp(){
     <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marca</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Sblocco</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
     ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Chiuso'?pill('Chiuso','dark'):(x[8]==='Ticket'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
     </tbody></table></div>
-    <p class="lbl" style="margin:0">I ticket arrivano dal portale del cliente; lo sblocco (account iCloud/Google e MDM) si fa sul loro sistema Habble.</p>`;
+`;
   }
   if(s==='telecamere'){ title='Telecamere'; hintTxt='la stessa sezione del gestionale Autotrasporti: il capannone è uno solo.'; body=telecamere(S.t); }
   return hint(hintTxt)+shell('Corporation',C_NAV,s,'cGo',title,body,'Cerca');
@@ -2530,6 +2593,10 @@ function analizzaFoto(file){
   document.addEventListener('pointerup',e=>{const c=e.target; if(!disegna)return; disegna=false; if(c.id==='firmaPad'){S.a.firmaImg=c.toDataURL('image/png'); const k=document.querySelector('[data-act="aFirmaOk"]'); if(k){k.disabled=false; k.removeAttribute('style'); k.style.flex='1';}}});
 })();
 /* proposta 23/11: i campi del nuovo lotto (si scrive senza ridisegnare; «Apri» si accende quando è tutto compilato) */
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sch; if(!k||!S.c.sch) return;
+  if(k==='bancale') e.target.value=e.target.value.toUpperCase(); S.c.sch[k]=e.target.value;
+  const sc=S.c.sch, ok={sVendi:numIt(sc.prezzo)>0,sFermo:!!sc.motivo.trim(),sRimetti:!!sc.bancale.trim()&&sc.p!==''};
+  Object.keys(ok).forEach(a=>{const bt=document.querySelector(`button[data-act="${a}"]`); if(bt){bt.disabled=!ok[a]; bt.style.opacity=ok[a]?'':'.35'; bt.style.cursor=ok[a]?'':'not-allowed';}});});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.nl; if(!k) return; S.c.nl[k]=e.target.value;
   const n=S.c.nl, ok=S.c.strada&&String(n.codice).trim()&&+n.pezzi>0&&String(n.costo).trim(), bt=document.querySelector('button[data-act="cApriL"]');
   if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';}});
