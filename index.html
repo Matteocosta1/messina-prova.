@@ -450,6 +450,8 @@ const bancaliVivi=()=>MAG.concat(S.k&&S.k.nbFatto?[[S.k.nbFatto.posto,'Scaffale'
 /* i PC della Corporation ancora sul bancale (non spediti né consegnati a mano): li legge l'Inventario */
 const pcSulBancale=cod=>pcInventario().filter(d=>d.banc===cod&&!d.uscito&&!ORDINI.some(o=>o[5]===d.sn&&(o[7]==='Spedito'||o[7]==='Consegnato'))).map(d=>({articolo:d.brand+' '+d.model,seriale:d.sn,h:(d.gg||0)*24}));
 /* magazzino (24/11): la stessa pianta del programma; i PC della Corporation sui bancali si leggono dall'Inventario */
+/* ore passate dall'ultima volta che è arrivata quell'ora (di notte: ieri), come «ultima» nel programma */
+const oreDa=(h,m)=>{const d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return (Date.now()-d.getTime())/3600000;};
 const MAG=[
  ['S01-1-2','Scaffale','Apple','B-0100',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
  ['S01-2-1','Scaffale','Apple','B-0101',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
@@ -478,7 +480,7 @@ const MAG=[
  ['S02-6-3','Scaffale','Snam','B-0124',48,[['Cavi',6,[],'Pistola','Magazziniere 1',22],['Sensori',4,[],'Pistola','Magazziniere 1',22]]],
  ['S03-1-1','Scaffale','Snam','B-0125',120,[['Contatori',12,[],'Pistola','Magazziniere 1',23]]],
  ['S03-1-3','Scaffale','Snam','B-0126',168,[['Apparati con seriale',18,['SN31301','SN31302'],'Pistola','Magazziniere 1',23]]],
- ['S03-2-1','Scaffale','Snam','B-0127',144,[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',23]]],
+ ['S03-2-1','Scaffale','Snam','B-0127',oreDa(7,5),[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',oreDa(7,5)]]],
  ['S03-2-2','Scaffale','Snam','B-0128',10248,[['Apparati con seriale',18,['SN32201','SN32202'],'Pistola','Magazziniere 1',23]]],
  ['S03-2-3','Scaffale','Snam','B-0129',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
  ['S03-3-2','Scaffale','Snam','B-0130',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
@@ -692,10 +694,10 @@ const STOPS=[
  {cliente:'Apple',ind:'Via [indirizzo], Pieve Emanuele',fascia:'15–18',colli:'8 colli',nota:'Sponda'}
 ];
 const C_MAILS=[
- {da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’[percentuale] dal test. Se ordini oggi spediamo entro [giorno]. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
- {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
- {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'},
- {da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0227.',azGo:'ordini'}
+ {nuova:true,da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’89% dal test. Se ordini oggi spediamo entro domani. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
+ {nuova:true,da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine BM-48213 per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azGo:'ordini',rif:'BM-48213'},
+ {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azGo:'stage',riep:true},
+ {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'}
 ];
 const DEVICES=[
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:null,cicli:190,screen:'14"',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0227',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false,uscito:false},
@@ -849,7 +851,13 @@ const nRiga=(p,cfg,g)=>{const rr=p.righe.filter(r=>nCfg(r)===cfg&&r.grade===g.sl
 const nIniziale=p=>{const cs=nConfigs(p); for(const g of ['Grado B','Grado A','Grado C','Grado D']) for(const c of cs.slice().reverse()) if(nRiga(p,c,g)) return [c,g]; return [cs[0],'Grado B'];};
 
 const GDESC={'Grado A':'Quasi impossibile distinguerlo da nuovo. Al massimo micro-segni visibili da vicino. Funziona al 100%.','Grado B':'Leggeri segni d’uso sulla scocca. Schermo e tastiera in ordine. Funziona al 100%.','Grado C':'Segni evidenti d’uso, possibile piccola ammaccatura. Funziona al 100%.','Grado D':'Funziona al 100%, ma ha la scocca rotta o danni estetici importanti. Testato e garantito come gli altri gradi.'};
+/* stage di oggi e di ieri, come li conta il programma dalle righe dello stage (vista stage_oggi) */
+const STAGE_OGGI={ricevuti:436,formattati:414,in_vendita:38}, STAGE_MESE={ricevuti:8640,formattati:8512,falliti:41,in_vendita:612}, STAGE_IERI={formattati:398,falliti:3};
+/* gli ordini dei siti per numero: il PC (come «riferimento» degli ordini nel programma) */
+const ORDINI_RIF={'BM-48213':'PF3XXXXX'};
+const T0=Date.now();
 const banchiState=i=>{ if(i===23||i===47) return 'err'; if(i%9===0) return 'free'; if(i%4===0||i%7===0) return 'run'; return 'fin'; };
+const nBanco=x=>Array.from({length:60},(_,k)=>banchiState(k+1)).filter(y=>y===x).length;
 const BANCO_TXT={fin:'Cancellazione finita, report pronto',run:'Cancellazione in corso',free:'Postazione libera',err:'Cancellazione interrotta: report dell’interruzione pronto per il cliente'};
 
 /* ---------- AZIONI ---------- */
@@ -960,8 +968,9 @@ const A={
   aReset:()=>{S.a={scr:'lista',cur:0,done:{},why:{},foto:{},fotoInfo:{},soglia:S.a.soglia,analisi:false,scanned:false,acc:{},accOpen:false,nav:false,accOk:{},firmata:false,colliOk:false,accConf:false,firmaOpen:false,firmaImg:null};},
   /* corporation */
   cCart:c=>{S.c.cart=c; S.c.mailMsg=''; S.c.reply=false; const f=C_MAILS.findIndex(m=>c==='In arrivo'||m.cart===c); if(f>=0) S.c.mail=f;},
-  cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false;},
+  cMail:i=>{S.c.mail=+i; S.c.mailMsg=''; S.c.reply=false; S.c.lette=Object.assign({},S.c.lette,{[i]:true});},
   cAz:()=>{S.c.mailMsg='az'; S.c.reply=false;},
+  cRiepInvia:()=>{S.c.mailMsg='riep';},
   cReply:()=>{S.c.reply=true; S.c.mailMsg='';},
   cReplyNo:()=>{S.c.reply=false;},
   cSend:()=>{S.c.reply=false; S.c.mailMsg='inviata';},
@@ -1325,7 +1334,8 @@ function satellitare(t){
 /* telecamere: una sola sezione per tutto il capannone, visibile solo alla Direzione */
 const CAM=['Ingresso','Piazzale','Baie di carico','Corsia S03','Corsia S07','Stage'];
 const CAM_AVVISI=[['02:14','Piazzale','Persona vicino al cancello, fuori orario','red'],['03:40','Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],['05:52','Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']];
-const CAM_SCAN=[['B-0141','S03-2-1','Entrata','Magazziniere 1','06:22','Baie di carico'],['B-0138','S03-2-2','Trasferisci','Mulettista 2','07:05','Corsia S03'],['Collo 3 di 4','—','Uscita','Magazziniere 2','07:41','Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1','08:10','Corsia S07']];
+/* le scansioni di stamattina sono gli stessi bancali della pianta: B-0128 lascia S03-2-1 per S03-2-2, poi in S03-2-1 entra B-0127 */
+const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[6,22],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,5],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,41],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
 function telecamere(t){
   const ora0=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const vivo=(n,i)=>`<button class="tcam ${t.camSel===i?'on':''}" data-act="camSel" data-arg="${i}"><span class="cam-img" aria-hidden="true"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${n}</span><span class="cam-ora">${ora0}</span></button>`;
@@ -1335,7 +1345,7 @@ function telecamere(t){
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi della notte</b><div class="list">${CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join('')}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
       <div class="glass tbox" style="flex:2 1 520px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Foto delle scansioni</div><table class="t nw"><thead><tr><th>Cosa</th><th>Posto</th><th>Movimento</th><th>Chi</th><th>Ora</th><th>Telecamera</th><th></th></tr></thead><tbody>
-        ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
+        ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${quandoH(oreDa(r[4][0],r[4][1]))}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
       </tbody></table><p class="lbl" style="margin:0;padding:0 14px 14px">A ogni scansione la telecamera più vicina salva una foto insieme al movimento: se qualcosa non torna, si apre il movimento e si vede cos’è successo.</p></div>
     </div>`;
 }
@@ -1886,7 +1896,9 @@ function corp(){
     if(daSpedire) guarda.push([conta(daSpedire,'1 ordine da spedire','ordini da spedire'),'ordini','Ordini',false]);
     if(nInterr) guarda.push([conta(nInterr,'1 postazione interrotta allo stage','postazioni interrotte allo stage'),'stage','Stage Computer',true]);
     guarda.push(['Licenze Certus: chiavetta 3 quasi finita','stage','Stage Computer',false]);
-    guarda.push(['1 mail da leggere','mail','Mail',false]);
+    /* come il programma: le mail «Da leggere» (diventano lette quando si aprono) */
+    const nMail=C_MAILS.filter((m,i)=>m.nuova&&!(c.lette||{})[i]).length;
+    if(nMail) guarda.push([conta(nMail,'1 mail da leggere','mail da leggere'),'mail','Mail',false]);
     const inVendita=968-vn.length+(c.carApp||[]).filter(x=>x.siti).length+(S.k.lettFatto&&Object.keys(S.k.canali).some(x=>S.k.canali[x])?1:0);
     const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2+vn.length]].sort((a,b)=>b[1]-a[1]);
     const maxCan=Math.max(...can.map(x=>x[1]));
@@ -1899,7 +1911,7 @@ function corp(){
     </div>
     <div class="glass card stack">
       <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
-      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti','436'],['Formattati','414'],['In corso','20'],['Interrotti','2'],['In vendita','38']]:[['Ricevuti','8.640'],['Formattati','8.512'],['In corso','20'],['Interrotti','41'],['In vendita','612']]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Interrotti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
+      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti',fNum(STAGE_OGGI.ricevuti)],['Formattati',fNum(STAGE_OGGI.formattati)],['In corso',fNum(nBanco('run'))],['Interrotti',fNum(nBanco('err'))],['In vendita',fNum(STAGE_OGGI.in_vendita)]]:[['Ricevuti',fNum(STAGE_MESE.ricevuti)],['Formattati',fNum(STAGE_MESE.formattati)],['In corso',fNum(nBanco('run'))],['Interrotti',fNum(STAGE_MESE.falliti)],['In vendita',fNum(STAGE_MESE.in_vendita)]]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Interrotti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
     </div>
     <div class="grid g2">
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
@@ -1913,7 +1925,11 @@ function corp(){
   if(s==='mail'){
     title='Mail'; hintTxt='apri la mail del DDT e premi «Carica il DDT nel lotto». Il tasto principale cambia con il tipo di mail.';
     const cur=C_MAILS[c.mail];
-    const ab={btn:b(cur.az,'cAz'), msg:c.mailMsg==='az'?msg(cur.azMsg,'Vai alla pagina','cGo',cur.azGo):''};
+    /* come il programma: l'ordine si trova dal numero nella mail e dice dove è il PC; il riepilogo di ieri ha i numeri e si invia */
+    let azMsg=cur.azMsg;
+    if(cur.rif){const o=ORDINI_RIF[cur.rif], d=o&&pcInventario().find(x=>x.sn===o); azMsg='Ordine aperto in Ordini'+(d&&d.shelf?`: il PC è nel posto ${d.shelf}, bancale ${d.banc}.`:'.');}
+    const riep=`${fNum(STAGE_IERI.formattati)} PC formattati, ${STAGE_IERI.falliti} ${STAGE_IERI.falliti===1?'interruzione':'interruzioni'} con report.`;
+    const ab={btn:b(cur.az,'cAz'), msg:c.mailMsg==='az'?(cur.riep?msg('Riepilogo di ieri pronto: '+riep,'Invia','cRiepInvia'):msg(azMsg,'Vai alla pagina','cGo',cur.azGo)):c.mailMsg==='riep'?msg('Riepilogo inviato al cliente.','Vai alla pagina','cGo',cur.azGo):''};
     body=mailView(C_MAILS,c,'c',ab,['In arrivo','Vendite','Lotti','Stage','Inviate']);
   }
   if(s==='lotti'){
@@ -1978,7 +1994,7 @@ function corp(){
   if(s==='ordini'){
     title='Ordini'; hintTxt='premi «Etichetta spedizione» su un ordine da preparare.';
     body=`${c.ordMsg&&c.ordMsg!=='ddt'?msg(c.ordMsg):''}
-    <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marchio</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Posto</th><th>Stato</th><th></th></tr></thead><tbody>
+    <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marca</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Posto</th><th>Stato</th><th></th></tr></thead><tbody>
     ${ORDINI.map((o,i)=>{const st=o[7]==='Da preparare'?pill(o[7]):(o[7]==='Annullato'?pill(o[7],'red'):pill(o[7],'dark'));return `<tr><td>${o[0]}</td><td>${o[1]}</td><td>${o[2]}</td><td><b>${o[3]}</b></td><td>${pill(o[4],'dark')}</td><td>${o[5]}</td><td>${o[6]}</td><td>${st}</td><td>${o[7]==='Da preparare'?b('Etichetta spedizione','cEtichetta',i,'ghost sm'):''}</td></tr>`;}).join('')}
     </tbody></table></div>`;
   }
@@ -2001,9 +2017,9 @@ function corp(){
         <div class="glass card"><div class="lbl">Lettura</div>
           <div class="row between" style="margin-top:8px;flex-wrap:nowrap;gap:10px"><div style="line-height:1.6">Lotto <b>L-016</b><br>Letti <b>3</b> di 3 · Caricati <b>${c.lettCaricati}</b> · <b class="miss">1 da guardare</b></div>${b('Excel','cXls','L-016','ghost sm')}</div>
           <div class="lbl" style="margin-top:10px">PF4L0003: disco guasto e password nel BIOS</div>
-          <div class="lbl" style="margin-top:10px">Banco stage: collegato, ultima lettura 2 min fa</div>
+          <div class="lbl" style="margin-top:10px">Banco stage: collegato, ultima lettura ${Math.round((Date.now()-T0)/60000+2.4)} min fa</div>
         </div>
-        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>436</b> · Formattati <b>414</b> · Interrotti <b>2</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
+        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>${fNum(STAGE_OGGI.ricevuti)}</b> · Formattati <b>${fNum(STAGE_OGGI.formattati)}</b> · Interrotti <b>${nBanco('err')}</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
         <div class="glass card"><div class="lbl">Licenze Certus</div><div style="margin-top:6px">Chiavetta 3: <b class="miss">40 licenze rimaste</b></div>${c.licOk?`<div style="margin-top:10px">${msg('Mail di richiesta licenze inviata.')}</div>`:`<div style="margin-top:12px">${b('Invia la mail già pronta','cLic')}</div>`}</div>
       </div></div>`;
   }
@@ -2020,7 +2036,7 @@ function corp(){
       <div class="glass card"><div class="lbl">Chiuso</div><div class="big">${cnt('Chiuso')}</div><div class="lbl">pronti da riconsegnare</div></div>
     </div>
     <div class="row">${f.map(x=>chip(x,'cTelF',x,c.telF===x)).join('')}</div>
-    <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marchio</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Sblocco</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
+    <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marca</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Sblocco</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
     ${list.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td><b>${x[2]}</b></td><td>${x[3]}</td><td>${x[4]}</td><td>${x[5]}</td><td>${x[6]}</td><td>${x[7]}</td><td>${x[8]==='Chiuso'?pill('Chiuso','dark'):(x[8]==='Ticket'?pill(x[8],'red'):pill(x[8]))}</td></tr>`).join('')}
     </tbody></table></div>
     <p class="lbl" style="margin:0">I ticket arrivano dal portale del cliente; lo sblocco (account iCloud/Google e MDM) si fa sul loro sistema Habble.</p>`;
