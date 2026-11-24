@@ -798,7 +798,8 @@ function pcLetti(){
       post:l.post,letto,car:car?dtFmt(Date.now()):'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
 }
 /* scheda del PC (come Scheda del programma): si apre toccando una riga o una scheda dell'Inventario.
-   Grado, prezzo e siti si cambiano qui; conferma del prezzo, vendita, fermo e «rimetti in vendita» come le funzioni del database.
+   Grado, prezzo e siti si cambiano qui; conferma del prezzo e vendita come le funzioni del database.
+   «Fermo» e «Rimetti» tolti il 24/11/2026 (Alessandro): torneranno con il laboratorio delle riparazioni.
    Chi la usa è Vendite: se cambia il prezzo, il prezzo è già confermato. */
 const SITI_V=['Sito','Back Market','Refurbed','eBay','Subito','Amazon'];
 const PREZZI_MOD={'ThinkPad T14 Gen 2|A':289,'ThinkPad T14 Gen 2|B':249,'ThinkPad T14 Gen 2|C':209};
@@ -808,7 +809,7 @@ const numIt=v=>String(v).trim()===''?0:Number(String(v).replace(',','.'));
 const bOff=(label,act,ok,cls)=>`<button class="btn ${cls||''}" data-act="${act}" data-arg="" ${ok?'':'disabled style="opacity:.35;cursor:not-allowed"'}>${label}</button>`;
 function schedaPC(){const sc=S.c.sch, d=pcInventario().find(x=>x.sn===sc.sn); if(!d) return '';
   const venduto=d.stato==='Venduto', daConf=!venduto&&d.price!=null&&d.conf===false, prop=prezzoProposto(d.model,d.grade);
-  const vOk=numIt(sc.prezzo)>0, fOk=!!sc.motivo.trim(), rOk=!!sc.bancale.trim()&&sc.p!=='';
+  const vOk=numIt(sc.prezzo)>0;
   return `<div class="glass card stack">
     <div class="row between"><h3 style="font-size:20px">${d.brand} ${d.model}</h3><span class="lbl">Seriale ${d.sn} · ${d.stato}</span></div>
     <div class="row"><b style="width:70px">Grado</b>${['A','B','C','D'].map(x=>chip(x,'sG',x,sc.g===x)).join('')}</div>
@@ -823,10 +824,8 @@ function schedaPC(){const sc=S.c.sch, d=pcInventario().find(x=>x.sn===sc.sn); if
         <label class="field"><span class="lbl">N. ordine</span><input class="input" style="max-width:140px" value="${sc.rif}" data-sch="rif"></label>
       </div>
       <div class="row">${bOff('Conferma','sVendi',vOk)}${b('Annulla','sAnnulla','','ghost')}</div></div>`:''}
-    ${sc.apri==='fermo'?`<div class="row"><input class="input" style="max-width:320px" placeholder="Perché è fermo" value="${sc.motivo}" data-sch="motivo">${bOff('Conferma','sFermo',fOk)}${b('Annulla','sAnnulla','','ghost')}</div>`:''}
-    ${sc.apri==='rimetti'?`<div class="row"><input class="input" style="max-width:200px" placeholder="Bancale" value="${sc.bancale}" data-sch="bancale">${bOff('Conferma','sRimetti',rOk)}${b('Annulla','sAnnulla','','ghost')}</div>`:''}
     ${sc.msg?msg(sc.msg):''}${sc.err?`<div class="warn">${sc.err}</div>`:''}
-    <div class="row">${!venduto&&d.stato!=='Reso'&&d.stato!=='Fermo'?b('Salva','sSalva'):''}${daConf?b('Conferma','sConferma'):''}${d.stato==='Disponibile'&&!sc.apri?b('Vendi','sApri','vendi','ghost'):''}${(d.stato==='Reso'||d.stato==='Fermo')&&!sc.apri?b('Rimetti','sApri','rimetti'):''}${!venduto&&d.stato!=='Fermo'&&!sc.apri?b('Fermo','sApri','fermo','ghost'):''}${b('Chiudi','sChiudi','','ghost')}</div>
+    <div class="row">${!venduto&&d.stato!=='Reso'&&d.stato!=='Fermo'?b('Salva','sSalva'):''}${daConf?b('Conferma','sConferma'):''}${d.stato==='Disponibile'&&!sc.apri?b('Vendi','sApri','vendi','ghost'):''}${b('Chiudi','sChiudi','','ghost')}</div>
   </div>`;}
 /* Inventario: i PC caricati, di tutti i lotti */
 const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:SITI_V.includes(o[1])?o[1]:''},n?{price:n.prezzo}:{});};
@@ -1084,14 +1083,7 @@ const A={
     S.c.vn=(S.c.vn||[]).concat([{sn:d.sn,lotto:d.lotto,prezzo:pr,netto:nettoVendita(pr,numIt(sc.comm)+numIt(sc.spese),d.costo),sito:sc.canale,banc:d.banc,shelf:d.shelf}]);
     if(sc.canale==='Azienda') S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:Object.assign({},(S.c.mod||{})[sc.sn],{uscito:true})});
     sc.apri=''; sc.msg=`Venduto su ${sc.canale}: tolto dagli altri siti, l’ordine è in Ordini.`;},
-  sFermo:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn); sc.err=''; if(!d||!sc.motivo.trim()) return;
-    if(d.stato==='Venduto'){sc.err='Questo PC non si può fermare'; return;}
-    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:Object.assign({},(S.c.mod||{})[sc.sn],{stato:'Fermo',siti:''})}); sc.apri=''; sc.motivo=''; sc.msg='PC fermo: tolto da tutti i siti.';},
-  sRimetti:()=>{const sc=S.c.sch, d=pcInventario().find(y=>y.sn===sc.sn), cod=sc.bancale.trim(); sc.err=''; if(!d||!cod||sc.p==='') return;
-    if(d.stato!=='Reso'&&d.stato!=='Fermo'){sc.err='Si rimette in vendita solo un PC reso o fermo'; return;}
-    const bk=MAG.find(m=>m[3]===cod); if(!bk){sc.err=`Bancale ${cod} non trovato: scansiona l'etichetta del bancale dove lo metti`; return;}
-    const m=Object.assign({},(S.c.mod||{})[sc.sn],{stato:'Disponibile',banc:bk[3],shelf:bk[0],uscito:false}), pr=numIt(sc.p); if(pr!==d.price) m.conf=true; m.price=pr;
-    S.c.mod=Object.assign({},S.c.mod,{[sc.sn]:m}); sc.apri=''; sc.msg='Di nuovo disponibile: scegli i siti e premi «Salva».';},
+
   cPer:v=>{S.c.per=v;},
   cBrand:v=>{S.c.brand=v;S.c.invMsg='';},
   cGrado:v=>{S.c.grado=v;S.c.invMsg='';},
@@ -2595,7 +2587,7 @@ function analizzaFoto(file){
 /* proposta 23/11: i campi del nuovo lotto (si scrive senza ridisegnare; «Apri» si accende quando è tutto compilato) */
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sch; if(!k||!S.c.sch) return;
   if(k==='bancale') e.target.value=e.target.value.toUpperCase(); S.c.sch[k]=e.target.value;
-  const sc=S.c.sch, ok={sVendi:numIt(sc.prezzo)>0,sFermo:!!sc.motivo.trim(),sRimetti:!!sc.bancale.trim()&&sc.p!==''};
+  const sc=S.c.sch, ok={sVendi:numIt(sc.prezzo)>0};
   Object.keys(ok).forEach(a=>{const bt=document.querySelector(`button[data-act="${a}"]`); if(bt){bt.disabled=!ok[a]; bt.style.opacity=ok[a]?'':'.35'; bt.style.cursor=ok[a]?'':'not-allowed';}});});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.nl; if(!k) return; S.c.nl[k]=e.target.value;
   const n=S.c.nl, ok=S.c.strada&&String(n.codice).trim()&&+n.pezzi>0&&String(n.costo).trim(), bt=document.querySelector('button[data-act="cApriL"]');
