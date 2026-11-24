@@ -317,24 +317,25 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 const _D=n=>{const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return d;};
 const cap=t=>t[0].toUpperCase()+t.slice(1);
 /* orari realistici, come packages/dati/src/calendario.ts del programma (stesse regole, stessi nomi):
-   lavoro in azienda dalle 7:30 alle 21:30 dei giorni lavorativi, all'ultima volta che è arrivata quell'ora (mai nel futuro, mai di notte, mai di festa);
-   siti e clienti online a qualsiasi ora, qualche minuto fa (la vendita conta nel giorno in cui avviene); avvisi delle telecamere: l'ultima notte.
-   Le feste nazionali le aggiorna Claude ogni anno, uguali nel programma e nel database. */
+   il programma non ha vincoli di orario né di giorno (l'azienda può lavorare giorno e notte, anche nel fine settimana e nelle feste);
+   queste regole servono solo a far sembrare vera la settimana di prova: lavoro in azienda di solito nei giorni lavorativi, all'ultima volta
+   che è arrivata quell'ora (mai nel futuro), lo stage anche di notte; siti e clienti online a qualsiasi ora, qualche minuto fa
+   (la vendita conta nel giorno in cui avviene); avvisi delle telecamere: quelli dei giorni che il sistema conserva.
+   Le feste nazionali le aggiorna Claude ogni anno, uguali nel programma e nel database (solo come informazione). */
 const FESTE=['2026-01-01','2026-01-06','2026-04-06','2026-04-25','2026-05-01','2026-06-02','2026-08-15','2026-10-04','2026-11-01','2026-12-08','2026-12-25','2026-12-26',
  '2027-01-01','2027-01-06','2027-03-29','2027-04-25','2027-05-01','2027-06-02','2027-08-15','2027-10-04','2027-11-01','2027-12-08','2027-12-25','2027-12-26'];
 const lavorativo=d=>d.getDay()>=1&&d.getDay()<=5&&!FESTE.includes(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
 const ultimaLav=(h,m=0,prima=0,adesso=Date.now())=>{const d=new Date(adesso); d.setHours(h,m,0,0); if(d.getTime()>adesso) d.setDate(d.getDate()-1); while(!lavorativo(d)) d.setDate(d.getDate()-1); for(let i=0;i<prima;i++){do d.setDate(d.getDate()-1); while(!lavorativo(d));} return d;};
-const ultimaOra=(h,m=0)=>{const d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return d;};
 const minFa=n=>new Date(Date.now()-n*60000);
+const giorniFa=(gg,h,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return d;};
+/* quanti giorni il sistema delle telecamere conserva avvisi e foto (proposta: 7 giorni, la decide la Direzione) */
+const CONSERVA_GIORNI=7;
 const caricatoGg=(gg,h=10,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); while(!lavorativo(d)||d.getTime()>Date.now()){d.setDate(d.getDate()-1); d.setHours(h,m,0,0);} return d;};
-const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(7,30,0,adesso).getTime(), fine=inizio+14*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
+const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(0,0,0,adesso).getTime(), fine=inizio+24*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
 const dtFmt=x=>new Date(x).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','');
 const hmFmt=x=>new Date(x).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 /* L-016 (strada «Lettura»): letti al banco alle 14:35, 14:41, 14:47, il primo caricato alle 15:40 dell'ultimo giorno lavorativo */
 const CARICO_L016=ultimaLav(15,40);
-/* un ordine fatto adesso parte entro le 16 del giorno lavorativo (come entro_spedizione del programma) */
-const entroSpedizione=(q=Date.now())=>{const d=new Date(q), x=new Date(q); x.setHours(16,0,0,0); if(!lavorativo(d)||d.getTime()>=x.getTime()){do{x.setDate(x.getDate()+1);}while(!lavorativo(x));} return x;};
-const quandoParte=()=>{const e=entroSpedizione(), o=new Date(), d=new Date(); d.setDate(o.getDate()+1); return e.toDateString()===o.toDateString()?'oggi':e.toDateString()===d.toDateString()?'domani':e.toLocaleDateString('it-IT',{weekday:'long'});};
 const isoG=n=>{const d=_D(n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const gLungo=n=>cap(_D(n).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}));
 const gBreve=n=>{const d=_D(n); return cap(d.toLocaleDateString('it-IT',{weekday:'short'}).replace('.',''))+' '+d.getDate()+' '+d.toLocaleDateString('it-IT',{month:'long'});};
@@ -716,29 +717,29 @@ const STOPS=[
  {cliente:'Apple',ind:'Via [indirizzo], Pieve Emanuele',fascia:'15–18',colli:'8 colli',nota:'Sponda'}
 ];
 const C_MAILS=[
- {nuova:true,t:minFa(24).getTime(),da:'Acquirente eBay',ind:'tramite eBay',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire presto?',all:'',bozza:`Ciao, la batteria è all’89% dal test. Se ordini oggi spediamo ${quandoParte()}. Grazie!`,az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
+ {nuova:true,t:minFa(24).getTime(),da:'Acquirente eBay',ind:'tramite eBay',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire presto?',all:'',bozza:'Ciao, la batteria è all’89% dal test. Spediamo con corriere e numero di tracciamento. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
  {nuova:true,t:minFa(30).getTime(),da:'Back Market',ind:'notifiche',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine BM-48213 per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azGo:'ordini',rif:'BM-48213'},
  {t:ultimaLav(8,40).getTime(),da:'Econocom',ind:'referente@[dominio]',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azGo:'stage',riep:true},
  {t:ultimaLav(8,2).getTime(),da:'[Fornitore lotto]',ind:'aste@[dominio]',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'}
 ];
 const DEVICES=[
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:null,cicli:190,screen:'14"',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0227',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false,uscito:false},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:349,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG001',conf:true,uscito:false},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:309,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG002',conf:true,uscito:false},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-015',costo:61,price:169,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'',sn:'NJX003',conf:true,uscito:false},
- {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:229,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'',sn:'NJX004',conf:true,uscito:false},
- {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6"',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'N5CD005',conf:true,uscito:false},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'NPF3006',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14"',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0227',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false,uscito:false},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'A',dif:'',lotto:'L-015',costo:61,price:349,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG001',conf:true,uscito:false},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'B',dif:'',lotto:'L-015',costo:61,price:309,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'N5CG002',conf:true,uscito:false},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'C',dif:'',lotto:'L-015',costo:61,price:169,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'',sn:'NJX003',conf:true,uscito:false},
+ {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'B',dif:'',lotto:'L-015',costo:61,price:229,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'',sn:'NJX004',conf:true,uscito:false},
+ {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6"',gpu:'Intel UHD',pw:'',canc:'Certificata',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'N5CD005',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'B',dif:'',lotto:'L-015',costo:61,price:219,stato:'Disponibile',siti:'Sito, Back Market',gg:0,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'NPF3006',conf:true,uscito:false},
  {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'i5-1135G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:80,cicli:null,screen:'15,6"',gpu:'Intel UHD',pw:'',canc:'',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',costo:61,price:219,stato:'Reso',siti:'',gg:1,banc:'B-0302',shelf:'S11-1-1',post:'',letto:'',foto:'hp-2x7x3ea.jpg',sn:'5CDXXXXX',conf:true,uscito:false},
  {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i7-1165G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:89,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:329,stato:'Venduto',siti:'eBay',gg:3,banc:'B-0300',shelf:'S11-3-2',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXXX',conf:true,uscito:false},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:61,price:289,stato:'Disponibile',siti:'Back Market, Sito',gg:4,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX2',conf:true,uscito:false},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:84,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-015',costo:61,price:399,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon, Sito',gg:5,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX',conf:true,uscito:false},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'',lotto:'L-014',costo:61,price:209,stato:'Disponibile',siti:'Sito, Subito',gg:7,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX3',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'A',dif:'',lotto:'L-014',costo:61,price:289,stato:'Disponibile',siti:'Back Market, Sito',gg:4,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX2',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'i7-1185G7',ram:'16 GB',disk:'512 GB SSD',sal:'',ore:null,bat:84,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'A',dif:'',lotto:'L-015',costo:61,price:399,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Amazon, Sito',gg:5,banc:'B-0229',shelf:'S11-2-3',post:'',letto:'',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX',conf:true,uscito:false},
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'Certificata',grade:'C',dif:'',lotto:'L-014',costo:61,price:209,stato:'Disponibile',siti:'Sito, Subito',gg:7,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX3',conf:true,uscito:false},
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:86,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',costo:61,price:249,stato:'Venduto',siti:'Back Market',gg:9,banc:'B-0227',shelf:'S11-2-1',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXXX',conf:true,uscito:false},
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:289,stato:'Venduto',siti:'Back Market',gg:10,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1000',conf:true,uscito:true},
  {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:260,stato:'Venduto',siti:'',gg:11,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1001',conf:true,uscito:true},
  {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:239,stato:'Venduto',siti:'eBay',gg:12,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1002',conf:true,uscito:true},
- {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:88,cicli:null,screen:'13,3"',gpu:'Apple M1 7 core',pw:'',canc:'',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:61,price:449,stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gg:12,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX',conf:true,uscito:false},
+ {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:88,cicli:null,screen:'13,3"',gpu:'Apple M1 7 core',pw:'',canc:'Certificata',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:61,price:449,stato:'Disponibile',siti:'Back Market, Refurbed, Sito',gg:12,banc:'B-0301',shelf:'S11-1-3',post:'',letto:'',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX',conf:true,uscito:false},
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-015',costo:61,price:299,stato:'Venduto',siti:'Refurbed',gg:13,banc:'',shelf:'',post:'',letto:'',foto:'lenovo-20w000auix.jpg',sn:'VX1003',conf:true,uscito:true},
  {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:199,stato:'Venduto',siti:'Subito',gg:14,banc:'',shelf:'',post:'',letto:'',foto:'hp-3c6p1ea.jpg',sn:'VX1004',conf:true,uscito:true},
  {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1135G7',ram:'16 GB',disk:'256 GB SSD',sal:'',ore:null,bat:null,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'',lotto:'L-014',costo:61,price:349,stato:'Venduto',siti:'Back Market',gg:15,banc:'',shelf:'',post:'',letto:'',foto:'',sn:'VX1005',conf:true,uscito:true},
@@ -1043,7 +1044,7 @@ const A={
     S.c.lottoMsg=S.c.strada==='Lettura'?`Lotto ${cod} aperto, strada Lettura: accendete i PC sul banco, si leggono da soli.`:`Lotto ${cod} aperto: dall’app si caricano i PC in questo lotto.`;
     S.c.nuovoL=false; S.c.strada=''; S.c.nl={codice:'L-0'+(18+S.c.nuovi.length-1),fornitore:'',data:isoG(0),pezzi:'',costo:''};},
   cXls:cod=>{const r=pcLotto(cod); if(!r.length){S.c.lottoMsg='vuoto:'+cod; return;} S.c.lottoMsg=''; scaricaExcel('Lotto '+cod,XCOL,r.map(rigaPC));},
-  cCsv:cod=>{const r=pcLotto(cod).filter(d=>d.stato==='Disponibile'); if(!r.length){S.c.lottoMsg=(pcLotto(cod).length?'vendita:':'vuoto:')+cod; return;} S.c.lottoMsg=''; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
+  cCsv:cod=>{const r=pcLotto(cod).filter(d=>d.stato==='Disponibile').sort((x,y)=>String(x.sn).localeCompare(String(y.sn))); if(!r.length){S.c.lottoMsg=(pcLotto(cod).length?'vendita:':'vuoto:')+cod; return;} S.c.lottoMsg=''; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   cInvXls:()=>{const r=invFiltrati(); if(!r.length) return; scaricaExcel('Inventario '+oggiIt().replace(/\//g,'-'),XCOL,r.map(rigaPC));},
   cInvCsv:()=>{const r=invFiltrati().filter(d=>d.stato==='Disponibile'); S.c.invMsg=r.length?'':'vuoto'; if(!r.length) return; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   /* carico */
@@ -1173,18 +1174,18 @@ function portaleBody(){
   const cli=`<div class="row" style="gap:6px">${['Snam','Econocom'].map(x=>chip(x,'pCli',x,p.cli===x)).join('')}<span class="lbl">Prova: scegli il cliente</span></div>`;
   if(s==='home'){
     body=snam?`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">3</div><div class="lbl">${consegnata?'1 consegnata':'nessuna ancora consegnata'}</div></div>
-      <div class="glass card"><div class="lbl">Bancali da noi</div><div class="big">${nB}</div><div class="lbl">${S.m.inN?S.m.inN+' entrati oggi':'aggiornato in tempo reale'}</div></div>
-      <div class="glass card"><div class="lbl">Seriali</div><div class="big">${nS.toLocaleString('it-IT')}</div><div class="lbl">ognuno con il suo posto</div></div>
-      <div class="glass card"><div class="lbl">Giacenze</div><div class="big">1</div><div class="lbl">riconsegna da chiedere</div></div></div>
+      <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">3</div></div>
+      <div class="glass card"><div class="lbl">Bancali da noi</div><div class="big">${nB}</div></div>
+      <div class="glass card"><div class="lbl">Seriali</div><div class="big">${nS.toLocaleString('it-IT')}</div></div>
+      <div class="glass card"><div class="lbl">Giacenze</div><div class="big">1</div></div></div>
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Ultimi movimenti</h3><div class="list">
         ${S.live.feed.filter(x=>/Snam/.test(x.testo)).slice(0,5).map(x=>`<div class="li"><span class="row between" style="width:100%"><span>${x.testo}</span><span class="lbl">${x.t}</span></span></div>`).join('')||'<div class="lbl" style="padding:12px">Nessun movimento oggi.</div>'}
       </div></div>`
     :`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Device UniCredit ricevuti</div><div class="big">1.000</div><div class="lbl">lotto Fastweb del ${gDM(-5)}</div></div>
-      <div class="glass card"><div class="lbl">Preparati</div><div class="big">640</div><div class="lbl">doppio cespite applicato</div></div>
-      <div class="glass card"><div class="lbl">Spediti</div><div class="big">410</div><div class="lbl">con busta di reso</div></div>
-      <div class="glass card"><div class="lbl">Resi rientrati</div><div class="big">37</div><div class="lbl">telefoni usati in deposito</div></div></div>
+      <div class="glass card"><div class="lbl">Device UniCredit ricevuti</div><div class="big">1.000</div></div>
+      <div class="glass card"><div class="lbl">Preparati</div><div class="big">640</div></div>
+      <div class="glass card"><div class="lbl">Spediti</div><div class="big">410</div></div>
+      <div class="glass card"><div class="lbl">Resi rientrati</div><div class="big">37</div></div></div>
       <p class="lbl" style="margin:0">Ogni sparo, carico e scarico si vede qui subito. Ogni sera parte anche il file Excel IMEI · Cespite · Utente.</p>`;
   }
   if(s==='spedizioni'){
@@ -1268,8 +1269,8 @@ function j7(){
     const fila=j7Fila();
     inner=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Sere controllate</div><div class="big">${j.giorni.length} <span class="lbl">di 20</span></div></div>
-      <div class="glass card"><div class="lbl">Di fila senza differenze</div><div class="big">${fila}</div><div class="lbl">ne servono 10 per spegnere J7</div></div>
-      <div class="glass card"><div class="lbl">Differenze trovate</div><div class="big" style="${j.giorni.filter(x=>x==='ko').length?'color:var(--alert)':''}">${j.giorni.filter(x=>x==='ko').length}</div><div class="lbl">tutte spiegate</div></div></div>
+      <div class="glass card"><div class="lbl">Di fila senza differenze</div><div class="big">${fila}</div></div>
+      <div class="glass card"><div class="lbl">Differenze trovate</div><div class="big" style="${j.giorni.filter(x=>x==='ko').length?'color:var(--alert)':''}">${j.giorni.filter(x=>x==='ko').length}</div></div></div>
       <div class="glass card"><div class="lbl" style="margin-bottom:10px">Una casella per sera: nera se i numeri tornano, rossa se no</div>
         <div class="banchi">${Array.from({length:20},(_,i)=>{const g=j.giorni[i];return `<span class="banco ${g==='ok'?'fin':(g==='ko'?'err':'free')}" style="display:flex;align-items:center;justify-content:center;cursor:default">${i+1}</span>`;}).join('')}</div></div>
       ${j.spento?msg('J7 spento. I suoi dati restano archiviati in sola lettura.'):`<div class="row">${j.giorni.length<20?b('Simula le sere','j7Auto')+b('Una sera','j7Giorno','','ghost'):''}${fila>=10?b('Spegni J7','j7Spegni'):'<button class="btn" disabled style="opacity:.35;cursor:not-allowed">Spegni J7</button>'}<span class="lbl">Si spegne solo dopo 10 sere di fila in cui tutto torna.</span></div>`}`;
@@ -1366,10 +1367,10 @@ function satellitare(t){
     <rect x="26" y="168" width="28" height="24" rx="6" fill="#111214"/></svg>
     <div class="row lbl" style="gap:14px;margin-top:6px"><span>- - - giro previsto</span><span style="color:${cur.an.some(a=>a[1]==='Deviazione')?'var(--alert)':'var(--ok)'}">——— percorso fatto</span></div>`;
   return `<div class="grid g4">
-      <div class="glass card"><div class="lbl">Mezzi in giro</div><div class="big">${SAT.length}</div><div class="lbl">posizione dal satellitare</div></div>
-      <div class="glass card"><div class="lbl">Km oggi</div><div class="big">${SAT.reduce((n,x)=>n+x.kmF,0)}</div><div class="lbl">previsti ${SAT.reduce((n,x)=>n+x.kmP,0)}</div></div>
-      <div class="glass card"><div class="lbl">Da guardare</div><div class="big">${bad}</div><div class="lbl">deviazioni, soste, rifornimenti</div></div>
-      <div class="glass card"><div class="lbl">Gasolio a ${mese()}</div><div class="big">€ [importo]</div><div class="lbl">carte carburante e km a confronto</div></div>
+      <div class="glass card"><div class="lbl">Mezzi in giro</div><div class="big">${SAT.length}</div></div>
+      <div class="glass card"><div class="lbl">Km oggi</div><div class="big">${SAT.reduce((n,x)=>n+x.kmF,0)}</div></div>
+      <div class="glass card"><div class="lbl">Da guardare</div><div class="big">${bad}</div></div>
+      <div class="glass card"><div class="lbl">Gasolio a ${mese()}</div><div class="big">€ [importo]</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass tbox" style="flex:1 1 520px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Giro</th><th>Km previsti</th><th>Km fatti</th><th>Litri/100 km</th><th>Controllo</th></tr></thead><tbody>
@@ -1383,8 +1384,10 @@ function satellitare(t){
 
 /* telecamere: una sola sezione per tutto il capannone, visibile solo alla Direzione */
 const CAM=['Ingresso','Piazzale','Baie di carico','Corsia S03','Corsia S07','Stage'];
-const CAM_AVVISI=[[ultimaOra(2,14),'Piazzale','Persona vicino al cancello, fuori orario','red'],[ultimaOra(3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(7,30),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']]
-  .filter(a=>a[0].getTime()>=Date.now()-86400000).sort((x,y)=>x[0]-y[0]).map(a=>[hmFmt(a[0])].concat(a.slice(1)));
+/* avvisi: quelli che il sistema conserva (gli ultimi CONSERVA_GIORNI giorni), a qualsiasi ora, dal più recente; i più vecchi li cancella la pulizia di ogni notte */
+const CAM_AVVISI=[[giorniFa(0,2,14),'Piazzale','Persona vicino al cancello con l’allarme inserito','red'],[giorniFa(0,3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(7,30),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok'],
+  [giorniFa(4,1,12),'Piazzale','Animale nel piazzale, nessun intervento','ok'],[ultimaLav(19,55,3),'Ingresso','Chiusura del magazzino: Magazziniere 2, badge regolare','ok']]
+  .filter(a=>a[0].getTime()>=Date.now()-CONSERVA_GIORNI*86400000).sort((x,y)=>y[0]-x[0]).map(a=>[quandoH((Date.now()-a[0].getTime())/3600000)].concat(a.slice(1)));
 /* le scansioni di stamattina sono gli stessi bancali della pianta: B-0128 lascia S03-2-1 per S03-2-2, poi in S03-2-1 entra B-0127 */
 const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[7,34],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,42],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,55],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
 function telecamere(t){
@@ -1392,9 +1395,9 @@ function telecamere(t){
   const vivo=(n,i)=>`<button class="tcam ${t.camSel===i?'on':''}" data-act="camSel" data-arg="${i}"><span class="cam-img" aria-hidden="true"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${n}</span><span class="cam-ora">${ora0}</span></button>`;
   return `<div class="glass card row between" style="padding:12px 16px"><span><b>Visibile solo alla Direzione</b> <span class="lbl">Tiziano, Sara, Matteo e Pierpaolo. Il commercialista vede i numeri, non le immagini.</span></span>${pill('Rete separata','dark')}</div>
     <div class="camgrid">${CAM.map(vivo).join('')}</div>
-    ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div><div class="lbl">Registrazione degli ultimi [giorni] giorni sul registratore in capannone: si scorre per ora.</div></div>`:''}
+    ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div><div class="lbl">Registrazione degli ultimi ${CONSERVA_GIORNI} giorni sul registratore in capannone: si scorre per ora.</div></div>`:''}
     <div class="row" style="align-items:flex-start;gap:16px">
-      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi della notte</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso nelle ultime 24 ore.</div>'}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
+      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso.</div>'}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
       <div class="glass tbox" style="flex:2 1 520px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Foto delle scansioni</div><table class="t nw"><thead><tr><th>Cosa</th><th>Posto</th><th>Movimento</th><th>Chi</th><th>Ora</th><th>Telecamera</th><th></th></tr></thead><tbody>
         ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${quandoH(oreDa(r[4][0],r[4][1]))}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
       </tbody></table><p class="lbl" style="margin:0;padding:0 14px 14px">A ogni scansione la telecamera più vicina salva una foto insieme al movimento: se qualcosa non torna, si apre il movimento e si vede cos’è successo.</p></div>
@@ -1556,14 +1559,14 @@ function trasp(){
   if(s==='home'){
     title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare dritta alla pagina giusta.';
     body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">1.240</div><div class="lbl">1.168 consegnate</div></div>
-      <div class="glass card"><div class="lbl">Consegnate al primo tentativo</div><div class="big">94%</div><div class="lbl">obiettivo 97%</div></div>
-      <div class="glass card"><div class="lbl">Bolle da confermare</div><div class="big">${18-Object.keys(t.bolleOk).length}</div><div class="lbl">3 con dati mancanti</div></div>
+      <div class="glass card"><div class="lbl">Spedizioni di oggi</div><div class="big">1.240</div></div>
+      <div class="glass card"><div class="lbl">Consegnate al primo tentativo</div><div class="big">94%</div></div>
+      <div class="glass card"><div class="lbl">Bolle da confermare</div><div class="big">${18-Object.keys(t.bolleOk).length}</div></div>
     </div>
     <div class="grid g4">
-      <div class="glass card"><div class="lbl">Fatturato oggi</div><div class="big">€ ${(4860+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div><div class="lbl">bolle di oggi × tariffe</div></div>
-      <div class="glass card"><div class="lbl">Fatturato ${mese()}</div><div class="big">€ ${(61240+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div><div class="lbl">dal 1° ${mese()}</div></div>
-      <div class="glass card incassato"><div class="lbl">Incassato</div><div class="big">€ ${(38900+[1240,2310,480].reduce((a,v,i)=>a+(t.pagate[i]?v:0),0)).toLocaleString('it-IT')}</div><div class="lbl">${(n=>n===1?'1 fattura pagata':n+' fatture pagate')(Object.keys(t.pagate).length)}</div></div>
+      <div class="glass card"><div class="lbl">Fatturato oggi</div><div class="big">€ ${(4860+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div></div>
+      <div class="glass card"><div class="lbl">Fatturato ${mese()}</div><div class="big">€ ${(61240+103*Object.keys(S.a.done).filter(k=>S.a.done[k]==='ok').length).toLocaleString('it-IT')}</div></div>
+      <div class="glass card incassato"><div class="lbl">Incassato</div><div class="big">€ ${(38900+[1240,2310,480].reduce((a,v,i)=>a+(t.pagate[i]?v:0),0)).toLocaleString('it-IT')}</div></div>
     </div>
     <div class="grid g2">
       <div class="glass card resoconto"><h3 style="font-size:18px;margin-bottom:8px">Resoconto del mattino</h3><p style="margin:0 0 8px">Ieri 1.198 consegne, costo medio per consegna in linea con la settimana. Due mezzi della zona Est hanno consumato più gasolio del solito: conviene guardare i loro giri.</p><p class="lbl" style="margin:0">Arriva ogni mattina alle 7:00 a Direzione e Amministrazione.</p></div>
@@ -1729,10 +1732,10 @@ function trasp(){
     const cur=G[t.giac], pren=t.giacPren[t.giac]||cur.rico.indexOf('Prenotata')===0;
     const daPren=G.filter((g,i)=>!t.giacPren[i]&&g.rico==='Da prenotare').length;
     body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Spedizioni in giacenza</div><div class="big">${G.length}</div><div class="lbl">merce tornata a Lacchiarella</div></div>
-      <div class="glass card"><div class="lbl">Riconsegne da prenotare</div><div class="big">${daPren}</div><div class="lbl">aspettano una data dal cliente</div></div>
+      <div class="glass card"><div class="lbl">Spedizioni in giacenza</div><div class="big">${G.length}</div></div>
+      <div class="glass card"><div class="lbl">Riconsegne da prenotare</div><div class="big">${daPren}</div></div>
       <div class="glass card"><div class="lbl">Giorni medi in giacenza</div><div class="big">${(G.reduce((a,g)=>a+g.gg,0)/G.length).toFixed(1).replace('.',',')}</div></div>
-      <div class="glass card"><div class="lbl">Giacenze da fatturare a ${mese()}</div><div class="big">€ [importo]</div><div class="lbl">con la tariffa di ogni cliente</div></div>
+      <div class="glass card"><div class="lbl">Giacenze da fatturare a ${mese()}</div><div class="big">€ [importo]</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass" style="flex:1 1 280px;padding:8px;min-width:0"><div class="row between" style="padding:8px 10px"><b>In magazzino</b><span class="lbl">${G.length} spedizioni</span></div><div class="list">
@@ -1769,9 +1772,9 @@ function trasp(){
     const cur=TP[t.tpSel], mov=TP_MOV[cur.aut]||[];
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Spesa di oggi</div><div class="big">€ 92,30</div></div>
-      <div class="glass card"><div class="lbl">Spesa di ${mese()}</div><div class="big">€ 2.031,60</div><div class="lbl">va nei costi dei mezzi</div></div>
+      <div class="glass card"><div class="lbl">Spesa di ${mese()}</div><div class="big">€ 2.031,60</div></div>
       <div class="glass card"><div class="lbl">Passaggi a ${mese()}</div><div class="big">297</div></div>
-      <div class="glass card"><div class="lbl">Da controllare</div><div class="big">3</div><div class="lbl">fuori orario o senza giro</div></div>
+      <div class="glass card"><div class="lbl">Da controllare</div><div class="big">3</div></div>
     </div>
     <div class="row" style="align-items:flex-start;gap:16px">
       <div class="glass tbox" style="flex:1 1 600px;min-width:0"><table class="t nw"><thead><tr><th>Autista</th><th>Mezzo</th><th>Oggi</th><th>${cap(mese())}</th><th>Passaggi</th><th>Controllo</th></tr></thead><tbody>
@@ -1791,10 +1794,10 @@ function trasp(){
     let inner='';
     if(t.presTab==='oggi'){
       inner=`<div class="grid g4">
-        <div class="glass card"><div class="lbl">Presenti ora</div><div class="big">46</div><div class="lbl">su 49</div></div>
+        <div class="glass card"><div class="lbl">Presenti ora</div><div class="big">46</div></div>
         <div class="glass card"><div class="lbl">In ritardo</div><div class="big">1</div></div>
         <div class="glass card"><div class="lbl">Ferie e malattia</div><div class="big">2</div></div>
-        <div class="glass card"><div class="lbl">Uscite da sistemare</div><div class="big">${nFix}</div><div class="lbl">di ieri</div></div>
+        <div class="glass card"><div class="lbl">Uscite da sistemare</div><div class="big">${nFix}</div></div>
       </div>
       <div class="glass tbox"><table class="t" style="min-width:720px"><thead><tr><th>Dipendente</th><th>Reparto</th><th>Contratto</th><th>Entrata</th><th>Uscita</th><th>Stato</th></tr></thead><tbody>
       ${DIP.map(d=>`<tr><td><b>${d[0]}</b></td><td>${d[1]}</td><td>${d[2]} a settimana</td><td>${d[3]}</td><td>${d[4]}</td><td>${d[5].indexOf('ritardo')>=0?pill(d[5],'red'):(d[5]==='Ferie'?pill('Ferie'):d[5])}</td></tr>`).join('')}
@@ -1884,7 +1887,7 @@ function trasp(){
     </div>`:''}`;
   }
   if(s==='satellitare'){ title='Satellitare'; hintTxt='tocca un autista: vedi il giro previsto e il percorso fatto, con le deviazioni e le soste da guardare.'; body=satellitare(t); }
-  if(s==='telecamere'){ title='Telecamere'; hintTxt='tocca una telecamera per vederla grande. Sotto: gli avvisi della notte e la foto salvata a ogni scansione del magazzino.'; body=telecamere(t); }
+  if(s==='telecamere'){ title='Telecamere'; hintTxt='tocca una telecamera per vederla grande. Sotto: gli avvisi degli ultimi '+CONSERVA_GIORNI+' giorni (i più vecchi si cancellano da soli, per la privacy) e la foto salvata a ogni scansione del magazzino.'; body=telecamere(t); }
   if(s==='mezzi'){
     title='Mezzi'; hintTxt='tocca un tipo di mezzo. Nella colonna Autista scegli l’autista fisso del mezzo: giri, Telepass e satellitare si collegano a lui.';
     const tipi=[['Sprinter','Sprinter'],['Furgone','Furgoni'],['Motrice','Motrici'],['Tre assi','Tre assi'],['Bilico','Bilici']];
@@ -1912,7 +1915,7 @@ function trasp(){
     if(!t.anSez){
       hintTxt='tocca una sezione per entrare e risolvere le anomalie una per una.';
       body=`<div class="row" style="align-items:stretch;gap:14px">
-        <div class="glass card" style="flex:0 0 auto;min-width:180px;${AN.length?'border:2px solid var(--alert)':''}"><div class="lbl">Totale</div><div class="big" style="${AN.length?'color:var(--alert)':''}">${AN.length}</div><div class="lbl">${AN.length?'da risolvere':'tutto torna'}</div></div>
+        <div class="glass card" style="flex:0 0 auto;min-width:180px;${AN.length?'border:2px solid var(--alert)':''}"><div class="lbl">Totale</div><div class="big" style="${AN.length?'color:var(--alert)':''}">${AN.length}</div></div>
       </div>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))">${SEZ.map(x=>{const n=cnt(x);return `<button class="glass card" data-act="tAnSez" data-arg="${x}" style="text-align:left;cursor:pointer;font:inherit;${n?'':'opacity:.6'}"><div class="row between"><b style="font-size:18px">${x}</b>${n?badge(n):pill('Ok','ok')}</div><div class="lbl" style="margin-top:6px">${n?(n===1?'1 anomalia':n+' anomalie'):'Nessuna'}</div></button>`;}).join('')}</div>
       <p class="lbl" style="margin:0">Nessuna chiusura passa se le cose non tornano. Quando un’anomalia si risolve sparisce da sola. Da decidere: un riassunto al giorno per la Direzione, a orario fisso.</p>`;
@@ -1955,8 +1958,8 @@ function corp(){
     const maxCan=Math.max(...can.map(x=>x[1]));
     const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],[meseOra(),v[1]],[String(new Date().getFullYear()),v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
     body=`<div class="kpi">
-      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(magazzino)}</div><div class="lbl">pezzi da vendere · ${fNum(inVendita)} in vendita · 11 invenduti da oltre 60 giorni</div></div>
-      <div class="glass card"><div class="lbl">Ordini</div><div class="big">${daSpedire}</div><div class="lbl">da spedire entro le 16:00</div></div>
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(magazzino)}</div></div>
+      <div class="glass card"><div class="lbl">Ordini</div><div class="big">${daSpedire}</div></div>
       <div class="glass card"><div class="lbl">Venduti</div>${per3([fNum(vendOggi),fNum(vendMese),fNum(vendAnno)])}</div>
       <div class="glass card"><div class="lbl">Incassato</div>${per3([fEur(incOggi),fEur(incMese),fEur(incAnno)])}</div>
     </div>
@@ -1989,10 +1992,10 @@ function corp(){
     const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
     const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
     body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Media</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0)/Math.max(L.reduce((a,r)=>a+r[3],0),1))}</div><div class="lbl">costo per PC, su tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Investito</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0))}</div><div class="lbl">acquisto di tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Incassato</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[6]),0))}</div><div class="lbl">dalle vendite di tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0))}</div><div class="lbl">pezzi da vendere · 11 invenduti da oltre 60 giorni</div></div>
+      <div class="glass card"><div class="lbl">Media</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0)/Math.max(L.reduce((a,r)=>a+r[3],0),1))}</div></div>
+      <div class="glass card"><div class="lbl">Investito</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0))}</div></div>
+      <div class="glass card"><div class="lbl">Incassato</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[6]),0))}</div></div>
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0))}</div></div>
     </div>
     ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0&&c.lottoMsg.indexOf('vendita:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vendita:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(8)} non c’è ancora nessun PC in vendita</div>`:''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
     ${c.nuovoL?`<div class="glass card stack">
@@ -2082,10 +2085,10 @@ function corp(){
     const cnt=st=>TELEFONI.filter(x=>x[8]===st).length;
     body=`<div class="grid g4">
       <div class="glass card"><div class="lbl">Ricevuti oggi</div><div class="big">${ultimaLav(9,15).toDateString()===new Date().toDateString()?TELEFONI.length:0}</div></div>
-      <div class="glass card"><div class="lbl">Reset</div><div class="big">${cnt('Reset')}</div><div class="lbl">da resettare</div></div>
-      <div class="glass card"><div class="lbl">Sblocco</div><div class="big">${cnt('Sblocco')}</div><div class="lbl">account iCloud/Google e MDM da togliere</div></div>
-      <div class="glass card"><div class="lbl">Ticket</div><div class="big">${cnt('Ticket')}</div><div class="lbl">da chiudere sul portale</div></div>
-      <div class="glass card"><div class="lbl">Chiuso</div><div class="big">${cnt('Chiuso')}</div><div class="lbl">pronti da riconsegnare</div></div>
+      <div class="glass card"><div class="lbl">Reset</div><div class="big">${cnt('Reset')}</div></div>
+      <div class="glass card"><div class="lbl">Sblocco</div><div class="big">${cnt('Sblocco')}</div></div>
+      <div class="glass card"><div class="lbl">Ticket</div><div class="big">${cnt('Ticket')}</div></div>
+      <div class="glass card"><div class="lbl">Chiuso</div><div class="big">${cnt('Chiuso')}</div></div>
     </div>
     <div class="row">${f.map(x=>chip(x,'cTelF',x,c.telF===x)).join('')}</div>
     <div class="glass tbox"><table class="t" style="min-width:1000px"><thead><tr><th>IMEI</th><th>Marca</th><th>Modello</th><th>Cliente</th><th>Ticket</th><th>Reset</th><th>Sblocco</th><th>Operatore</th><th>Stato</th></tr></thead><tbody>
