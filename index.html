@@ -331,7 +331,7 @@ const S = {
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
   k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:600},
-  n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
+  n:{view:'home', brand:'Tutti', pid:'', g:'Grado B', cfg:'', cart:[], added:false, payMsg:false}
 };
 
 const VIEWS=[['intro','Introduzione'],['trasp','Autotrasporti'],['autisti','App autisti'],['magazzino','App magazzino'],['presenze','App presenze'],['corp','Corporation'],['carico','App Corporation'],['negozio','Negozio online'],['sitoT','Sito Autotrasporti'],['sitoC','Sito Corporation']];
@@ -440,7 +440,6 @@ const STORICO=[
  ['08:15','Magazziniere 2','Entrata','1.000 telefoni Econocom','Ricevimento → S08-1-1','Pistola'],
  ['07:40','Magazziniere 1','Entrata','40 colli Snam','Ricevimento → S04-2-3','Pistola']
 ];
-const MAGCLI=['Tutti','Apple','Econocom','Luxiona','Messina Corporation','Snam','Velier'];
 /* come «quando» del programma: oggi solo l'ora, ieri «Ieri», poi giorno e data */
 const quandoH=h=>{const x=new Date(Date.now()-h*3600000), o=new Date(), i=new Date(o); i.setDate(o.getDate()-1); const hh=x.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   if(x.toDateString()===o.toDateString()) return hh; if(x.toDateString()===i.toDateString()) return 'Ieri '+hh; return cap(x.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'long'}))+' '+hh;};
@@ -614,11 +613,13 @@ const MAG=[
  ['GIA','Giacenze','Velier','B-0260',6,[]],
  ['RES','Resi','Luxiona','B-0261',3,[]],
  ['RES','Resi','Luxiona','B-0262',4,[]],
- ['S08-6-3','Scaffale','UniCredit','B-0190',70,[['iPhone 13 con cespite',3,['35XXXXXXXXXX101','35XXXXXXXXXX102','35XXXXXXXXXX103'],'Pistola','Magazziniere 1',70]]],
+ ['S08-6-3','Scaffale','UniCredit','B-0263',70,[['iPhone 13 con cespite',3,['35XXXXXXXXXX101','35XXXXXXXXXX102','35XXXXXXXXXX103'],'Pistola','Magazziniere 1',70]]],
  ['S11-3-2','Scaffale','Messina Corporation','B-0300',72,[]],
  ['S11-1-3','Scaffale','Messina Corporation','B-0301',288,[]],
  ['S11-1-1','Scaffale','Messina Corporation','B-0302',24,[]]
 ];
+/* i clienti che hanno bancali in magazzino, come nel programma */
+const MAGCLI=['Tutti',...[...new Set(MAG.map(m=>m[2]))].sort()];
 const CONTROLLO=[
  {bolla:'[n. bolla]',cli:'Snam',tipo:'Entrata',attesi:40,letti:40,chi:'Magazziniere 1',ora:'07:40'},
  {bolla:'[n. bolla]',cli:'Econocom',tipo:'Entrata',attesi:1000,letti:1000,chi:'Magazziniere 2',ora:'08:15'},
@@ -730,13 +731,15 @@ const LOTTI=[['L-016','Lettura',gFa(0),3,'€ 450',0,'€ 0','0%','€ -450','-1
 const nEur=x=>+String(x).replace(/[^\d-]/g,'');
 const fNum=n=>(n<0?'-':'')+String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fEur=n=>'€ '+fNum(n);
+/* incassato netto come nel programma: prezzo − commissione del sito − IVA del regime del margine (22/122 sul guadagno) */
+const nettoVendita=(prezzo,comm,costo)=>Math.round((prezzo-comm-Math.round(Math.max(prezzo-(costo||0),0)*22/122*100)/100)*100)/100;
 function lottiVivi(){ const vn=S.c.vn||[];
   return (S.c.nuovi||[]).concat(LOTTI).map(r=>{const x=vn.filter(v=>v.lotto===r[0]); if(!x.length) return r;
-    const costo=nEur(r[4]), inc=nEur(r[6])+x.reduce((a,v)=>a+v.prezzo,0), mar=inc-costo;
+    const costo=nEur(r[4]), inc=nEur(r[6])+x.reduce((a,v)=>a+v.netto,0), mar=inc-costo;
     return [r[0],r[1],r[2],r[3],r[4],r[5]+x.length,fEur(inc),Math.round(inc/costo*100)+'%',fEur(mar),Math.round(mar/costo*100)+'%'];});}
 const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
 const LETTURE=[
- {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0300',shelf:'S11-2-1'},
+ {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0227',shelf:'S11-2-1'},
  {sn:'PF4L0002',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:9120,bat:74,cicli:410,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:4,letto:'14:41'},
  {sn:'PF4L0003',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Guasto',ore:21300,bat:81,cicli:260,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'Sì',post:5,letto:'14:47'}];
 /* proposta 23/11: una lista sola di colonne per la tabella di Inventario, l'Excel di Inventario e l'Excel del lotto.
@@ -818,15 +821,33 @@ const TELEFONI=[
  ['35XXXXXXXXXXXX4','Apple','iPhone SE','Accenture','Aperto','Fatto','Fatta','Manuel','Ticket'],
  ['35XXXXXXXXXXXX5','Samsung','Galaxy A52','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Chiuso']
 ];
-const SHOP=[
- {brand:'Lenovo',name:'ThinkPad T14 Gen 2',spec:'Intel i5 · 14" Full HD',base:249,gen:'Gen 2 (2021)',cpu:'Intel Core i5-1135G7, 11ª generazione, 4 core',gpu:'Intel Iris Xe',schermo:'14" Full HD IPS, 1920 × 1080, antiriflesso',disco:'SSD NVMe',batt:'86% della capacità originale',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, Ethernet, jack audio',rete:'Wi-Fi 6, Bluetooth 5.1',webcam:'720p con copertura',peso:'1,47 kg'},
- {brand:'HP',name:'EliteBook 840 G8',spec:'Intel i7 · 14" Full HD',base:309,gen:'G8 (2021)',cpu:'Intel Core i7-1165G7, 11ª generazione, 4 core',gpu:'Intel Iris Xe',schermo:'14" Full HD IPS, 1920 × 1080',disco:'SSD NVMe',batt:'89% della capacità originale',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p con copertura',peso:'1,33 kg'},
- {brand:'Dell',name:'Latitude 5420',spec:'Intel i5 · 14" Full HD',base:209,gen:'5420 (2021)',cpu:'Intel Core i5-1145G7, 11ª generazione, 4 core',gpu:'Intel Iris Xe',schermo:'14" Full HD, 1920 × 1080',disco:'SSD NVMe',batt:'82% della capacità originale',os:'Windows 11 Pro',tastiera:'Italiana',porte:'USB-C Thunderbolt 4, 2 USB-A, HDMI, Ethernet',rete:'Wi-Fi 6, Bluetooth 5.1',webcam:'720p',peso:'1,36 kg'},
- {brand:'Apple',name:'MacBook Air M1',spec:'Apple M1 · 13,3" Retina',base:449,gen:'M1 (2020)',cpu:'Apple M1, 8 core',gpu:'Apple M1, 7 core',schermo:'13,3" Retina, 2560 × 1600',disco:'SSD',batt:'88% della capacità originale',os:'macOS Sonoma',tastiera:'Italiana, retroilluminata',porte:'2 Thunderbolt / USB 4, jack audio',rete:'Wi-Fi 6, Bluetooth 5.0',webcam:'720p FaceTime HD',peso:'1,29 kg'},
- {brand:'Lenovo',name:'ThinkPad X1 Carbon',spec:'Intel i7 · 14" Full HD',base:379,gen:'Gen 9 (2021)',cpu:'Intel Core i7-1185G7, 11ª generazione, 4 core',gpu:'Intel Iris Xe',schermo:'14" WUXGA IPS, 1920 × 1200',disco:'SSD NVMe',batt:'84% della capacità originale',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p con copertura',peso:'1,13 kg'},
- {brand:'HP',name:'ProBook 450 G8',spec:'Intel i5 · 15,6" Full HD',base:219,gen:'G8 (2021)',cpu:'Intel Core i5-1135G7, 11ª generazione, 4 core',gpu:'Intel Iris Xe',schermo:'15,6" Full HD, 1920 × 1080',disco:'SSD NVMe',batt:'80% della capacità originale',os:'Windows 11 Pro',tastiera:'Italiana con tastierino numerico',porte:'USB-C, 2 USB-A, HDMI, Ethernet, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p',peso:'1,74 kg'}
-];
-const GDELTA={'Grado A':40,'Grado B':0,'Grado C':-40,'Grado D':-90};
+/* scheda tecnica per modello (come SCHEDA nel programma): il resto lo dà l'Inventario */
+const SCHEDA={
+ 'ThinkPad T14 Gen 2':{gen:'Gen 2 (2021)',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, Ethernet, jack audio',rete:'Wi-Fi 6, Bluetooth 5.1',webcam:'720p con copertura',peso:'1,47 kg'},
+ 'EliteBook 840 G8':{gen:'G8 (2021)',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p con copertura',peso:'1,33 kg'},
+ 'Latitude 5420':{gen:'5420 (2021)',os:'Windows 11 Pro',tastiera:'Italiana',porte:'USB-C Thunderbolt 4, 2 USB-A, HDMI, Ethernet',rete:'Wi-Fi 6, Bluetooth 5.1',webcam:'720p',peso:'1,36 kg'},
+ 'MacBook Air M1':{gen:'M1 (2020)',os:'macOS Sonoma',tastiera:'Italiana, retroilluminata',porte:'2 Thunderbolt / USB 4, jack audio',rete:'Wi-Fi 6, Bluetooth 5.0',webcam:'720p FaceTime HD',peso:'1,29 kg'},
+ 'ThinkPad X1 Carbon':{gen:'Gen 9 (2021)',os:'Windows 11 Pro',tastiera:'Italiana, retroilluminata',porte:'2 USB-C Thunderbolt 4, 2 USB-A, HDMI, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p con copertura',peso:'1,13 kg'},
+ 'ProBook 450 G8':{gen:'G8 (2021)',os:'Windows 11 Pro',tastiera:'Italiana con tastierino numerico',porte:'USB-C, 2 USB-A, HDMI, Ethernet, jack audio',rete:'Wi-Fi 6, Bluetooth 5.2',webcam:'720p',peso:'1,74 kg'}
+};
+/* il catalogo del negozio si calcola dall'Inventario, come catalogo() del programma: i PC Disponibili, sul Sito, con il prezzo confermato.
+   Un gruppo per configurazione e grado; il prezzo è il più basso del gruppo. Un PC venduto esce subito dal catalogo. */
+const nVendibili=()=>pcInventario().filter(d=>d.stato==='Disponibile'&&String(d.siti).split(', ').includes('Sito')&&d.price!=null&&d.conf!==false);
+const catalogo=()=>{const m={}; nVendibili().forEach(d=>{const k=[d.model,d.brand,d.cpu,d.ram,d.disk,d.screen,d.gpu,d.grade].join('|');
+    if(!m[k]) m[k]={model:d.model,brand:d.brand,cpu:d.cpu,ram:d.ram,disk:d.disk,screen:d.screen,gpu:d.gpu,grade:d.grade,prezzo:d.price,n:0,bat:null};
+    const r=m[k]; r.n++; r.prezzo=Math.min(r.prezzo,d.price); if(d.bat!=null) r.bat=Math.min(r.bat==null?100:r.bat,d.bat);});
+  return Object.values(m).sort((a,b)=>(a.brand+a.model+a.grade).localeCompare(b.brand+b.model+b.grade));};
+const nSlug=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const cpuBreve=c=>!c?'':(/^i[3579]-/i.test(c)?'Intel '+c.slice(0,2):c);
+const nCfg=r=>`${r.ram||'—'} RAM · ${r.disk||'—'}`;
+const nEurS=n=>'€ '+n.toLocaleString('it-IT',{maximumFractionDigits:2});
+const nProdotti=()=>{const m=new Map(); catalogo().forEach(r=>{const k=r.brand+' '+r.model; if(!m.has(k)) m.set(k,{slug:nSlug(k),brand:r.brand,name:r.model,spec:[cpuBreve(r.cpu),r.screen].filter(Boolean).join(' · '),righe:[],da:Infinity}); const p=m.get(k); p.righe.push(r); p.da=Math.min(p.da,r.prezzo);});
+  const ps=[...m.values()], marche=[...new Set(['Lenovo','HP','Dell','Apple',...ps.map(x=>x.brand)])], per=marche.map(b=>ps.filter(x=>x.brand===b)), out=[];
+  for(let i=0;per.some(l=>l[i]);i++) per.forEach(l=>{if(l[i]) out.push(l[i]);}); return out;};
+const nConfigs=p=>[...new Set(p.righe.map(nCfg))].sort((x,y)=>parseFloat(x)-parseFloat(y)||x.localeCompare(y));
+const nRiga=(p,cfg,g)=>{const rr=p.righe.filter(r=>nCfg(r)===cfg&&r.grade===g.slice(-1)); if(!rr.length) return null; return Object.assign({},rr[0],{prezzo:Math.min(...rr.map(r=>r.prezzo)),n:rr.reduce((a,r)=>a+r.n,0)});};
+const nIniziale=p=>{const cs=nConfigs(p); for(const g of ['Grado B','Grado A','Grado C','Grado D']) for(const c of cs.slice().reverse()) if(nRiga(p,c,g)) return [c,g]; return [cs[0],'Grado B'];};
+
 const GDESC={'Grado A':'Quasi impossibile distinguerlo da nuovo. Al massimo micro-segni visibili da vicino. Funziona al 100%.','Grado B':'Leggeri segni d’uso sulla scocca. Schermo e tastiera in ordine. Funziona al 100%.','Grado C':'Segni evidenti d’uso, possibile piccola ammaccatura. Funziona al 100%.','Grado D':'Funziona al 100%, ma ha la scocca rotta o danni estetici importanti. Testato e garantito come gli altri gradi.'};
 const banchiState=i=>{ if(i===23||i===47) return 'err'; if(i%9===0) return 'free'; if(i%4===0||i%7===0) return 'run'; return 'fin'; };
 const BANCO_TXT={fin:'Cancellazione finita, report pronto',run:'Cancellazione in corso',free:'Postazione libera',err:'Cancellazione interrotta: report dell’interruzione pronto per il cliente'};
@@ -984,14 +1005,15 @@ const A={
   nHome:()=>{S.n.view='home'; S.n.payMsg=false;},
   nCart:()=>{S.n.view='cart'; S.n.payMsg=false;},
   nBrand:v=>{S.n.brand=v;},
-  nOpen:i=>{S.n.view='prod'; S.n.pid=+i; S.n.g='Grado B'; S.n.ram=16; S.n.added=false;},
-  nG:g=>{S.n.g=g; S.n.added=false;},
-  nRam:r=>{S.n.ram=+r; S.n.added=false;},
-  nAdd:()=>{ if(S.n.added){S.n.view='cart';return;} const p=SHOP[S.n.pid]; S.n.cart.push({name:p.name,det:S.n.g+' · '+S.n.ram+' GB RAM',p:nPrice(p,S.n.g,S.n.ram)}); S.n.added=true;},
+  nOpen:v=>{const p=nProdotti().find(x=>x.slug===v); if(!p)return; const [c,g]=nIniziale(p); S.n.view='prod'; S.n.pid=v; S.n.cfg=c; S.n.g=g; S.n.added=false;},
+  nG:g=>{const p=nProdotti().find(x=>x.slug===S.n.pid); if(!p||!nRiga(p,S.n.cfg,g))return; S.n.g=g; S.n.added=false;},
+  nCfgSel:c=>{const p=nProdotti().find(x=>x.slug===S.n.pid); if(!p)return; S.n.added=false; S.n.cfg=c; if(!nRiga(p,c,S.n.g)) S.n.g=['Grado A','Grado B','Grado C','Grado D'].find(x=>nRiga(p,c,x))||S.n.g;},
+  nAdd:()=>{ if(S.n.added){S.n.view='cart';return;} const p=nProdotti().find(x=>x.slug===S.n.pid), r=p&&nRiga(p,S.n.cfg,S.n.g); if(!r)return;
+    if(S.n.cart.filter(v=>v.slug===p.slug&&v.grade===r.grade&&v.cfg===S.n.cfg).length>=r.n)return;
+    S.n.cart.push({slug:p.slug,name:p.name,model:r.model,grade:r.grade,ram:r.ram,cfg:S.n.cfg,det:S.n.g+' · '+(r.ram||'—')+' RAM',p:r.prezzo}); S.n.added=true;},
   nRemove:i=>{S.n.cart.splice(+i,1);},
   nPay:()=>{S.n.payMsg=true;}
 };
-function nPrice(p,g,ram){return p.base+GDELTA[g]+(ram===16?0:-30);}
 /* ================= VITA DEL SISTEMA: eventi, portale, J7, siti ================= */
 S.live={feed:[],toasts:[],seq:0};
 S.t.fixed={};
@@ -1064,12 +1086,13 @@ hook('tGiacChiedi',()=>evt('Posta','Mail al cliente pronta: giacenza, costo e ri
 /* negozio: pagamento simulato e ordine che arriva alla Corporation */
 A.nPay=()=>{S.n.view='pay';};
 A.nPaga=()=>{const tot=S.n.cart.reduce((a,c)=>a+c.p,0), c=S.n.cart[0]; S.n.ord={n:'SITO-1043',tot:tot,cosa:c?c.name:''}; S.n.view='ok';
-  const pc=c?pcInventario().find(d=>d.stato==='Disponibile'&&String(d.siti).indexOf('Sito')>=0&&d.model===c.name):null;
-  if(c&&pc){ORDINI.unshift([ora(),'Sito',pc.brand,pc.model,((c.det.match(/Grado ([A-D])/)||[])[1]||pc.grade),pc.sn,pc.shelf,'Da preparare']);
-    S.c.vn=(S.c.vn||[]).concat([{sn:pc.sn,lotto:pc.lotto,prezzo:tot,sito:'Sito',banc:pc.banc,shelf:pc.shelf}]);}
+  /* come il pagamento del programma: per ogni riga del carrello il PC più economico di quel modello, grado e RAM */
+  const presi=[]; S.n.cart.forEach(r=>{const pc=nVendibili().filter(d=>d.model===r.model&&d.grade===r.grade&&(!r.ram||d.ram===r.ram)&&!presi.includes(d)).sort((x,y)=>x.price-y.price)[0]; if(pc) presi.push(pc);});
+  presi.forEach(pc=>{ORDINI.unshift([ora(),'Sito',pc.brand,pc.model,pc.grade,pc.sn,pc.shelf,'Da preparare']);
+    S.c.vn=(S.c.vn||[]).concat([{sn:pc.sn,lotto:pc.lotto,prezzo:pc.price,netto:nettoVendita(pc.price,0,pc.costo),sito:'Sito',banc:pc.banc,shelf:pc.shelf}]);});
   S.n.cart=[]; S.n.added=false;
   evt('Negozio',`Pagamento riuscito: ordine SITO-1043, € ${tot}. Il PC è tolto subito dagli altri siti e in Inventario risulta venduto.`);
-  const u=(S.c.vn||[]).slice(-1)[0]; if(c&&u) setTimeout(()=>evt('Ordini',`Nuovo ordine in Corporation › Ordini: prendi il PC ${u.sn} in ${u.shelf}, bancale ${u.banc}.`),1300);};
+  const u=presi[0]; if(u) setTimeout(()=>evt('Ordini',`Nuovo ordine in Corporation › Ordini: prendi il PC ${u.sn} in ${u.shelf}, bancale ${u.banc}.`),1300);};
 
 /* portale clienti */
 A.pCli=v=>{S.p.cli=v; S.p.sec='home'; S.p.pod=false;};
@@ -1847,7 +1870,7 @@ function corp(){
   const c=S.c, s=c.sec; let body='', title='', hintTxt='';
   if(s==='home'){
     title='Home'; hintTxt='tocca una delle cose da guardare oggi per andare alla pagina giusta. Proposta: Magazzino è lo stesso numero di Lotti; prova a comprare un PC nel «Negozio online» e torna qui: salgono Venduti e Incassato, scende Magazzino, e in Lotti, Inventario e Ordini cambia tutto insieme.';
-    const LV=lottiVivi(), vn=S.c.vn||[], piu=vn.reduce((a,v)=>a+v.prezzo,0);
+    const LV=lottiVivi(), vn=S.c.vn||[], piu=vn.reduce((a,v)=>a+v.netto,0);
     const magazzino=LV.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0);
     const vendAnno=LV.reduce((a,r)=>a+r[5],0), incAnno=LV.reduce((a,r)=>a+nEur(r[6]),0);
     const vendOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato').length, vendMese=214+vn.length;
@@ -2347,29 +2370,34 @@ function negozio(){
   const n=S.n; let inner='';
   const head=`<div class="shophead"><button class="tab" style="font-size:18px;font-weight:800;letter-spacing:-.03em" data-act="nHome">Messina Corporation</button><div class="row" style="gap:4px"><button class="tab" data-act="nHome">Portatili</button><button class="tab" data-act="nHome">Apple</button><button class="tab" data-act="nHome">Per aziende</button></div>${b('Carrello · '+n.cart.length,'nCart','','sm')}</div>`;
   if(n.view==='home'){
-    const vis=SHOP.map((p,i)=>Object.assign({i:i},p)).filter(p=>n.brand==='Tutti'||p.brand===n.brand);
+    const tutti=nProdotti(), marche=['Tutti',...new Set(['Lenovo','HP','Dell','Apple',...tutti.map(x=>x.brand)])], vis=tutti.filter(p=>n.brand==='Tutti'||p.brand===n.brand);
     inner=`<div class="shopbody"><h1 class="shoph1">Messina Corporation</h1>
-      <div class="row" style="margin-bottom:18px">${['Tutti','Lenovo','HP','Dell','Apple'].map(x=>chip(x,'nBrand',x,n.brand===x)).join('')}<span class="lbl" style="margin-left:auto">${vis.length} modelli</span></div>
-      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">${vis.map(p=>`<button class="prod" data-act="nOpen" data-arg="${p.i}"><span class="ph">${LAPTOP}</span><span class="lbl">${p.brand}</span><b style="font-size:19px;letter-spacing:-.02em">${p.name}</b><span class="lbl">${p.spec}</span><span>da <b style="font-size:20px">€ ${p.base-40}</b></span></button>`).join('')}</div></div>`;
+      <div class="row" style="margin-bottom:18px">${marche.map(x=>chip(x,'nBrand',x,n.brand===x)).join('')}<span class="lbl" style="margin-left:auto">${vis.length} ${vis.length===1?'modello':'modelli'}</span></div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">${vis.map(p=>`<button class="prod" data-act="nOpen" data-arg="${p.slug}"><span class="ph">${LAPTOP}</span><span class="lbl">${p.brand}</span><b style="font-size:19px;letter-spacing:-.02em">${p.name}</b><span class="lbl">${p.spec}</span><span>da <b style="font-size:20px">${nEurS(p.da)}</b></span></button>`).join('')}${vis.length?'':'<p class="lbl">Nessun computer di questa marca in vendita adesso.</p>'}</div></div>`;
   }
   if(n.view==='prod'){
-    const p=SHOP[n.pid], price=nPrice(p,n.g,n.ram);
+    const p=nProdotti().find(x=>x.slug===n.pid);
+    if(!p) inner=`<div class="shopbody" style="max-width:760px;margin:0 auto"><h2 style="font-size:34px;font-weight:900;letter-spacing:-.04em;margin-bottom:16px">Non trovato</h2><div class="stack"><p>Questo computer non è più disponibile.</p>${b('Tutti i portatili','nHome','','ghost sm')}</div></div>`;
+    else {
+    const cfgs=nConfigs(p), r=nRiga(p,n.cfg,n.g), nel=n.cart.filter(v=>v.slug===p.slug&&v.grade===n.g.slice(-1)&&v.cfg===n.cfg).length, esaurito=!r||nel>=r.n, x=SCHEDA[p.name]||{};
+    const off='disabled style="opacity:.35;cursor:not-allowed"';
     inner=`<div class="shopbody"><div style="margin-bottom:14px">${b('Tutti i portatili','nHome','','ghost sm')}</div><div class="pdet">
       <div class="ph" style="border-radius:24px">${LAPTOP}</div>
       <div class="stack">
         <div><div class="lbl">${p.brand}</div><h2 style="font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.04em;line-height:1.05">${p.name}</h2><div class="muted">${p.spec}</div></div>
-        <div style="font-size:42px;font-weight:900;letter-spacing:-.04em">€ ${price}</div>
-        <div><b>Grado</b><div class="gradebox g4b" style="margin-top:8px">${['Grado A','Grado B','Grado C','Grado D'].map(g=>`<button class="gopt ${n.g===g?'on':''}" data-act="nG" data-arg="${g}"><span style="font-weight:700">${g}</span><span style="font-size:18px;font-weight:800">€ ${nPrice(p,g,n.ram)}</span></button>`).join('')}</div><p style="margin:10px 0 0" class="muted">${GDESC[n.g]}</p></div>
-        <div><b>Memoria</b><div class="row" style="margin-top:8px">${[8,16].map(r=>chip(r+' GB RAM · 256 GB SSD','nRam',r,n.ram===r)).join('')}</div></div>
-        <button class="bigbtn" data-act="nAdd">${n.added?'Aggiunto · vai al carrello':'Aggiungi al carrello'}</button>
+        <div style="font-size:42px;font-weight:900;letter-spacing:-.04em">${r?nEurS(r.prezzo):'—'}</div>
+        <div><b>Grado</b><div class="gradebox g4b" style="margin-top:8px">${['Grado A','Grado B','Grado C','Grado D'].map(g=>{const rx=nRiga(p,n.cfg,g); return `<button class="gopt ${n.g===g?'on':''}" data-act="nG" data-arg="${g}" aria-pressed="${n.g===g}" ${rx?'':off}><span style="font-weight:700">${g}</span><span style="font-size:${rx?18:14}px;font-weight:800;overflow-wrap:anywhere">${rx?nEurS(rx.prezzo):'Esaurito'}</span></button>`;}).join('')}</div><p style="margin:10px 0 0" class="muted">${GDESC[n.g]}</p></div>
+        <div><b>Memoria</b><div class="row" style="margin-top:8px">${cfgs.map(c=>chip(c,'nCfgSel',c,n.cfg===c)).join('')}</div></div>
+        <button class="bigbtn" data-act="nAdd" ${!n.added&&esaurito?off:''}>${n.added?'Aggiunto · vai al carrello':esaurito?'Esaurito':'Aggiungi al carrello'}</button>
         <div class="row">${pill('Dati cancellati con metodo certificato')}${pill('Garanzia [mesi]')}${pill('Reso entro [giorni]')}</div>
       </div></div>
-      <div class="pcard" style="padding:18px;margin-top:18px"><b style="font-size:20px">Scheda tecnica</b><div class="schedat">${[['Marca',p.brand],['Modello',p.name],['Generazione',p.gen],['Processore',p.cpu],['Scheda grafica',p.gpu],['RAM',n.ram+' GB'],['Disco','256 GB '+p.disco],['Schermo',p.schermo],['Batteria',p.batt],['Sistema operativo',p.os],['Tastiera',p.tastiera],['Porte',p.porte],['Rete',p.rete],['Webcam',p.webcam],['Peso',p.peso],['Grado',n.g],['Dati','Cancellati con software certificato, rapporto per numero di serie']].map(r=>`<div><span class="lbl">${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div></div></div>`;
+      ${r?`<div class="pcard" style="padding:18px;margin-top:18px"><b style="font-size:20px">Scheda tecnica</b><div class="schedat">${[['Marca',r.brand],['Modello',r.model],['Generazione',x.gen],['Processore',r.cpu],['Scheda grafica',r.gpu],['RAM',r.ram],['Disco',r.disk],['Schermo',r.screen],['Batteria',r.bat!=null?`almeno ${r.bat}% della capacità originale`:null],['Sistema operativo',x.os],['Tastiera',x.tastiera],['Porte',x.porte],['Rete',x.rete],['Webcam',x.webcam],['Peso',x.peso],['Grado',n.g],['Dati','Cancellati con software certificato, rapporto per numero di serie']].filter(v=>v[1]!=null&&v[1]!=='').map(v=>`<div><span class="lbl">${v[0]}</span><b>${v[1]}</b></div>`).join('')}</div></div>`:''}</div>`;
+    }
   }
   if(n.view==='pay'){
     const tot=n.cart.reduce((a,c)=>a+c.p,0);
     inner=`<div class="shopbody" style="max-width:620px;margin:0 auto"><h2 style="font-size:34px;font-weight:900;letter-spacing:-.04em;margin-bottom:6px">Pagamento</h2><div class="lbl" style="margin-bottom:16px">Simulazione: nessun addebito. Sul sito vero si paga con carta, Apple Pay o Google Pay tramite Stripe.</div>
-      ${n.cart.map(c=>`<div class="pcard row between" style="padding:14px;margin-bottom:8px"><span><b>${c.name}</b><span class="lbl" style="display:block">${c.det}</span></span><b>€ ${c.p}</b></div>`).join('')}
+      ${n.cart.map(c=>`<div class="pcard row between" style="padding:14px;margin-bottom:8px"><span><b>${c.name}</b><span class="lbl" style="display:block">${c.det}</span></span><b>${nEurS(c.p)}</b></div>`).join('')}
       <div class="pcard stack" style="padding:16px;gap:8px;margin-top:6px"><div class="kvp"><span>Spedizione</span><b>Gratis</b></div><div class="kvp" style="border:0"><span>Totale IVA inclusa</span><b style="font-size:22px">€ ${tot}</b></div></div>
       <div style="margin-top:14px"><button class="bigbtn" data-act="nPaga">Paga € ${tot}</button></div></div>`;
   }
