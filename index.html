@@ -317,14 +317,17 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 const _D=n=>{const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return d;};
 const cap=t=>t[0].toUpperCase()+t.slice(1);
 /* orari realistici, come packages/dati/src/calendario.ts del programma (stesse regole, stessi nomi):
-   lavoro in azienda solo nei giorni lavorativi, all'ultima volta che è arrivata quell'ora (mai nel futuro, mai di notte);
-   siti e clienti online a qualsiasi ora, qualche minuto fa; avvisi delle telecamere: l'ultima notte */
-const lavorativo=d=>d.getDay()>=1&&d.getDay()<=5;
+   lavoro in azienda dalle 7:30 alle 21:30 dei giorni lavorativi, all'ultima volta che è arrivata quell'ora (mai nel futuro, mai di notte, mai di festa);
+   siti e clienti online a qualsiasi ora, qualche minuto fa (la vendita conta nel giorno in cui avviene); avvisi delle telecamere: l'ultima notte.
+   Le feste nazionali le aggiorna Claude ogni anno, uguali nel programma e nel database. */
+const FESTE=['2026-01-01','2026-01-06','2026-04-06','2026-04-25','2026-05-01','2026-06-02','2026-08-15','2026-10-04','2026-11-01','2026-12-08','2026-12-25','2026-12-26',
+ '2027-01-01','2027-01-06','2027-03-29','2027-04-25','2027-05-01','2027-06-02','2027-08-15','2027-10-04','2027-11-01','2027-12-08','2027-12-25','2027-12-26'];
+const lavorativo=d=>d.getDay()>=1&&d.getDay()<=5&&!FESTE.includes(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
 const ultimaLav=(h,m=0,prima=0,adesso=Date.now())=>{const d=new Date(adesso); d.setHours(h,m,0,0); if(d.getTime()>adesso) d.setDate(d.getDate()-1); while(!lavorativo(d)) d.setDate(d.getDate()-1); for(let i=0;i<prima;i++){do d.setDate(d.getDate()-1); while(!lavorativo(d));} return d;};
 const ultimaOra=(h,m=0)=>{const d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return d;};
 const minFa=n=>new Date(Date.now()-n*60000);
 const caricatoGg=(gg,h=10,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); while(!lavorativo(d)||d.getTime()>Date.now()){d.setDate(d.getDate()-1); d.setHours(h,m,0,0);} return d;};
-const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(7,30,0,adesso).getTime(), fine=inizio+10*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
+const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(7,30,0,adesso).getTime(), fine=inizio+14*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
 const dtFmt=x=>new Date(x).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','');
 const hmFmt=x=>new Date(x).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 /* L-016 (strada «Lettura»): letti al banco alle 14:35, 14:41, 14:47, il primo caricato alle 15:40 dell'ultimo giorno lavorativo */
@@ -499,7 +502,7 @@ const MAG=[
  ['S02-6-3','Scaffale','Snam','B-0124',48,[['Cavi',6,[],'Pistola','Magazziniere 1',22],['Sensori',4,[],'Pistola','Magazziniere 1',22]]],
  ['S03-1-1','Scaffale','Snam','B-0125',120,[['Contatori',12,[],'Pistola','Magazziniere 1',23]]],
  ['S03-1-3','Scaffale','Snam','B-0126',168,[['Apparati con seriale',18,['SN31301','SN31302'],'Pistola','Magazziniere 1',23]]],
- ['S03-2-1','Scaffale','Snam','B-0127',oreDa(7,5),[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',oreDa(7,5)]]],
+ ['S03-2-1','Scaffale','Snam','B-0127',oreDa(7,42),[['Armadi tecnici',2,[],'Pistola','Magazziniere 1',oreDa(7,42)]]],
  ['S03-2-2','Scaffale','Snam','B-0128',10248,[['Apparati con seriale',18,['SN32201','SN32202'],'Pistola','Magazziniere 1',23]]],
  ['S03-2-3','Scaffale','Snam','B-0129',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
  ['S03-3-2','Scaffale','Snam','B-0130',192,[['Cavi',6,[],'Pistola','Magazziniere 1',23],['Sensori',4,[],'Pistola','Magazziniere 1',23]]],
@@ -881,7 +884,7 @@ const nIniziale=p=>{const cs=nConfigs(p); for(const g of ['Grado B','Grado A','G
 
 const GDESC={'Grado A':'Quasi impossibile distinguerlo da nuovo. Al massimo micro-segni visibili da vicino. Funziona al 100%.','Grado B':'Leggeri segni d’uso sulla scocca. Schermo e tastiera in ordine. Funziona al 100%.','Grado C':'Segni evidenti d’uso, possibile piccola ammaccatura. Funziona al 100%.','Grado D':'Funziona al 100%, ma ha la scocca rotta o danni estetici importanti. Testato e garantito come gli altri gradi.'};
 /* stage di oggi e di ieri, come li conta il programma dalle righe dello stage (vista stage_oggi) */
-/* una giornata intera dello stage (07:30–17:30) e il riepilogo che chiede Econocom: come prova-stage.ts */
+/* una giornata intera dello stage (07:30–21:30, l'orario dell'azienda) e il riepilogo che chiede Econocom: come prova-stage.ts */
 const STAGE_GIORNO={ricevuti:436,formattati:414,in_vendita:38}, STAGE_MESE={ricevuti:8640,formattati:8512,falliti:41,in_vendita:612}, STAGE_IERI={formattati:398,falliti:3};
 /* gli ordini dei siti per numero: il PC (come «riferimento» degli ordini nel programma) */
 const ORDINI_RIF={'BM-48213':'PF3XXXXX'};
@@ -1371,10 +1374,10 @@ function satellitare(t){
 
 /* telecamere: una sola sezione per tutto il capannone, visibile solo alla Direzione */
 const CAM=['Ingresso','Piazzale','Baie di carico','Corsia S03','Corsia S07','Stage'];
-const CAM_AVVISI=[[ultimaOra(2,14),'Piazzale','Persona vicino al cancello, fuori orario','red'],[ultimaOra(3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(5,52),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']]
+const CAM_AVVISI=[[ultimaOra(2,14),'Piazzale','Persona vicino al cancello, fuori orario','red'],[ultimaOra(3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(7,30),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']]
   .filter(a=>a[0].getTime()>=Date.now()-86400000).sort((x,y)=>x[0]-y[0]).map(a=>[hmFmt(a[0])].concat(a.slice(1)));
 /* le scansioni di stamattina sono gli stessi bancali della pianta: B-0128 lascia S03-2-1 per S03-2-2, poi in S03-2-1 entra B-0127 */
-const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[6,22],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,5],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,41],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
+const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[7,34],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,42],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,55],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
 function telecamere(t){
   const ora0=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   const vivo=(n,i)=>`<button class="tcam ${t.camSel===i?'on':''}" data-act="camSel" data-arg="${i}"><span class="cam-img" aria-hidden="true"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${n}</span><span class="cam-ora">${ora0}</span></button>`;
@@ -1939,7 +1942,7 @@ function corp(){
     const nMail=C_MAILS.filter((m,i)=>m.nuova&&!(c.lette||{})[i]).length;
     if(nMail) guarda.push([conta(nMail,'1 mail da leggere','mail da leggere'),'mail','Mail',false]);
     const inVendita=968-vn.length+(c.carApp||[]).filter(x=>x.siti).length+(S.k.lettFatto&&Object.keys(S.k.canali).some(x=>S.k.canali[x])?1:0);
-    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2+vn.length]].sort((a,b)=>b[1]-a[1]);
+    const can=[['Back Market',62],['Azienda',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2+vn.length]].sort((a,b)=>b[1]-a[1]);
     const maxCan=Math.max(...can.map(x=>x[1]));
     const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],[meseOra(),v[1]],[String(new Date().getFullYear()),v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
     body=`<div class="kpi">
