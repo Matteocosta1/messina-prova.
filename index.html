@@ -316,6 +316,22 @@ textarea{font:inherit;font-size:15px;line-height:1.5;min-height:110px;border-rad
 /* date vere (24/11): il mockup gira sulla data di oggi, come il programma. Le date d'esempio sono a scarti fissi da oggi */
 const _D=n=>{const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return d;};
 const cap=t=>t[0].toUpperCase()+t.slice(1);
+/* orari realistici, come packages/dati/src/calendario.ts del programma (stesse regole, stessi nomi):
+   lavoro in azienda solo nei giorni lavorativi, all'ultima volta che è arrivata quell'ora (mai nel futuro, mai di notte);
+   siti e clienti online a qualsiasi ora, qualche minuto fa; avvisi delle telecamere: l'ultima notte */
+const lavorativo=d=>d.getDay()>=1&&d.getDay()<=5;
+const ultimaLav=(h,m=0,prima=0,adesso=Date.now())=>{const d=new Date(adesso); d.setHours(h,m,0,0); if(d.getTime()>adesso) d.setDate(d.getDate()-1); while(!lavorativo(d)) d.setDate(d.getDate()-1); for(let i=0;i<prima;i++){do d.setDate(d.getDate()-1); while(!lavorativo(d));} return d;};
+const ultimaOra=(h,m=0)=>{const d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return d;};
+const minFa=n=>new Date(Date.now()-n*60000);
+const caricatoGg=(gg,h=10,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.setHours(h,m,0,0); while(!lavorativo(d)||d.getTime()>Date.now()){d.setDate(d.getDate()-1); d.setHours(h,m,0,0);} return d;};
+const giornataStage=(adesso=Date.now())=>{const inizio=ultimaLav(7,30,0,adesso).getTime(), fine=inizio+10*3600000, fin=Math.min(adesso,fine); return {inizio,fine,fin,f:Math.max(0,Math.min(1,(fin-inizio)/(fine-inizio)))};};
+const dtFmt=x=>new Date(x).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','');
+const hmFmt=x=>new Date(x).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+/* L-016 (strada «Lettura»): letti al banco alle 14:35, 14:41, 14:47, il primo caricato alle 15:40 dell'ultimo giorno lavorativo */
+const CARICO_L016=ultimaLav(15,40);
+/* un ordine fatto adesso parte entro le 16 del giorno lavorativo (come entro_spedizione del programma) */
+const entroSpedizione=(q=Date.now())=>{const d=new Date(q), x=new Date(q); x.setHours(16,0,0,0); if(!lavorativo(d)||d.getTime()>=x.getTime()){do{x.setDate(x.getDate()+1);}while(!lavorativo(x));} return x;};
+const quandoParte=()=>{const e=entroSpedizione(), o=new Date(), d=new Date(); d.setDate(o.getDate()+1); return e.toDateString()===o.toDateString()?'oggi':e.toDateString()===d.toDateString()?'domani':e.toLocaleDateString('it-IT',{weekday:'long'});};
 const isoG=n=>{const d=_D(n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const gLungo=n=>cap(_D(n).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}));
 const gBreve=n=>{const d=_D(n); return cap(d.toLocaleDateString('it-IT',{weekday:'short'}).replace('.',''))+' '+d.getDate()+' '+d.toLocaleDateString('it-IT',{month:'long'});};
@@ -446,12 +462,15 @@ const quandoH=h=>{const x=new Date(Date.now()-h*3600000), o=new Date(), i=new Da
 const dataH=h=>new Date(Date.now()-h*3600000).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
 const codiciC=c=>!c||!c.length?'—':(c.length<=2?c.join(', '):c.slice(0,2).join(', ')+' +'+(c.length-2));
 /* i bancali al loro posto: quelli della pianta più il bancale nuovo fatto con l'App Corporation */
-const bancaliVivi=()=>MAG.concat(S.k&&S.k.nbFatto?[[S.k.nbFatto.posto,'Scaffale','Messina Corporation','B-0303',(Date.now()-S.k.nbFatto.t)/3600000,[]]]:[]);
+/* i bancali nati con il primo PC caricato sopra (come nel programma): arrivano quando è stato caricato quel PC */
+const BANC_PRIMO_PC={'B-0300':'5CGXXXXX','B-0301':'C02XXXXX','B-0302':'5CDXXXXX'};
+const bancaliVivi=()=>MAG.map(m=>{const sn=BANC_PRIMO_PC[m[3]], d=sn&&DEVICES.find(x=>x.sn===sn); return d?[m[0],m[1],m[2],m[3],(Date.now()-d.carMs)/3600000,m[5]]:m;})
+  .concat(S.k&&S.k.nbFatto?[[S.k.nbFatto.posto,'Scaffale','Messina Corporation','B-0303',(Date.now()-S.k.nbFatto.t)/3600000,[]]]:[]);
 /* i PC della Corporation ancora sul bancale (non spediti né consegnati a mano): li legge l'Inventario */
-const pcSulBancale=cod=>pcInventario().filter(d=>d.banc===cod&&!d.uscito&&!ORDINI.some(o=>o[5]===d.sn&&(o[7]==='Spedito'||o[7]==='Consegnato'))).map(d=>({articolo:d.brand+' '+d.model,seriale:d.sn,h:(d.gg||0)*24}));
+const pcSulBancale=cod=>pcInventario().filter(d=>d.banc===cod&&!d.uscito&&!ORDINI.some(o=>o[5]===d.sn&&(o[7]==='Spedito'||o[7]==='Consegnato'))).map(d=>({articolo:d.brand+' '+d.model,seriale:d.sn,h:d.carMs?(Date.now()-d.carMs)/3600000:0}));
 /* magazzino (24/11): la stessa pianta del programma; i PC della Corporation sui bancali si leggono dall'Inventario */
 /* ore passate dall'ultima volta che è arrivata quell'ora (di notte: ieri), come «ultima» nel programma */
-const oreDa=(h,m)=>{const d=new Date(); d.setHours(h,m,0,0); if(d.getTime()>Date.now()) d.setDate(d.getDate()-1); return (Date.now()-d.getTime())/3600000;};
+const oreDa=(h,m)=>(Date.now()-ultimaLav(h,m).getTime())/3600000;
 const MAG=[
  ['S01-1-2','Scaffale','Apple','B-0100',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
  ['S01-2-1','Scaffale','Apple','B-0101',96,[['iMac',8,[],'Pistola','Magazziniere 1',21]]],
@@ -694,10 +713,10 @@ const STOPS=[
  {cliente:'Apple',ind:'Via [indirizzo], Pieve Emanuele',fascia:'15–18',colli:'8 colli',nota:'Sponda'}
 ];
 const C_MAILS=[
- {nuova:true,da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’89% dal test. Se ordini oggi spediamo entro domani. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
- {nuova:true,da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine BM-48213 per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azGo:'ordini',rif:'BM-48213'},
- {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azGo:'stage',riep:true},
- {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'}
+ {nuova:true,t:minFa(24).getTime(),da:'Acquirente eBay',ind:'tramite eBay',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire presto?',all:'',bozza:`Ciao, la batteria è all’89% dal test. Se ordini oggi spediamo ${quandoParte()}. Grazie!`,az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
+ {nuova:true,t:minFa(30).getTime(),da:'Back Market',ind:'notifiche',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine BM-48213 per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azGo:'ordini',rif:'BM-48213'},
+ {t:ultimaLav(8,40).getTime(),da:'Econocom',ind:'referente@[dominio]',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azGo:'stage',riep:true},
+ {t:ultimaLav(8,2).getTime(),da:'[Fornitore lotto]',ind:'aste@[dominio]',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'}
 ];
 const DEVICES=[
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W0004XIX',cpu:'i5-1145G7',ram:'16 GB',disk:'256 GB SSD',sal:'Buono',ore:4210,bat:null,cicli:190,screen:'14"',gpu:'Intel Iris Xe',pw:'No',canc:'',grade:'B',dif:'',lotto:'L-016',costo:150,price:259,stato:'Disponibile',siti:'eBay, Subito',gg:0,banc:'B-0227',shelf:'S11-2-1',post:3,letto:'',foto:'lenovo-20w0004xix.jpg',sn:'PF5XXXX1',conf:false,uscito:false},
@@ -725,11 +744,16 @@ const DEVICES=[
  {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'i5-1145G7',ram:'8 GB',disk:'256 GB SSD',sal:'',ore:null,bat:82,cicli:null,screen:'14"',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, Tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Venduto',siti:'Subito',gg:64,banc:'B-0238',shelf:'S12-1-1',post:'',letto:'',foto:'',sn:'JXXXXXX',conf:true,uscito:true}
 ];
 /* la data di carico si conta dai giorni, come nel programma (i dati di prova sono relativi a oggi) */
-DEVICES.forEach(d=>{const x=new Date(Date.now()-d.gg*86400000); d.car=x.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});});
+DEVICES.forEach(d=>{d.carMs=(d.sn==='PF5XXXX1'?CARICO_L016:caricatoGg(d.gg)).getTime(); d.gg=Math.max(0,Math.floor((Date.now()-d.carMs)/86400000)); d.car=dtFmt(d.carMs);});
+/* i PC in vendita allo stage del negozio (tutti tranne PF5XXXX1, arrivato dopo): la loro cancellazione conta nella giornata dello stage */
+const STAGE_NEG=DEVICES.filter(d=>d.stato==='Disponibile'&&d.sn!=='PF5XXXX1').map(d=>d.carMs);
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
 const gFa=n=>new Date(Date.now()-n*86400000).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-const LOTTI=[['L-016','Lettura',gFa(0),3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco',gFa(20),612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto',gFa(50),480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto',gFa(80),320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
+const LOTTI=[['L-016','Lettura',ultimaLav(9,0).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}),3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco',gFa(20),612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto',gFa(50),480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto',gFa(80),320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
 /* proposta 24/11: tutto correlato. Una vendita nella prova (Negozio online) entra nel suo lotto: Lotti, Home, Inventario e Ordini leggono gli stessi dati */
+/* controllo del DDT (come carica_ddt del programma): i seriali del DDT confrontati con l'archivio dei PC lavorati allo stage.
+   L-015: 609 formattati da noi per Accenture, 3 sconosciuti; L-016: 3 PC già formattati da altri */
+const DDT_LOTTI={'L-016':{nel_ddt:3,lavorati:0,da_verificare:3},'L-015':{nel_ddt:612,lavorati:609,da_verificare:3},'L-014':{nel_ddt:480,lavorati:0,da_verificare:480},'L-013':{nel_ddt:320,lavorati:0,da_verificare:320}};
 const nEur=x=>+String(x).replace(/[^\d-]/g,'');
 const fNum=n=>(n<0?'-':'')+String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fEur=n=>'€ '+fNum(n);
@@ -755,10 +779,11 @@ function pcLetti(){
   const oggi=oggiIt();
   return LETTURE.map((l,i)=>{const car=i===0||(i===1&&S.k.lettFatto);
     const d=i===1&&S.k.lettFatto?{grado:S.k.grado,prezzo:+S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),siti:Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', ')}:{grado:l.grado,prezzo:l.prezzo,banc:l.banc,shelf:l.shelf,dif:'',siti:'Back Market, Refurbed, eBay, Subito'};
-    const gia=DEVICES.find(x=>x.sn===l.sn); if(gia) return Object.assign({},gia,{post:l.post,letto:oggi+' '+l.letto,caricato:true});
+    const letto=dtFmt(CARICO_L016.getTime()-[65,59,53][i]*60000);
+    const gia=DEVICES.find(x=>x.sn===l.sn); if(gia) return Object.assign({},gia,{post:l.post,letto,caricato:true});
     return {sn:l.sn,brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:l.cod,cpu:l.cpu,ram:l.ram,disk:l.disk,sal:l.sal,ore:l.ore,bat:l.bat,cicli:l.cicli,screen:l.screen,gpu:l.gpu,pw:l.pw,canc:'',
       grade:car?d.grado:'',dif:car?d.dif:'',lotto:'L-016',costo:150,price:car?d.prezzo:null,stato:car?'Disponibile':'',siti:car?d.siti:'',gg:car?0:null,banc:car?d.banc:'',shelf:car?d.shelf:'',
-      post:l.post,letto:oggi+' '+l.letto,car:car?oggi+' 15:4'+i:'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
+      post:l.post,letto,car:car?dtFmt(Date.now()):'',foto:'lenovo-20w0004xix.jpg',caricato:car};});
 }
 /* Inventario: i PC caricati, di tutti i lotti */
 const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:o[1]},n?{price:n.prezzo}:{});};
@@ -810,12 +835,16 @@ function scaricaExcel(nome,col,righe){
 }
 const quandoOrdine=ms=>{const t=new Date(Date.now()-ms), g=x=>x.toDateString(), i=new Date(); i.setDate(i.getDate()-1);
   return g(t)===g(new Date())?t.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}):(g(t)===g(i)?'Ieri':t.toLocaleDateString('it-IT',{day:'numeric',month:'short'}));};
-const ORDINI=[
- ['09:14','Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
- ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
- ['08:10','Subito','Dell','Latitude 5420','C','JXXXXXX','S12-1-1','Spedito'],
- [quandoOrdine(26*3600000),'Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Annullato']
-];
+/* ordini dei siti con l'ora vera (come il programma): dal più nuovo */
+const ORDINI_T=[[minFa(30).getTime(),'Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
+ [minFa(52).getTime(),'eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
+ [ultimaLav(8,10).getTime(),'Subito','Dell','Latitude 5420','C','JXXXXXX','S12-1-1','Spedito'],
+ [Date.now()-26*3600000,'Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Annullato']].sort((x,y)=>y[0]-x[0]);
+const ORDINI=ORDINI_T.map(r=>[quandoOrdine(Date.now()-r[0])].concat(r.slice(1)));
+/* prezzo e commissione delle vendite degli ordini: l'incassato di oggi è il loro netto */
+const ORD_VEND={'PF3XXXXX':[249,25],'5CGXXXXX':[329,33],'JXXXXXX':[179,0]};
+/* le mail della Corporation con l'ora vera, dalla più nuova (come la Mail del programma) */
+C_MAILS.sort((x,y)=>y.t-x.t).forEach(m=>{m.ora=quandoOrdine(Date.now()-m.t);});
 const TELEFONI=[
  ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Chiuso'],
  ['35XXXXXXXXXXXX2','Samsung','Galaxy S21','Accenture','[n. ticket]','Fatto','Da fare','Manuel','Sblocco'],
@@ -852,12 +881,21 @@ const nIniziale=p=>{const cs=nConfigs(p); for(const g of ['Grado B','Grado A','G
 
 const GDESC={'Grado A':'Quasi impossibile distinguerlo da nuovo. Al massimo micro-segni visibili da vicino. Funziona al 100%.','Grado B':'Leggeri segni d’uso sulla scocca. Schermo e tastiera in ordine. Funziona al 100%.','Grado C':'Segni evidenti d’uso, possibile piccola ammaccatura. Funziona al 100%.','Grado D':'Funziona al 100%, ma ha la scocca rotta o danni estetici importanti. Testato e garantito come gli altri gradi.'};
 /* stage di oggi e di ieri, come li conta il programma dalle righe dello stage (vista stage_oggi) */
-const STAGE_OGGI={ricevuti:436,formattati:414,in_vendita:38}, STAGE_MESE={ricevuti:8640,formattati:8512,falliti:41,in_vendita:612}, STAGE_IERI={formattati:398,falliti:3};
+/* una giornata intera dello stage (07:30–17:30) e il riepilogo che chiede Econocom: come prova-stage.ts */
+const STAGE_GIORNO={ricevuti:436,formattati:414,in_vendita:38}, STAGE_MESE={ricevuti:8640,formattati:8512,falliti:41,in_vendita:612}, STAGE_IERI={formattati:398,falliti:3};
 /* gli ordini dei siti per numero: il PC (come «riferimento» degli ordini nel programma) */
 const ORDINI_RIF={'BM-48213':'PF3XXXXX'};
 const T0=Date.now();
 const banchiState=i=>{ if(i===23||i===47) return 'err'; if(i%9===0) return 'free'; if(i%4===0||i%7===0) return 'run'; return 'fin'; };
 const nBanco=x=>Array.from({length:60},(_,k)=>banchiState(k+1)).filter(y=>y===x).length;
+/* «oggi» dello stage, contato come la vista stage_oggi del programma: i numeri crescono con l'ora della giornata;
+   i 32 finiti del banco hanno lavorato di notte; di notte e nei festivi «oggi» non si è ancora lavorato (restano gli «in corso») */
+function stageOggi(){const G=giornataStage(), oggiD=new Date(G.inizio).toDateString()===new Date().toDateString();
+  if(!oggiD) return {ricevuti:0,formattati:0,in_corso:nBanco('run'),falliti:0,in_vendita:0};
+  const Rt=Math.round(STAGE_GIORNO.ricevuti*G.f), Ft=Math.round(STAGE_GIORNO.formattati*G.f), Vt=Math.round(STAGE_GIORNO.in_vendita*G.f);
+  const neg=STAGE_NEG.filter(t=>t>=G.inizio&&t<=G.fin).length, giaF=nBanco('fin')+neg, giaI=nBanco('run')+nBanco('free')+nBanco('err')+neg+Vt;
+  const extra=Math.max(Ft-giaF,0), inG=Math.min(extra,Math.max(Rt-giaI,0));
+  return {ricevuti:giaI+inG,formattati:giaF+extra,in_corso:nBanco('run'),falliti:nBanco('err'),in_vendita:Vt};}
 const BANCO_TXT={fin:'Cancellazione finita, report pronto',run:'Cancellazione in corso',free:'Postazione libera',err:'Cancellazione interrotta: report dell’interruzione pronto per il cliente'};
 
 /* ---------- AZIONI ---------- */
@@ -1083,7 +1121,7 @@ hook('bTimbra',()=>{const x=S.b.timb[0]; if(x)evt('Presenze',`Christian · ${x[0
 hook('bFinto',()=>evt('Presenze','Allarme: badge di Christian passato da un telefono non registrato. Timbratura rifiutata, avvisati Angela e la Direzione.'));
 hook('tAllVisto',()=>evt('Presenze','Messaggio pronto per il dipendente.'));
 hook('tPresFix',i=>evt('Presenze',`Uscita di ${PRES_IERI[i][0]} sistemata da Angela.`));
-hook('cDdt',()=>evt('Lotti','DDT del lotto L-015 letto: 609 seriali su 612 trovati, 3 da verificare.'));
+hook('cDdt',()=>{const l=lottiVivi()[0], d=DDT_LOTTI[l[0]]; evt('Lotti',`DDT del lotto ${l[0]} letto: ${fNum(d.lavorati)} seriali su ${fNum(d.nel_ddt)} trovati, ${fNum(d.da_verificare)} da verificare.`);});
 hook('cEtichetta',i=>evt('Ordini',`Etichetta del corriere pronta per ${ORDINI[+i][3]}: prendi il PC in ${ORDINI[+i][6]}.`));
 hook('kFatto',()=>{const att=Object.keys(S.k.canali).filter(x=>S.k.canali[x]); evt('Inventario',`ThinkPad T14 Gen 2 grado ${S.k.grado} in vendita a € ${S.k.prezzo} su ${att.length} siti.`);});
 hook('cApriL',()=>{const n=(S.c.nuovi||[])[0]; if(n&&S.c.lottoMsg&&S.c.lottoMsg!=='esiste') evt('Lotti',`Lotto ${n[0]} aperto · strada ${n[1]}.`);});
@@ -1333,7 +1371,8 @@ function satellitare(t){
 
 /* telecamere: una sola sezione per tutto il capannone, visibile solo alla Direzione */
 const CAM=['Ingresso','Piazzale','Baie di carico','Corsia S03','Corsia S07','Stage'];
-const CAM_AVVISI=[['02:14','Piazzale','Persona vicino al cancello, fuori orario','red'],['03:40','Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],['05:52','Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']];
+const CAM_AVVISI=[[ultimaOra(2,14),'Piazzale','Persona vicino al cancello, fuori orario','red'],[ultimaOra(3,40),'Piazzale','Auto ferma 6 minuti davanti all’ingresso','red'],[ultimaLav(5,52),'Ingresso','Apertura del magazzino: Magazziniere 1, badge regolare','ok']]
+  .filter(a=>a[0].getTime()>=Date.now()-86400000).sort((x,y)=>x[0]-y[0]).map(a=>[hmFmt(a[0])].concat(a.slice(1)));
 /* le scansioni di stamattina sono gli stessi bancali della pianta: B-0128 lascia S03-2-1 per S03-2-2, poi in S03-2-1 entra B-0127 */
 const CAM_SCAN=[['B-0128','S03-2-2','Trasferisci','Magazziniere 2',[6,22],'Corsia S03'],['B-0127','S03-2-1','Entrata','Magazziniere 1',[7,5],'Baie di carico'],['Collo 3 di 4','—','Uscita','Magazziniere 2',[7,41],'Baie di carico'],['S07-2-1','S07','Missione','Magazziniere 1',[8,10],'Corsia S07']];
 function telecamere(t){
@@ -1343,7 +1382,7 @@ function telecamere(t){
     <div class="camgrid">${CAM.map(vivo).join('')}</div>
     ${t.camSel!==null?`<div class="glass card stack"><div class="row between"><b>${CAM[t.camSel]} · grande</b>${b('Chiudi','camSel',t.camSel,'ghost sm')}</div><div class="tcam big-cam"><span class="cam-img"></span><span class="cam-top"><span class="dot"></span>Dal vivo</span><span class="cam-nome">${CAM[t.camSel]}</span><span class="cam-ora">${ora0}</span></div><div class="lbl">Registrazione degli ultimi [giorni] giorni sul registratore in capannone: si scorre per ora.</div></div>`:''}
     <div class="row" style="align-items:flex-start;gap:16px">
-      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi della notte</b><div class="list">${CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join('')}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
+      <div class="glass card stack" style="flex:1 1 360px;min-width:0"><b>Avvisi della notte</b><div class="list">${CAM_AVVISI.length?CAM_AVVISI.map(a=>`<div class="li"><span class="row between" style="width:100%"><b>${a[0]} · ${a[1]}</b>${pill(a[3]==='red'?'Da guardare':'Normale',a[3]==='red'?'red':'ok')}</span><span class="lbl">${a[2]} · foto salvata</span></div>`).join(''):'<div class="lbl" style="padding:10px">Nessun avviso nelle ultime 24 ore.</div>'}</div><span class="lbl">Gli avvisi arrivano anche sul telefono della Direzione.</span></div>
       <div class="glass tbox" style="flex:2 1 520px;min-width:0"><div style="padding:14px 14px 0;font-weight:700">Foto delle scansioni</div><table class="t nw"><thead><tr><th>Cosa</th><th>Posto</th><th>Movimento</th><th>Chi</th><th>Ora</th><th>Telecamera</th><th></th></tr></thead><tbody>
         ${CAM_SCAN.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${quandoH(oreDa(r[4][0],r[4][1]))}</td><td>${r[5]}</td><td><span class="cam-mini" aria-label="Foto"></span></td></tr>`).join('')}
       </tbody></table><p class="lbl" style="margin:0;padding:0 14px 14px">A ogni scansione la telecamera più vicina salva una foto insieme al movimento: se qualcosa non torna, si apre il movimento e si vede cos’è successo.</p></div>
@@ -1884,10 +1923,10 @@ function corp(){
     const magazzino=LV.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0);
     const vendAnno=LV.reduce((a,r)=>a+r[5],0), incAnno=LV.reduce((a,r)=>a+nEur(r[6]),0);
     const vendOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato').length, vendMese=214+vn.length;
-    const incOggi=757+piu, incMese=26840+piu;
+    const incOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato'&&ORD_VEND[o[5]]).reduce((a,o)=>{const d=DEVICES.find(x=>x.sn===o[5]); return a+nettoVendita(ORD_VEND[o[5]][0],ORD_VEND[o[5]][1],d?d.costo:0);},0)+piu, incMese=26840+piu;
     const daSpedire=ORDINI.filter(o=>o[7]==='Da preparare').length;
     const inv=pcInventario(), nResi=inv.filter(d=>d.stato==='Reso').length, nConf=inv.filter(d=>d.stato!=='Venduto'&&d.price!=null&&d.conf===false).length;
-    const nInterr=Array.from({length:60},(_,k)=>banchiState(k+1)).filter(x=>x==='err').length;
+    const nInterr=stageOggi().falliti;   /* come il programma: le interruzioni di oggi */
     const conta=(n,uno,tanti)=>n===1?uno:n+' '+tanti;
     /* come il programma: le voci si contano dai dati, compaiono solo se c'è qualcosa da fare */
     const guarda=[['11 PC invenduti da oltre 60 giorni','inv','Inventario',true]];
@@ -1911,7 +1950,7 @@ function corp(){
     </div>
     <div class="glass card stack">
       <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
-      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti',fNum(STAGE_OGGI.ricevuti)],['Formattati',fNum(STAGE_OGGI.formattati)],['In corso',fNum(nBanco('run'))],['Interrotti',fNum(nBanco('err'))],['In vendita',fNum(STAGE_OGGI.in_vendita)]]:[['Ricevuti',fNum(STAGE_MESE.ricevuti)],['Formattati',fNum(STAGE_MESE.formattati)],['In corso',fNum(nBanco('run'))],['Interrotti',fNum(STAGE_MESE.falliti)],['In vendita',fNum(STAGE_MESE.in_vendita)]]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Interrotti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
+      <div class="grid g4">${(c.per==='Oggi'?(so=>[['Ricevuti',fNum(so.ricevuti)],['Formattati',fNum(so.formattati)],['In corso',fNum(so.in_corso)],['Interrotti',fNum(so.falliti)],['In vendita',fNum(so.in_vendita)]])(stageOggi()):[['Ricevuti',fNum(STAGE_MESE.ricevuti)],['Formattati',fNum(STAGE_MESE.formattati)],['In corso',fNum(nBanco('run'))],['Interrotti',fNum(STAGE_MESE.falliti)],['In vendita',fNum(STAGE_MESE.in_vendita)]]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Interrotti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
     </div>
     <div class="grid g2">
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
@@ -1954,7 +1993,7 @@ function corp(){
     <div class="glass tbox"><table class="t"><thead><tr><th>Lotto</th><th>Acquisto</th><th>Pezzi</th><th>Costo</th><th>Venduti</th><th>Rimasti</th><th>Incassato</th><th>Margine</th><th>Margine %</th><th></th></tr></thead><tbody>
     ${L.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${(r[3]-r[5]).toLocaleString('it-IT')}</td><td><b>${r[6]}</b></td><td${String(r[8]).indexOf('-')>=0?' class="miss"':''}>${r[8]}</td><td${String(r[9]).indexOf('-')>=0?' class="miss"':''}>${r[9]}</td><td><div class="row" style="gap:6px;flex-wrap:nowrap">${b('Excel','cXls',r[0],'ghost sm')}${b('CSV','cCsv',r[0],'ghost sm')}</div></td></tr>`).join('')}
     </tbody></table></div>
-    ${c.ordMsg==='ddt'?msg('Fattura e DDT caricati: 609 seriali trovati nell’archivio dei PC lavorati, 3 da verificare.'):''}
+    ${c.ordMsg==='ddt'?msg(`Fattura e DDT caricati: ${fNum(DDT_LOTTI[L[0][0]].lavorati)} seriali trovati nell’archivio dei PC lavorati, ${fNum(DDT_LOTTI[L[0][0]].da_verificare)} da verificare.`):''}
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}<span class="lbl">Il programma confronta i seriali del DDT con l’archivio dei PC lavorati.</span></div>`;
   }
   if(s==='inv'){
@@ -2019,7 +2058,7 @@ function corp(){
           <div class="lbl" style="margin-top:10px">PF4L0003: disco guasto e password nel BIOS</div>
           <div class="lbl" style="margin-top:10px">Banco stage: collegato, ultima lettura ${Math.round((Date.now()-T0)/60000+2.4)} min fa</div>
         </div>
-        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>${fNum(STAGE_OGGI.ricevuti)}</b> · Formattati <b>${fNum(STAGE_OGGI.formattati)}</b> · Interrotti <b>${nBanco('err')}</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
+        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">${(so=>`Ricevuti <b>${fNum(so.ricevuti)}</b> · Formattati <b>${fNum(so.formattati)}</b> · Interrotti <b>${fNum(so.falliti)}</b>`)(stageOggi())}</div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
         <div class="glass card"><div class="lbl">Licenze Certus</div><div style="margin-top:6px">Chiavetta 3: <b class="miss">40 licenze rimaste</b></div>${c.licOk?`<div style="margin-top:10px">${msg('Mail di richiesta licenze inviata.')}</div>`:`<div style="margin-top:12px">${b('Invia la mail già pronta','cLic')}</div>`}</div>
       </div></div>`;
   }
@@ -2029,7 +2068,7 @@ function corp(){
     const list=TELEFONI.filter(x=>c.telF==='Tutti'||x[8]===c.telF);
     const cnt=st=>TELEFONI.filter(x=>x[8]===st).length;
     body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Ricevuti oggi</div><div class="big">${TELEFONI.length}</div></div>
+      <div class="glass card"><div class="lbl">Ricevuti oggi</div><div class="big">${ultimaLav(9,15).toDateString()===new Date().toDateString()?TELEFONI.length:0}</div></div>
       <div class="glass card"><div class="lbl">Reset</div><div class="big">${cnt('Reset')}</div><div class="lbl">da resettare</div></div>
       <div class="glass card"><div class="lbl">Sblocco</div><div class="big">${cnt('Sblocco')}</div><div class="lbl">account iCloud/Google e MDM da togliere</div></div>
       <div class="glass card"><div class="lbl">Ticket</div><div class="big">${cnt('Ticket')}</div><div class="lbl">da chiudere sul portale</div></div>
