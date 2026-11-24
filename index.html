@@ -320,7 +320,7 @@ const S = {
   c:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:'2026-10-19',pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
-  k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:12},
+  k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:600},
   n:{view:'home', brand:'Tutti', pid:0, g:'Buono', ram:16, cart:[], added:false, payMsg:false}
 };
 
@@ -510,20 +510,20 @@ const STOPS=[
 ];
 const C_MAILS=[
  {da:'Acquirente eBay',ind:'tramite eBay',ora:'09:20',ogg:'Domanda su EliteBook 840 G8',tag:'Vendite',cart:'Vendite',ant:'La batteria com’è messa?…',testo:'Ciao,\nla batteria com’è messa? Riuscite a spedire entro venerdì?',all:'',bozza:'Ciao, la batteria è all’[percentuale] dal test. Se ordini oggi spediamo entro [giorno]. Grazie!',az:'Apri l’annuncio',azMsg:'Annuncio EliteBook 840 G8 trovato in Inventario.',azGo:'inv'},
- {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 412 PC formattati, 2 interruzioni con report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
+ {da:'Econocom',ind:'referente@[dominio]',ora:'08:40',ogg:'Riscontro giornaliero',tag:'Stage',cart:'Stage',ant:'Ci mandate il riepilogo di ieri?…',testo:'Buongiorno Simone,\nci mandate il riepilogo dei PC lavorati ieri?\nGrazie',all:'',bozza:'Buongiorno, in allegato il riepilogo di ieri: 398 PC formattati, 3 interrotti con il report. Simone',az:'Allega il riepilogo di ieri',azMsg:'Riepilogo di ieri allegato alla risposta.',azGo:'stage'},
  {da:'[Fornitore lotto]',ind:'aste@[dominio]',ora:'08:02',ogg:'DDT lotto L-015',tag:'Lotti',cart:'Lotti',ant:'In allegato il DDT di uscita…',testo:'Buongiorno,\nin allegato il DDT di uscita del lotto aggiudicato.\nCordiali saluti',all:'DDT_L-015.pdf',bozza:'Buongiorno, ricevuto, grazie.',az:'Carica il DDT nel lotto',azMsg:'DDT caricato nel lotto L-015: seriali confrontati con l’archivio, 3 da verificare.',azGo:'lotti'},
- {da:'Back Market',ind:'notifiche',ora:'Ieri',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0142.',azGo:'ordini'}
+ {da:'Back Market',ind:'notifiche',ora:'09:14',ogg:'Nuovo ordine ThinkPad T14',tag:'Vendite',cart:'Vendite',ant:'Hai ricevuto un nuovo ordine…',testo:'Nuovo ordine per ThinkPad T14 Gen 2, grado B.',all:'',bozza:'',az:'Apri l’ordine',azMsg:'Ordine aperto in Ordini: il PC è nel posto S11-2-1, bancale B-0142.',azGo:'ordini'}
 ];
 const DEVICES=[
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'',ore:null,bat:86,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'B',dif:'Graffi sul coperchio',lotto:'L-014',costo:60,price:249,stato:'Venduto',siti:'Back Market',gg:9,banc:'B-0142',shelf:'S11-2-1',post:'',letto:'',car:'14/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXXX'},
  {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'Intel Core i7-1165G7',ram:'16 GB',disk:'SSD 512 GB',sal:'',ore:null,bat:91,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:60,price:329,stato:'Venduto',siti:'eBay',gg:3,banc:'B-0139',shelf:'S11-3-2',post:'',letto:'',car:'20/11/2026',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXXX'},
  {brand:'Dell',model:'Latitude 5420',cod:'',cpu:'Intel Core i5-1145G7',ram:'8 GB',disk:'SSD 256 GB',sal:'',ore:null,bat:83,cicli:null,screen:'14" 1366×768',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'C',dif:'Ammaccatura, tastiera lucida',lotto:'L-013',costo:61,price:179,stato:'Venduto',siti:'Subito',gg:64,banc:'B-0121',shelf:'S12-1-1',post:'',letto:'',car:'20/09/2026',foto:'',sn:'JXXXXXX'},
  {brand:'Apple',model:'MacBook Air M1',cod:'MGN63T/A',cpu:'Apple M1',ram:'8 GB',disk:'SSD 256 GB',sal:'Buono',ore:2900,bat:89,cicli:312,screen:'13,3" 2560×1600',gpu:'Apple M1 7 core',pw:'No',canc:'Certificata',grade:'B',dif:'Segni sullo schermo',lotto:'L-015',costo:60,price:449,stato:'Venduto',siti:'Refurbed',gg:12,banc:'B-0145',shelf:'S11-1-3',post:'',letto:'',car:'11/11/2026',foto:'apple-mgn63t-a.jpg',sn:'C02XXXXX'},
- {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'Intel Core i7-1185G7',ram:'16 GB',disk:'SSD 512 GB',sal:'Buono',ore:5400,bat:92,cicli:150,screen:'14" 1920×1200',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'A',dif:'',lotto:'L-015',costo:60,price:399,stato:'Venduto',siti:'Sito proprio',gg:5,banc:'B-0144',shelf:'S11-2-3',post:'',letto:'',car:'18/11/2026',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX'},
+ {brand:'Lenovo',model:'ThinkPad X1 Carbon',cod:'20XW004LIX',cpu:'Intel Core i7-1185G7',ram:'16 GB',disk:'SSD 512 GB',sal:'Buono',ore:5400,bat:92,cicli:150,screen:'14" 1920×1200',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'A',dif:'',lotto:'L-015',costo:60,price:399,stato:'Venduto',siti:'Sito',gg:5,banc:'B-0144',shelf:'S11-2-3',post:'',letto:'',car:'18/11/2026',foto:'lenovo-20xw004lix.jpg',sn:'PF2XXXXX'},
  {brand:'HP',model:'ProBook 450 G8',cod:'2X7X3EA',cpu:'Intel Core i5-1135G7',ram:'8 GB',disk:'SSD 256 GB',sal:'Buono',ore:7100,bat:76,cicli:480,screen:'15,6" 1920×1080',gpu:'Intel UHD',pw:'No',canc:'Certificata',grade:'B',dif:'Batteria sotto 80%',lotto:'L-015',costo:60,price:219,stato:'Reso',siti:'',gg:1,banc:'B-0146',shelf:'Ricevimento',post:'',letto:'',car:'22/11/2026',foto:'hp-2x7x3ea.jpg',sn:'5CDXXXXX'},
  {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:6300,bat:85,cicli:230,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'D',dif:'Scocca inferiore crepata, funziona al 100%',lotto:'L-015',costo:60,price:159,stato:'Fermo',siti:'eBay, Subito',gg:64,banc:'B-0145',shelf:'S11-1-2',post:'',letto:'',car:'19/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX8'},
- {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 512 GB',sal:'',ore:null,bat:90,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:60,price:279,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Subito, Sito proprio',gg:6,banc:'B-0142',shelf:'S11-2-1',post:'',letto:'',car:'17/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX9'},
- {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'Intel Core i5-1145G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:4800,bat:88,cicli:260,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'B',dif:'Graffi leggeri sul poggiapolsi',lotto:'L-015',costo:60,price:289,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Sito proprio',gg:2,banc:'B-0144',shelf:'S11-2-3',post:'',letto:'',car:'21/11/2026',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXX4'}
+ {brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 512 GB',sal:'',ore:null,bat:90,cicli:null,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'',canc:'',grade:'A',dif:'',lotto:'L-014',costo:60,price:279,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Subito, Sito',gg:6,banc:'B-0142',shelf:'S11-2-1',post:'',letto:'',car:'17/11/2026',foto:'lenovo-20w000auix.jpg',sn:'PF3XXXX9'},
+ {brand:'HP',model:'EliteBook 840 G8',cod:'3C6P1EA',cpu:'Intel Core i5-1145G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:4800,bat:88,cicli:260,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:'B',dif:'Graffi leggeri sul poggiapolsi',lotto:'L-015',costo:60,price:289,stato:'Disponibile',siti:'Back Market, Refurbed, eBay, Sito',gg:2,banc:'B-0144',shelf:'S11-2-3',post:'',letto:'',car:'21/11/2026',foto:'hp-3c6p1ea.jpg',sn:'5CGXXXX4'}
 ];
 /* proposta 23/11 (strada «Lettura»): lotti con la strada, letture del banco e Excel del lotto */
 const LOTTI=[['L-016','Lettura','19/10/2026',3,'€ 450',0,'€ 0','0%','€ -450','-100%'],['L-015','Banco','06/10/2026',612,'€ 36.700',12,'€ 2.202','6%','€ -34.498','-94%'],['L-014','Pronto','12/09/2026',480,'€ 28.800',131,'€ 20.736','72%','€ -8.064','-28%'],['L-013','Pronto','18/08/2026',320,'€ 19.500',298,'€ 31.980','164%','€ 12.480','64%']];
@@ -557,7 +557,9 @@ function pcLetti(){
 }
 /* Inventario: i PC caricati, di tutti i lotti */
 const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:o[1]},n?{price:n.prezzo}:{});};
-const pcInventario=()=>DEVICES.map(vendita).concat(pcLetti().filter(d=>d.caricato));
+/* i PC formattati caricati dall'app nella prova (lotto L-015) */
+const pcApp=()=>(S.c.carApp||[]).map(x=>({brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:5200,bat:87,cicli:240,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:x.grade,dif:x.dif,lotto:'L-015',costo:60,price:x.price,stato:'Disponibile',siti:x.siti,gg:0,banc:x.banc,shelf:x.shelf,post:'',letto:'',car:oggiIt(),foto:'lenovo-20w000auix.jpg',sn:x.sn}));
+const pcInventario=()=>DEVICES.map(vendita).concat(pcLetti().filter(d=>d.caricato)).concat(pcApp());
 const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado));
 const vuoto=v=>v===null||v===undefined||v===''?null:v;
 const fotoUrl=d=>d.foto?FOTO_URL+d.foto:null;
@@ -565,6 +567,7 @@ const rigaPC=d=>[d.sn,d.brand,d.model,d.cod,d.cpu,d.ram,d.disk,d.sal,d.ore,d.bat
 const rigaCliente=d=>[d.sn,d.brand,d.model,d.cod,d.cpu,d.ram,d.disk,d.sal,d.ore,d.bat,d.cicli,d.screen,d.gpu,d.pw,d.canc,d.grade,d.dif,d.price,fotoUrl(d)].map(vuoto);
 function pcLotto(cod){
   if(cod==='L-016') return pcLetti();
+  if(cod==='L-015') return DEVICES.map(vendita).filter(d=>d.lotto===cod).concat(pcApp());
   if(S.c.nuovi&&S.c.nuovi.find(x=>x[0]===cod)) return [];
   return DEVICES.map(vendita).filter(d=>d.lotto===cod);
 }
@@ -605,7 +608,7 @@ const ORDINI=[
  ['08:52','eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
  ['08:10','Subito','Dell','Latitude 5420','C','JXXXXXX','S12-1-1','Spedito'],
  ['Ieri','Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Reso aperto'],
- ['Ieri','Sito proprio','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','S11-2-3','Consegnato']
+ ['Ieri','Sito','Lenovo','ThinkPad X1 Carbon','A','PF2XXXXX','S11-2-3','Consegnato']
 ];
 const TELEFONI=[
  ['35XXXXXXXXXXXX1','Apple','iPhone 13','Accenture','[n. ticket]','Fatto','Fatta','Manuel','Chiuso'],
@@ -769,7 +772,9 @@ const A={
   kCan:l=>{S.k.canali[l]=!S.k.canali[l];},
   kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
   kPiu:()=>{S.k.prezzo+=10;},
-  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.n+=1; if(S.k.ex==='lettura'&&!S.k.lettFatto){S.k.lettFatto=true; S.c.lettCaricati=2;}},
+  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto';
+    if(S.k.ex==='lettura'&&!S.k.lettFatto){S.k.lettFatto=true; S.c.lettCaricati=2;}
+    else if(S.k.ex==='certus'){S.k.n+=1; const siti=Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', '); S.c.carApp=(S.c.carApp||[]).concat([{sn:'PF3XXXX'+(5+(S.c.carApp||[]).length+1),grade:S.k.grado,price:+S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),siti}]);}},
   kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto='S11-2-1';},
   kNbStampa:()=>{S.k.nb.stampata=true;},
   kNbPosto:()=>{if(S.k.nb.stampata)S.k.nb.posto='S11-3-2';},
@@ -858,8 +863,8 @@ hook('tGiacChiedi',()=>evt('Posta','Mail al cliente pronta: giacenza, costo e ri
 /* negozio: pagamento simulato e ordine che arriva alla Corporation */
 A.nPay=()=>{S.n.view='pay';};
 A.nPaga=()=>{const tot=S.n.cart.reduce((a,c)=>a+c.p,0), c=S.n.cart[0]; S.n.ord={n:'SITO-1043',tot:tot,cosa:c?c.name:''}; S.n.view='ok';
-  if(c){ORDINI.unshift([ora(),'Sito proprio',c.name.indexOf('ThinkPad')>=0?'Lenovo':(c.name.indexOf('MacBook')>=0?'Apple':(c.name.indexOf('Latitude')>=0?'Dell':'HP')),c.name,((c.det.match(/Grado ([A-D])/)||[])[1]||'B'),'PF3XXXX9','S11-2-1','Da preparare']);}
-  if(c){S.c.vn=(S.c.vn||[]).concat([{sn:'PF3XXXX9',lotto:'L-014',prezzo:tot,sito:'Sito proprio'}]);}
+  if(c){ORDINI.unshift([ora(),'Sito',c.name.indexOf('ThinkPad')>=0?'Lenovo':(c.name.indexOf('MacBook')>=0?'Apple':(c.name.indexOf('Latitude')>=0?'Dell':'HP')),c.name,((c.det.match(/Grado ([A-D])/)||[])[1]||'B'),'PF3XXXX9','S11-2-1','Da preparare']);}
+  if(c){S.c.vn=(S.c.vn||[]).concat([{sn:'PF3XXXX9',lotto:'L-014',prezzo:tot,sito:'Sito'}]);}
   S.n.cart=[]; S.n.added=false;
   evt('Negozio',`Pagamento riuscito: ordine SITO-1043, € ${tot}. Il PC è tolto subito dagli altri siti e in Inventario risulta venduto.`);
   setTimeout(()=>evt('Ordini','Nuovo ordine in Corporation › Ordini: prendi il PC in S11-2-1, bancale B-0142.'),1300);};
@@ -1628,22 +1633,23 @@ function corp(){
     const vendOggi=ORDINI.filter(o=>o[0]!=='Ieri').length, vendMese=214+vn.length;
     const incOggi=757+piu, incMese=26840+piu;
     const daSpedire=ORDINI.filter(o=>o[7]==='Da preparare').length;
-    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito proprio',2+vn.length]].sort((a,b)=>b[1]-a[1]);
+    const inVendita=968-vn.length+(c.carApp||[]).filter(x=>x.siti).length+(S.k.lettFatto&&Object.keys(S.k.canali).some(x=>S.k.canali[x])?1:0);
+    const can=[['Back Market',62],['Di persona',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2+vn.length]].sort((a,b)=>b[1]-a[1]);
     const maxCan=Math.max(...can.map(x=>x[1]));
     const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],['Ottobre',v[1]],['2026',v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
     body=`<div class="kpi">
-      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(magazzino)}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(magazzino)}</div><div class="lbl">pezzi da vendere · ${fNum(inVendita)} in vendita · 11 invenduti da oltre 60 giorni</div></div>
       <div class="glass card"><div class="lbl">Ordini</div><div class="big">${daSpedire}</div><div class="lbl">da spedire entro le 16:00</div></div>
       <div class="glass card"><div class="lbl">Venduti</div>${per3([fNum(vendOggi),fNum(vendMese),fNum(vendAnno)])}</div>
       <div class="glass card"><div class="lbl">Incassato</div>${per3([fEur(incOggi),fEur(incMese),fEur(incAnno)])}</div>
     </div>
     <div class="glass card stack">
       <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
-      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti','430'],['Formattati','412'],['In corso','16'],['Falliti','2'],['In vendita','38']]:[['Ricevuti','8.640'],['Formattati','8.512'],['In corso','16'],['Falliti','41'],['In vendita','612']]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Falliti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
+      <div class="grid g4">${(c.per==='Oggi'?[['Ricevuti','436'],['Formattati','414'],['In corso','20'],['Interrotti','2'],['In vendita','38']]:[['Ricevuti','8.640'],['Formattati','8.512'],['In corso','20'],['Interrotti','41'],['In vendita','612']]).map(x=>`<div><div class="lbl">${x[0]}</div><div class="big" style="font-size:28px;${x[0]==='Interrotti'?'color:var(--alert)':''}">${x[1]}</div></div>`).join('')}</div>
     </div>
     <div class="grid g2">
       <div class="glass card"><h3 style="font-size:18px;margin-bottom:6px">Da guardare oggi</h3><div class="list">
-        <button class="li" data-act="cGo" data-arg="inv"><span class="row between" style="width:100%"><span>11 PC fermi da oltre 60 giorni</span>${pill('Inventario','red')}</span></button>
+        <button class="li" data-act="cGo" data-arg="inv"><span class="row between" style="width:100%"><span>11 PC invenduti da oltre 60 giorni</span>${pill('Inventario','red')}</span></button>
         <button class="li" data-act="cGo" data-arg="ordini"><span class="row between" style="width:100%"><span>1 reso aperto su Refurbed</span>${pill('Ordini')}</span></button>
         <button class="li" data-act="cGo" data-arg="lotti"><span class="row between" style="width:100%"><span>DDT lotto L-015: 3 seriali da verificare</span>${pill('Lotti','red')}</span></button>
         <button class="li" data-act="cGo" data-arg="stage"><span class="row between" style="width:100%"><span>Licenze Certus: chiavetta 3 quasi finita</span>${pill('Stage Computer')}</span></button>
@@ -1665,10 +1671,10 @@ function corp(){
     const nl=c.nl, inp=(k,lab,w,mode)=>`<label class="field"><span class="lbl">${lab}</span><input class="input"${w?` style="max-width:${w}px"`:''}${mode?` inputmode="${mode}"`:''} value="${nl[k]}" data-nl="${k}"></label>`;
     const pronto=c.strada&&String(nl.codice).trim()&&+nl.pezzi>0&&String(nl.costo).trim();
     body=`<div class="grid g4">
-      <div class="glass card"><div class="lbl">Media</div><div class="big">€ 61</div><div class="lbl">costo per PC, su tutti i lotti</div></div>
+      <div class="glass card"><div class="lbl">Media</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0)/Math.max(L.reduce((a,r)=>a+r[3],0),1))}</div><div class="lbl">costo per PC, su tutti i lotti</div></div>
       <div class="glass card"><div class="lbl">Investito</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[4]),0))}</div><div class="lbl">acquisto di tutti i lotti</div></div>
       <div class="glass card"><div class="lbl">Incassato</div><div class="big">${fEur(L.reduce((a,r)=>a+nEur(r[6]),0))}</div><div class="lbl">dalle vendite di tutti i lotti</div></div>
-      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0))}</div><div class="lbl">pezzi da vendere · 11 fermi da oltre 60 giorni</div></div>
+      <div class="glass card"><div class="lbl">Magazzino</div><div class="big">${fNum(L.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0))}</div><div class="lbl">pezzi da vendere · 11 invenduti da oltre 60 giorni</div></div>
     </div>
     ${c.lottoMsg&&c.lottoMsg!=='esiste'&&c.lottoMsg.indexOf('vuoto:')!==0&&c.lottoMsg.indexOf('vendita:')!==0?msg(c.lottoMsg):''}${c.lottoMsg&&c.lottoMsg.indexOf('vendita:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(8)} non c’è ancora nessun PC in vendita</div>`:''}${c.lottoMsg&&c.lottoMsg.indexOf('vuoto:')===0?`<div class="warn">Nel lotto ${c.lottoMsg.slice(6)} non c’è ancora nessun PC</div>`:''}
     ${c.nuovoL?`<div class="glass card stack">
@@ -1746,7 +1752,7 @@ function corp(){
           <div class="lbl" style="margin-top:10px">PF4L0003: disco guasto e password nel BIOS</div>
           <div class="lbl" style="margin-top:10px">Banco stage: collegato, ultima lettura 2 min fa</div>
         </div>
-        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>430</b> · Formattati <b>412</b> · Interrotti <b>2</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
+        <div class="glass card"><div class="lbl">Oggi</div><div style="margin-top:6px;line-height:1.9">Ricevuti <b>436</b> · Formattati <b>414</b> · Interrotti <b>2</b></div><div style="margin-top:10px">${b('Riscontro giornaliero a Econocom','cGo','mail','ghost')}</div></div>
         <div class="glass card"><div class="lbl">Licenze Certus</div><div style="margin-top:6px">Chiavetta 3: <b class="miss">40 licenze rimaste</b></div>${c.licOk?`<div style="margin-top:10px">${msg('Mail di richiesta licenze inviata.')}</div>`:`<div style="margin-top:12px">${b('Invia la mail già pronta','cLic')}</div>`}</div>
       </div></div>`;
   }
@@ -2004,8 +2010,8 @@ function caricoApp(){
   if(k.scr==='scan'){
     inner=`<div class="pscr">
       ${kSteps('scan')}
-      <div class="lbl">Lotto L-015 · ${k.n} di 612 caricati</div>
-      <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM 20W0XXXXIX</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N PF3XXXXX</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
+      <div class="lbl">${k.lettFatto?`Lotto L-015 · ${k.n} di 612 caricati`:`Lotto L-016 · ${S.c.lettCaricati} di 3 caricati`}</div>
+      <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM ${k.lettFatto?'20W000AUIX':'20W0004XIX'}</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N ${k.lettFatto?'PF3XXXX6':'PF4L0002'}</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
       <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="bigbtn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.cam}Foto</button><button class="bigbtn ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.pen}Manuale</button></div>
     </div>`;
   }
@@ -2024,7 +2030,7 @@ function caricoApp(){
   } else if(k.scr==='scheda'){
     inner=`<div class="pscr">
       ${kSteps('scheda')}
-      <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXXX</b></div>${pill('Verificato su Lenovo','ok')}</div>
+      <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXX6</b></div>${pill('Verificato su Lenovo','ok')}</div>
       <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Lavorato da noi')}</div>
       <div class="ptitle" style="font-size:24px">Lenovo ThinkPad T14 Gen 2</div>
       <div class="pcard" style="padding:4px 14px">
