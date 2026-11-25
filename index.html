@@ -342,7 +342,7 @@ const giorniFa=(gg,h,m=0)=>{const d=new Date(); d.setDate(d.getDate()-gg); d.set
 /* quanti giorni il sistema delle telecamere conserva avvisi e foto: li sceglie la Direzione nella Guida di Telecamere (proposta 7) */
 const consGiorni=()=>S.perm.giorni;
 /* GUIDA:inizio (generato da sorgenti/guida.py: non modificare qui) */
-const GUIDA=[{"id": "home", "titolo": "Home", "serve": "La giornata in un colpo d’occhio: magazzino, ordini da spedire, vendite, incassi, stage e le cose da fare oggi.", "uso": ["In alto: Magazzino (pezzi ancora da vendere), Ordini (da spedire), Venduti e Incassato di oggi, del mese e dell’anno.", "Stage: i numeri della cancellazione dei PC. «Oggi» o «Mese» cambiano il periodo.", "«Da guardare oggi»: le cose da fare. Toccane una e vai dritto alla pagina giusta. Compaiono solo quando c’è davvero qualcosa da fare.", "«Venduti per sito»: quanti PC si sono venduti questo mese su ogni sito e in azienda."], "parole": [["Incassato", "quello che resta a noi di ogni vendita: prezzo meno commissione del sito, spese e IVA sul margine."], ["Magazzino", "i pezzi dei lotti non ancora venduti."], ["Interrotti", "le cancellazioni che si sono fermate a metà: hanno il loro report per il cliente."]]}, {"id": "mail", "titolo": "Mail", "serve": "Le mail delle caselle della Corporation (vendite, stage, acquisti), divise per cartella, con il tasto giusto per ogni tipo di mail.", "uso": ["A sinistra le cartelle: «In arrivo» le mostra tutte, le altre solo il loro tipo.", "Tocca una mail per aprirla: diventa letta e sotto trovi la risposta già scritta.", "Il tasto principale cambia con la mail: «Apri l’annuncio» per una domanda su un PC (lo trova in Inventario), «Apri l’ordine» per un nuovo ordine (ti dice in che posto è il PC), «Allega il riepilogo di ieri» per la richiesta di Econocom (prepara il riepilogo dell’ultimo giorno di lavoro, poi «Invia»).", "«Rispondi» usa la risposta già scritta, «Inoltra» la manda a un altro indirizzo, «Assegna a un collega» la passa a chi se ne occupa."], "parole": [["Da leggere", "mail non ancora aperte: le conta anche la Home."], ["Riepilogo", "per Econocom: PC formattati e cancellazioni interrotte dell’ultimo giorno in cui lo stage ha lavorato."]]}, {"id": "lotti", "titolo": "Lotti", "serve": "I lotti di PC comprati: quanto sono costati, quanti se ne sono venduti, quanto hanno incassato e se si sono ripagati.", "uso": ["In alto: costo medio per PC, quanto si è investito, quanto si è incassato, quanti pezzi restano da vendere.", "Nella tabella tocca un lotto: la riga diventa grigia. È il lotto scelto.", "«Carica fattura d’acquisto e DDT» mette i documenti nel lotto scelto. Il programma legge i seriali del DDT e li confronta con l’archivio dei PC lavorati: sotto vedi quanti sono stati trovati e l’elenco di quelli da verificare.", "«Excel» scarica il file interno del lotto, con tutte le nostre colonne.", "«CSV» scarica il file per il cliente: solo i PC in vendita e solo le sue colonne. Le nostre (lotto, costo, posti, date) le toglie il programma da solo.", "«Nuovo» apre un lotto: codice, fornitore, data d’acquisto, pezzi nel DDT, costo e strada, poi «Apri»."], "parole": [["Margine", "incassato meno il costo di tutto il lotto. È rosso finché il lotto non si è ripagato."], ["Strada", "come si lavora il lotto. Banco: si formatta allo stage con Certus. Lettura: PC già formattati, al banco si leggono soltanto. Pronto: i dati arrivano dal fornitore."], ["Da verificare", "seriali del DDT che non abbiamo mai lavorato: quando arriva la merce vanno controllati a mano."]]}, {"id": "inv", "titolo": "Inventario", "serve": "Tutti i PC caricati, di tutti i lotti, con i dati dell’Excel: cosa sono, dove sono, quanto costano e a quanto si vendono.", "uso": ["Scegli Marca e Grado: il numero dei PC si aggiorna subito. «Vista» passa dalla tabella alle schede.", "Tocca un PC per aprire la sua scheda: grado, prezzo e siti dove è in vendita. Cambi e premi «Salva»: cambia ovunque, anche sul negozio.", "«Conferma» compare quando il prezzo l’ha messo il magazzino dall’app: lo confermano le Vendite e solo allora il PC va sul nostro sito.", "«Vendi» registra una vendita fatta fuori dal nostro negozio (Back Market, eBay, Refurbed, Subito, Amazon o in azienda): scegli dove, scrivi prezzo, commissione, spese e numero d’ordine, poi «Conferma». Il PC diventa «Venduto», sparisce dagli altri siti e l’ordine arriva in Ordini.", "«Excel» scarica il file interno con tutte le colonne; «CSV» il file per il cliente, solo i PC in vendita e solo le sue colonne, con i filtri di marca e grado."], "parole": [["Da confermare", "prezzo messo dal magazzino che le Vendite devono ancora confermare."], ["Proposto", "il prezzo delle ultime vendite dello stesso modello e grado."], ["Reso", "PC venduto e rimandato indietro dal cliente."], ["Giorni", "da quanti giorni il PC è caricato."], ["Foto", "la foto della casa madre, una per modello. «Mancante» se non c’è ancora."]]}, {"id": "ordini", "titolo": "Ordini", "serve": "Gli ordini dei siti e le vendite registrate a mano, con il posto dove prendere il PC.", "uso": ["Ogni riga: quando, da quale sito, che PC, seriale, posto in magazzino e stato.", "Su un ordine «Da preparare» premi «Etichetta spedizione»: esce l’etichetta del corriere e il programma ti dice in che posto prendere il PC.", "Le vendite fatte in azienda risultano già spedite."], "parole": [["Da preparare", "ordine pagato, il PC è ancora in magazzino."], ["Spedito", "il PC è partito, o è stato consegnato in azienda."], ["Annullato", "ordine annullato dal cliente o dal sito: il PC torna in vendita."]]}, {"id": "stage", "titolo": "Stage Computer", "serve": "Il banco dove si cancellano i dati dei PC con Certus: postazioni, PC ricevuti, formattati e interrotti.", "uso": ["Il banco ha 60 postazioni. Nero: cancellazione finita. Grigio: in corso. Bianco: libera. Rosso: interrotta. Tocca una postazione per vedere a che punto è.", "«Lettura»: i lotti di PC già formattati che al banco si leggono soltanto. Vedi quanti sono letti e caricati e quali sono da guardare (disco guasto, password nel BIOS). «Excel» scarica il file del lotto.", "«Oggi»: ricevuti, formattati e interrotti. «Riscontro giornaliero a Econocom» porta alla mail del riepilogo.", "«Licenze Certus»: quante licenze restano sulla chiavetta. Quando stanno per finire, «Invia la mail già pronta» le richiede."], "parole": [["Interrotta", "la cancellazione si è fermata: il report dell’interruzione è pronto per il cliente."], ["Certificata", "cancellazione finita con il certificato di Certus."], ["Da guardare", "PC letto al banco con un problema da controllare prima di venderlo."]]}, {"id": "stageTel", "titolo": "Stage Cellulari", "serve": "I telefoni dei clienti da resettare e sbloccare, con i ticket.", "uso": ["In alto: quanti telefoni sono arrivati oggi e quanti sono in ogni fase.", "Tocca un filtro, per esempio «Sblocco», per vedere solo quei telefoni.", "I ticket arrivano dal portale del cliente; lo sblocco (account iCloud o Google e MDM) si fa sul loro sistema Habble."], "parole": [["Reset", "il telefono va riportato alle impostazioni di fabbrica."], ["Sblocco", "c’è ancora un account iCloud o Google, o il blocco MDM, da togliere."], ["Ticket", "c’è un ticket aperto sul portale del cliente."], ["Chiuso", "lavoro finito, pronto da riconsegnare."]]}, {"id": "telecamere", "titolo": "Telecamere", "serve": "Le immagini dal vivo del capannone, gli avvisi e la foto salvata a ogni scansione del magazzino. La vede solo la Direzione.", "uso": ["Tocca una telecamera per vederla grande. Le registrazioni restano sul registratore in capannone e si scorrono per ora da lì.", "«Avvisi»: quelli dei giorni che il sistema conserva, dal più recente. «Da guardare» sono quelli da controllare.", "«Foto delle scansioni»: a ogni scansione la telecamera più vicina salva una foto insieme al movimento. Se qualcosa non torna, si apre il movimento e si vede cos’è successo."], "parole": [["Conservazione", "dopo quanti giorni avvisi e foto si cancellano da soli, ogni notte."], ["Rete separata", "le telecamere stanno su una rete loro, staccata da quella degli uffici."]], "regole": ["Le telecamere riprendono anche i dipendenti: servono l’accordo sindacale o l’autorizzazione dell’Ispettorato del lavoro (art. 4 dello Statuto dei lavoratori). Finché non è scritto qui sotto, il programma non accetta né foto né avvisi.", "Si usano solo per la sicurezza del lavoro, la tutela della merce e le esigenze organizzative, non per controllare come lavorano le persone.", "Prima delle zone riprese ci va il cartello, che rimanda all’informativa completa.", "Immagini e avvisi si tengono pochi giorni: oltre le 72 ore va scritto il motivo, per noi la merce di valore in magazzino. Il registratore in capannone va impostato sugli stessi giorni.", "Niente audio. Niente telecamere in bagni, spogliatoi e zone di pausa.", "Le immagini le vede solo la Direzione. Il commercialista vede i numeri, non le immagini.", "Chi è ripreso può chiedere di vedere le sue immagini, finché sono conservate."]}];
+const GUIDA=[{"id": "home", "titolo": "Home", "serve": "La giornata in un colpo d’occhio: magazzino, ordini da spedire, vendite, incassi, stage e le cose da fare oggi.", "uso": ["In alto: Magazzino (pezzi ancora da vendere), Ordini (da spedire), Venduti e Incassato di oggi, del mese e dell’anno.", "Stage: i numeri della cancellazione dei PC. «Oggi» o «Mese» cambiano il periodo.", "«Da guardare oggi»: le cose da fare. Toccane una e vai dritto alla pagina giusta. Compaiono solo quando c’è davvero qualcosa da fare.", "«Venduti per sito»: quanti PC si sono venduti questo mese su ogni sito e in azienda.", "Solo la Direzione vede «Chiedi»: quante domande sono state fatte a Claude questo mese e quanto sono costate, nel mese e nell’anno, in dollari come la fattura di Anthropic."], "parole": [["Incassato", "quello che resta a noi di ogni vendita: prezzo meno commissione del sito, spese e IVA sul margine."], ["Magazzino", "i pezzi dei lotti non ancora venduti."], ["Interrotti", "le cancellazioni che si sono fermate a metà: hanno il loro report per il cliente."], ["Resi da caricare", "PC che il cliente ha rimandato: appena tornano il magazzino li carica dall’app. Restano in rosso tra le cose da fare finché non sono caricati."]]}, {"id": "mail", "titolo": "Mail", "serve": "Le mail delle caselle della Corporation (vendite, stage, acquisti), divise per cartella, con il tasto giusto per ogni tipo di mail.", "uso": ["A sinistra le cartelle: «In arrivo» le mostra tutte, le altre solo il loro tipo.", "Tocca una mail per aprirla: diventa letta e sotto trovi la risposta già scritta.", "Il tasto principale cambia con la mail: «Apri l’annuncio» per una domanda su un PC (lo trova in Inventario), «Apri l’ordine» per un nuovo ordine (ti dice in che posto è il PC), «Allega il riepilogo di ieri» per la richiesta di Econocom (prepara il riepilogo dell’ultimo giorno di lavoro, poi «Invia»).", "«Rispondi» usa la risposta già scritta, «Inoltra» la manda a un altro indirizzo, «Assegna a un collega» la passa a chi se ne occupa."], "parole": [["Da leggere", "mail non ancora aperte: le conta anche la Home."], ["Riepilogo", "per Econocom: PC formattati e cancellazioni interrotte dell’ultimo giorno in cui lo stage ha lavorato."]]}, {"id": "lotti", "titolo": "Lotti", "serve": "I lotti di PC comprati: quanto sono costati, quanti se ne sono venduti, quanto hanno incassato e se si sono ripagati.", "uso": ["In alto: costo medio per PC, quanto si è investito, quanto si è incassato, quanti pezzi restano da vendere.", "Nella tabella tocca un lotto: la riga diventa grigia. È il lotto scelto.", "«Carica fattura d’acquisto e DDT» mette i documenti nel lotto scelto. Il programma legge i seriali del DDT e li confronta con l’archivio dei PC lavorati: sotto vedi quanti sono stati trovati e l’elenco di quelli da verificare.", "«Excel» scarica il file interno del lotto, con tutte le nostre colonne.", "«CSV» scarica il file per il cliente: solo i PC in vendita e solo le sue colonne. Le nostre (lotto, costo, posti, date) le toglie il programma da solo.", "«Nuovo» apre un lotto: codice, fornitore, data d’acquisto, pezzi nel DDT, costo e strada, poi «Apri»."], "parole": [["Margine", "incassato meno il costo di tutto il lotto. È rosso finché il lotto non si è ripagato."], ["Strada", "come si lavora il lotto. Banco: si formatta allo stage con Certus. Lettura: PC già formattati, al banco si leggono soltanto. Pronto: i dati arrivano dal fornitore."], ["Da verificare", "seriali del DDT che non abbiamo mai lavorato: quando arriva la merce vanno controllati a mano."]]}, {"id": "inv", "titolo": "Inventario", "serve": "Tutti i PC caricati, di tutti i lotti, con i dati dell’Excel: cosa sono, dove sono, quanto costano e a quanto si vendono.", "uso": ["Scegli Marca, Grado e Stato: il numero dei PC si aggiorna subito. «Vista» passa dalla tabella alle schede.", "Tocca un PC per aprire la sua scheda: grado, prezzo e siti dove è in vendita. Cambi e premi «Salva»: cambia ovunque, anche sul negozio.", "«Conferma» compare quando il prezzo l’ha messo il magazzino dall’app: lo confermano le Vendite e solo allora il PC va sul nostro sito.", "«Vendi» registra una vendita fatta fuori dal nostro negozio (Back Market, eBay, Refurbed, Subito, Amazon o in azienda): scegli dove, scrivi prezzo, commissione, spese e numero d’ordine, poi «Conferma». Il PC diventa «Venduto», sparisce dagli altri siti e l’ordine arriva in Ordini.", "«Excel» scarica il file interno con tutte le colonne; «CSV» il file per il cliente, solo i PC in vendita e solo le sue colonne, con i filtri di marca e grado."], "parole": [["Da confermare", "prezzo messo dal magazzino che le Vendite devono ancora confermare."], ["Disponibile", "in magazzino e in vendita sui siti scelti."], ["Venduto", "resta sempre in Inventario, con il prezzo a cui è stato venduto: è lo storico."], ["Reso", "venduto e rimandato dal cliente, non ancora ricaricato: quando torna si carica dall’app come un PC normale e torna «Disponibile»."], ["Proposto", "il prezzo delle ultime vendite dello stesso modello e grado."], ["Giorni", "da quanti giorni il PC è caricato."], ["Foto", "la foto della casa madre, una per modello. «Mancante» se non c’è ancora."]]}, {"id": "ordini", "titolo": "Ordini", "serve": "Gli ordini dei siti e le vendite registrate a mano, con il posto dove prendere il PC.", "uso": ["Ogni riga: quando, da quale sito, che PC, seriale, posto in magazzino e stato.", "Su un ordine «Da preparare» premi «Etichetta spedizione»: esce l’etichetta del corriere e il programma ti dice in che posto prendere il PC.", "Su un ordine «Spedito», se il cliente rimanda il PC, premi «Reso»: scrivi il rimborso e il motivo, poi «Conferma». La vendita esce dai conti, l’ordine diventa «Reso» e il PC va tra i resi da caricare. Quando i siti saranno collegati, i resi arriveranno da soli.", "Le vendite fatte in azienda risultano già spedite."], "parole": [["Da preparare", "ordine pagato, il PC è ancora in magazzino."], ["Spedito", "il PC è partito, o è stato consegnato in azienda."], ["Reso", "il cliente ha rimandato il PC: l’incasso è tolto e il PC si ricarica dall’app quando torna."], ["Annullato", "ordine annullato dal cliente o dal sito: il PC torna in vendita."]]}, {"id": "stage", "titolo": "Stage Computer", "serve": "Il banco dove si cancellano i dati dei PC con Certus: postazioni, PC ricevuti, formattati e interrotti.", "uso": ["Il banco ha 60 postazioni. Nero: cancellazione finita. Grigio: in corso. Bianco: libera. Rosso: interrotta. Tocca una postazione per vedere a che punto è.", "«Lettura»: i lotti di PC già formattati che al banco si leggono soltanto. Vedi quanti sono letti e caricati e quali sono da guardare (disco guasto, password nel BIOS). «Excel» scarica il file del lotto.", "«Oggi»: ricevuti, formattati e interrotti. «Riscontro giornaliero a Econocom» porta alla mail del riepilogo.", "«Licenze Certus»: quante licenze restano sulla chiavetta. Quando stanno per finire, «Invia la mail già pronta» le richiede."], "parole": [["Interrotta", "la cancellazione si è fermata: il report dell’interruzione è pronto per il cliente."], ["Certificata", "cancellazione finita con il certificato di Certus."], ["Da guardare", "PC letto al banco con un problema da controllare prima di venderlo."]]}, {"id": "stageTel", "titolo": "Stage Cellulari", "serve": "I telefoni dei clienti da resettare e sbloccare, con i ticket.", "uso": ["In alto: quanti telefoni sono arrivati oggi e quanti sono in ogni fase.", "Tocca un filtro, per esempio «Sblocco», per vedere solo quei telefoni.", "I ticket arrivano dal portale del cliente; lo sblocco (account iCloud o Google e MDM) si fa sul loro sistema Habble."], "parole": [["Reset", "il telefono va riportato alle impostazioni di fabbrica."], ["Sblocco", "c’è ancora un account iCloud o Google, o il blocco MDM, da togliere."], ["Ticket", "c’è un ticket aperto sul portale del cliente."], ["Chiuso", "lavoro finito, pronto da riconsegnare."]]}, {"id": "entrate", "titolo": "Entrate", "serve": "Il carico dei PC in magazzino dal telefono: foto del seriale, scheda, grado, prezzo, siti e bancale. Anche i resi che tornano si caricano da qui.", "uso": ["«Foto»: inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio. Se non si legge, «Manuale» e lo scrivi.", "Scheda: controlla i dati. «Nel DDT», «Lavorato da noi» e «Letto al banco» dicono da dove arrivano. Poi «Avanti».", "Grado: A, B, C o D con un tocco, e i difetti visti. Poi «Avanti».", "Prezzo: parte da quello proposto. − e + lo cambiano di 10 euro e non scende sotto il minimo. «Uguali» sono i prezzi degli stessi PC già in vendita. Scegli i siti dove pubblicarlo. Se il prezzo lo metti tu, lo confermano poi le Vendite.", "Bancale: scansiona l’etichetta del bancale dove lo metti, oppure «Nuovo»: stampa l’etichetta, porta il bancale nel posto proposto e scansiona l’etichetta dello scaffale. Poi «Conferma».", "Caricato: mettilo sul bancale e nel posto scritti. È già in Inventario e in vendita sui siti scelti; quando si vende su un sito, sparisce dagli altri. «Prossimo» per il PC dopo.", "Resi: in cima alla prima schermata ci sono i «Resi da caricare». Quando un reso torna, caricalo subito come un PC normale: il programma riconosce il seriale e lo rimette in vendita. Finché non lo carichi resta tra le cose da fare."], "parole": [["Reso", "PC venduto e rimandato dal cliente: si ricarica come gli altri e la parola «Reso» sparisce."], ["Minimo", "il prezzo sotto cui il PC non si vende: il suo costo più il 20%."], ["Proposto", "il prezzo delle ultime vendite dello stesso modello e grado."], ["Già in Inventario", "il seriale è già caricato: non si carica due volte."]]}, {"id": "telecamere", "titolo": "Telecamere", "serve": "Le immagini dal vivo del capannone, gli avvisi e la foto salvata a ogni scansione del magazzino. La vede solo la Direzione.", "uso": ["Tocca una telecamera per vederla grande. Le registrazioni restano sul registratore in capannone e si scorrono per ora da lì.", "«Avvisi»: quelli dei giorni che il sistema conserva, dal più recente. «Da guardare» sono quelli da controllare.", "«Foto delle scansioni»: a ogni scansione la telecamera più vicina salva una foto insieme al movimento. Se qualcosa non torna, si apre il movimento e si vede cos’è successo."], "parole": [["Conservazione", "dopo quanti giorni avvisi e foto si cancellano da soli, ogni notte."], ["Rete separata", "le telecamere stanno su una rete loro, staccata da quella degli uffici."]], "regole": ["Le telecamere riprendono anche i dipendenti: servono l’accordo sindacale o l’autorizzazione dell’Ispettorato del lavoro (art. 4 dello Statuto dei lavoratori). Finché non è scritto qui sotto, il programma non accetta né foto né avvisi.", "Si usano solo per la sicurezza del lavoro, la tutela della merce e le esigenze organizzative, non per controllare come lavorano le persone.", "Prima delle zone riprese ci va il cartello, che rimanda all’informativa completa.", "Immagini e avvisi si tengono pochi giorni: oltre le 72 ore va scritto il motivo, per noi la merce di valore in magazzino. Il registratore in capannone va impostato sugli stessi giorni.", "Niente audio. Niente telecamere in bagni, spogliatoi e zone di pausa.", "Le immagini le vede solo la Direzione. Il commercialista vede i numeri, non le immagini.", "Chi è ripreso può chiedere di vedere le sue immagini, finché sono conservate."]}];
 /* GUIDA:fine */
 /* «Chiedi» senza Claude (come cercaGuida di packages/dati/src/guida.ts): le parti della guida con le parole della domanda.
    Nel programma vero risponde Claude Haiku 5.5. */
@@ -376,10 +376,10 @@ const S = {
   t:{sec:'home', cart:'In arrivo', mail:0, mailMsg:'', reply:false, bolla:0, bolleOk:{}, bollaMsg:'', giriOk:false, fattOk:false, pagate:{}, nuovaF:false, nfMsg:'', cliente:null, mezzoF:'Sprinter', tpSel:0, autF:'Tutti', giac:0, giacMsg:'', giacPren:{}, magTab:'pianta', magCli:'Tutti', scaf:3, cerca:'', invOn:true, posto:null, cont:{}, log:[], stF:'Tutto', anSez:null, presTab:'oggi', presFix:{}, presMsg:'', allVisti:{}, allMsg:''},
   a:{scr:'lista', cur:0, done:{}, why:{}, foto:{}, fotoInfo:{}, soglia:35, analisi:false, scanned:false, acc:{}, accOpen:false, nav:false, accOk:{}, firmata:false, colliOk:false, accConf:false, firmaOpen:false, firmaImg:null},
   perm:{tipo:'Autorizzazione Ispettorato',data:'2025-06-10',rif:'[riferimento di prova]',giorni:7,apri:false,nTipo:'',nData:'',nRif:'',tempo:'',msg:'',err:''},
-  c:{sec:'home', aiuto:'', chat:[], gq:'', gAperte:{}, cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:isoG(0),pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
+  c:{sec:'home', aiuto:'', chat:[], gq:'', gAperte:{}, resoI:null, resoRimb:'', resoMot:'', ordErr:'', resi:[], ric:{}, statoF:'Tutti', cart:'In arrivo', mail:0, mailMsg:'', reply:false, vista:'tabella', per:'Oggi', brand:'Tutti', grado:'Tutti', licOk:false, banco:null, telF:'Tutti', ordMsg:'', nuovoL:false, strada:'', nl:{codice:'L-017',fornitore:'Fornitore D',data:isoG(0),pezzi:'60',costo:'3600'}, lottoMsg:'', lettCaricati:1},
   b:{timb:[], n:0, finto:false},
   m:{scr:'home', inStep:0, inN:0, outN:0, outErr:false, outGo:false, mvStep:0, conta:{}, contaCur:null, cs:{}, blocchi:{}, contaMsg:''},
-  k:{scr:'scan', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Sito':false}, n:600},
+  k:{scr:'scan', aiuto:'', chat:[], ex:'', rsn:'', grado:'B', difetti:{'Graffi sul coperchio':true}, prezzo:249, canali:{'eBay':true,'Subito':true,'Back Market':true,'Refurbed':true,'Amazon':false,'Sito':false}, n:600},
   n:{view:'home', brand:'Tutti', pid:'', g:'Grado B', cfg:'', cart:[], added:false, payMsg:false}
 };
 
@@ -800,10 +800,16 @@ const fNum=n=>(n<0?'-':'')+String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})
 const fEur=n=>'€ '+fNum(n);
 /* incassato netto come nel programma: prezzo − commissione del sito − IVA del regime del margine (22/122 sul guadagno) */
 const nettoVendita=(prezzo,comm,costo)=>Math.round((prezzo-comm-Math.round(Math.max(prezzo-(costo||0),0)*22/122*100)/100)*100)/100;
-function lottiVivi(){ const vn=S.c.vn||[];
-  return (S.c.nuovi||[]).concat(LOTTI).map(r=>{const x=vn.filter(v=>v.lotto===r[0]); if(!x.length) return r;
-    const costo=nEur(r[4]), inc=nEur(r[6])+x.reduce((a,v)=>a+v.netto,0), mar=inc-costo;
-    return [r[0],r[1],r[2],r[3],r[4],r[5]+x.length,fEur(inc),Math.round(inc/costo*100)+'%',fEur(mar),Math.round(mar/costo*100)+'%'];});}
+function lottiVivi(){ const vn=S.c.vn||[], rs=S.c.resi||[];
+  return (S.c.nuovi||[]).concat(LOTTI).map(r=>{const x=vn.filter(v=>v.lotto===r[0]), y=rs.filter(v=>v.lotto===r[0]); if(!x.length&&!y.length) return r;
+    const costo=nEur(r[4]), inc=nEur(r[6])+x.reduce((a,v)=>a+v.netto,0)-y.reduce((a,v)=>a+v.rimborso,0), mar=inc-costo;
+    return [r[0],r[1],r[2],r[3],r[4],r[5]+x.length-y.length,fEur(inc),Math.round(inc/costo*100)+'%',fEur(mar),Math.round(mar/costo*100)+'%'];});}
+/* 25/11: i resi registrati nella prova da «Ordini» (come reso_vendita): sn, lotto, sito, rimborso e quando era stata la vendita */
+const CHIEDI_PROVA=[[1,0.000383,'inv'],[2,0.000412,'ordini'],[3,0.000356,'lotti'],[5,0.000497,'inv'],[7,0.000371,'entrate'],
+  [20,0.000402,'mail'],[22,0.000451,'stage'],[26,0.000389,'inv'],[27,0.000366,'entrate'],[29,0.000428,'ordini'],[30,0.000395,'home'],[31,0.000417,'inv']];
+const resiDi=f=>(S.c.resi||[]).filter(f);
+const stessoMese=ms=>new Date(ms).toLocaleDateString('sv-SE',{timeZone:'Europe/Rome'}).slice(0,7)===new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Rome'}).slice(0,7);
+const stessoGiorno=ms=>new Date(ms).toDateString()===new Date().toDateString();
 const STRADA_TXT={Banco:'si formatta al banco con Certus: i dati arrivano dai report',Lettura:'già formattati: al banco si leggono senza cancellare, poi dall’app grado, prezzo, bancale e posto',Pronto:'dati del fornitore o lotto tutto uguale: dall’app foto del seriale, grado, prezzo, bancale e posto'};
 const LETTURE=[
  {sn:'PF5XXXX1',cod:'20W0004XIX',cpu:'Intel Core i5-1145G7',ram:'16 GB DDR4',disk:'SSD NVMe 256 GB',sal:'Buono',ore:4210,bat:88,cicli:190,screen:'14" 1920×1080',gpu:'Intel Iris Xe Graphics',pw:'No',post:3,letto:'14:35',grado:'B',prezzo:259,banc:'B-0227',shelf:'S11-2-1'},
@@ -890,14 +896,16 @@ function guidaLista(){const q=gNorm(S.c.gq.trim()), testo=g=>gNorm([g.titolo,g.s
   if(!lista.length) return `<div class="glass card lbl">Nessuna parte della guida contiene «${gEsc(S.c.gq.trim())}».</div>`;
   return lista.map(g=>{const on=!!q||!!S.c.gAperte[g.id]; return `<div class="glass card stack" style="gap:10px"><button type="button" class="guida-tit" aria-expanded="${on}" data-act="gTog" data-arg="${g.id}"><b style="font-size:18px">${g.titolo}</b><span class="lbl">${on?'▲':'▼'}</span></button><div>${g.serve}</div>${on?testoSezione(g,false):''}</div>`;}).join('');}
 /* Inventario: i PC caricati, di tutti i lotti */
-const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d; const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:SITI_V.includes(o[1])?o[1]:''},n?{price:n.prezzo}:{});};
+const vendita=d=>{const o=ORDINI.find(x=>x[5]===d.sn&&x[7]!=='Annullato'); if(!o) return d;
+  /* 25/11: reso annunciato (come reso_vendita): «Reso» senza bancale; ricaricato dall'app (come ricarica_reso): di nuovo in vendita */
+  if(o[7]==='Reso'){const r=(S.c.ric||{})[d.sn]; return r?Object.assign({},d,r,{stato:'Disponibile'}):Object.assign({},d,{stato:'Reso',siti:'',banc:'',shelf:''});} const n=(S.c.vn||[]).find(v=>v.sn===d.sn); return Object.assign({},d,{stato:'Venduto',siti:SITI_V.includes(o[1])?o[1]:''},n?{price:n.prezzo}:{});};
 /* le modifiche fatte dalla scheda del PC (grado, prezzo, siti, fermo, rimesso in vendita): valgono ovunque */
 const conMod=d=>S.c.mod&&S.c.mod[d.sn]?Object.assign({},d,S.c.mod[d.sn]):d;
 /* i PC formattati caricati dall'app nella prova (lotto L-015) */
 const pcApp=()=>(S.c.carApp||[]).map(x=>({brand:'Lenovo',model:'ThinkPad T14 Gen 2',cod:'20W000AUIX',cpu:'Intel Core i5-1135G7',ram:'16 GB',disk:'SSD 256 GB',sal:'Buono',ore:5200,bat:87,cicli:240,screen:'14" 1920×1080',gpu:'Intel Iris Xe',pw:'No',canc:'Certificata',grade:x.grade,dif:x.dif,lotto:'L-015',costo:60,price:x.price,stato:'Disponibile',siti:x.siti,gg:0,banc:x.banc,shelf:x.shelf,post:'',letto:'',car:oggiIt(),foto:'lenovo-20w000auix.jpg',sn:x.sn}));
 const pcInventario=()=>DEVICES.map(conMod).map(vendita).concat(pcLetti().filter(d=>d.caricato&&!DEVICES.some(x=>x.sn===d.sn)).map(conMod)).concat(pcApp().map(conMod));
 /* dal più recente (data di carico), a parità per seriale: come public.inventario() del programma */
-const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado))
+const invFiltrati=()=>pcInventario().filter(d=>(S.c.brand==='Tutti'||d.brand===S.c.brand)&&(S.c.grado==='Tutti'||d.grade===S.c.grado)&&(S.c.statoF==='Tutti'||d.stato===S.c.statoF))
   .map(d=>Object.assign({},d,{_t:d.carMs||Date.now()})).sort((a,b)=>(b._t-a._t)||String(a.sn).localeCompare(String(b.sn)));
 const vuoto=v=>v===null||v===undefined||v===''?null:v;
 const fotoUrl=d=>d.foto?FOTO_URL+d.foto:null;
@@ -947,10 +955,13 @@ const quandoOrdine=ms=>{const t=new Date(Date.now()-ms), g=x=>x.toDateString(), 
 const ORDINI_T=[[minFa(30).getTime(),'Back Market','Lenovo','ThinkPad T14 Gen 2','B','PF3XXXXX','S11-2-1','Da preparare'],
  [minFa(52).getTime(),'eBay','HP','EliteBook 840 G8','A','5CGXXXXX','S11-3-2','Da preparare'],
  [ultimaLav(8,10).getTime(),'Subito','Dell','Latitude 5420','C','JXXXXXX','S12-1-1','Spedito'],
- [Date.now()-26*3600000,'Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Annullato']].sort((x,y)=>y[0]-x[0]);
+ [Date.now()-26*3600000,'Refurbed','Apple','MacBook Air M1','B','C02XXXXX','S11-1-3','Annullato'],
+ [Date.now()-4*86400000,'Back Market','HP','ProBook 450 G8','B','5CDXXXXX','—','Reso']].sort((x,y)=>y[0]-x[0]);
 const ORDINI=ORDINI_T.map(r=>[quandoOrdine(Date.now()-r[0])].concat(r.slice(1)));
 /* prezzo e commissione delle vendite degli ordini: l'incassato di oggi è il loro netto */
 const ORD_VEND={'PF3XXXXX':[249,25],'5CGXXXXX':[329,33],'JXXXXXX':[179,0]};
+/* il prezzo pagato di un ordine (la sua vendita): quelli della prova o le vendite fatte adesso; null se l'ordine non ha vendita */
+const prezzoOrdine=o=>{const n=(S.c.vn||[]).filter(v=>v.sn===o[5]).pop(); return n&&!ORD_VEND[o[5]]?n.prezzo:(ORD_VEND[o[5]]?ORD_VEND[o[5]][0]:(n?n.prezzo:null));};
 /* le mail della Corporation con l'ora vera, dalla più nuova (come la Mail del programma) */
 C_MAILS.sort((x,y)=>y.t-x.t).forEach(m=>{m.ora=quandoOrdine(Date.now()-m.t);});
 const TELEFONI=[
@@ -1161,9 +1172,17 @@ const A={
   cPer:v=>{S.c.per=v;},
   cBrand:v=>{S.c.brand=v;S.c.invMsg='';},
   cGrado:v=>{S.c.grado=v;S.c.invMsg='';},
+  cStatoF:v=>{S.c.statoF=v;S.c.invMsg='';},
   cLic:()=>{S.c.licOk=true;},
   cBanco:i=>{S.c.banco=+i;},
   cTelF:f=>{S.c.telF=f;},
+  cResoApri:i=>{const o=ORDINI[+i]; S.c.resoI=+i; S.c.resoRimb=String(prezzoOrdine(o)).replace('.',','); S.c.resoMot=''; S.c.ordMsg=''; S.c.ordErr='';},
+  cResoNo:()=>{S.c.resoI=null; S.c.ordErr='';},
+  cResoOk:()=>{const o=ORDINI[S.c.resoI]; if(!o) return; const pr=prezzoOrdine(o), rb=numIt(S.c.resoRimb);
+    if(!(rb>=0)||rb>pr){S.c.ordErr=`Il rimborso va da 0 al prezzo pagato (${pr} €)`; return;}
+    const d=pcInventario().find(x=>x.sn===o[5]), nuova=(S.c.vn||[]).some(v=>v.sn===o[5]), t=(ORDINI_T.find(r=>r[5]===o[5])||[Date.now()])[0];
+    S.c.resi=(S.c.resi||[]).concat([{sn:o[5],lotto:d?d.lotto:'',sito:o[1],rimborso:rb,ms:nuova?Date.now():t}]);
+    o[7]='Reso'; o[6]='—'; S.c.resoI=null; S.c.ordErr=''; S.c.ordMsg=`Reso registrato: ${o[2]} ${o[3]} ${o[5]} è tra i resi da caricare.`;},
   cEtichetta:i=>{S.c.ordMsg='Etichetta di spedizione pronta per '+ORDINI[+i][3]+': il PC è nel posto '+ORDINI[+i][6]+'.';},
   cDdt:()=>{S.c.ordMsg='ddt'; S.c.ddtLotto=lottoScelto()[0];},
   cLotSel:cod=>{S.c.lotSel=cod; S.c.ordMsg=''; S.c.lottoMsg='';},
@@ -1179,13 +1198,24 @@ const A={
   cInvXls:()=>{const r=invFiltrati(); if(!r.length) return; scaricaExcel('Inventario '+oggiIt().replace(/\//g,'-'),XCOL,r.map(rigaPC));},
   cInvCsv:()=>{const r=invFiltrati().filter(d=>d.stato==='Disponibile').sort((x,y)=>String(x.sn).localeCompare(String(y.sn))); S.c.invMsg=r.length?'':'vuoto'; if(!r.length) return; scaricaCsv('PC in vendita '+oggiIt().replace(/\//g,'-'),CCOL,r.map(rigaCliente));},
   /* carico */
-  kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};} S.k.scr=s; if(s==='scan') S.k.banc=null;},
+  kGo:s=>{if(s==='scheda'&&S.k.scr==='scan'){
+      /* 25/11: prima i resi tornati (come leggi-seriale della prova del programma), poi il PC letto al banco, poi i formattati */
+      const r=resiApp()[0];
+      if(r){S.k.ex='reso'; S.k.rsn=r.sn; S.k.grado=r.grade||'B'; S.k.difetti=Object.fromEntries(String(r.dif||'').split(', ').filter(Boolean).map(x=>[x,true])); S.k.prezzo=r.price||249;}
+      else {S.k.ex=S.k.lettFatto?'certus':'lettura'; if(S.k.ex==='lettura') S.k.difetti={'Batteria sotto 80%':true}; else S.k.difetti={'Graffi sul coperchio':true};}}
+    /* il prezzo di un reso parte dagli uguali in vendita (la mediana), come il programma; se non ce ne sono resta il suo */
+    if(S.k.ex==='reso'&&(s==='grado'||s==='prezzo')){const r=pcInventario().find(d=>d.sn===S.k.rsn), u=r?uguali(r.model,S.k.grado,r.sn).sort((a,b)=>a-b):[]; if(u.length) S.k.prezzo=u[Math.floor(u.length/2)];}
+    S.k.scr=s; S.k.aiuto=''; if(s==='scan') S.k.banc=null;},
+  kAiuto:x=>{S.k.aiuto=S.k.aiuto===x?'':x;},
+  kInvia:()=>{const el=document.getElementById('chiediApp'), d=el?el.value.trim():''; if(!d) return; S.k.chat=S.k.chat.concat([{ruolo:'io',testo:d},{ruolo:'claude',testo:cercaGuida(d,'entrate')}]);},
   kGrado:g=>{const base={A:289,B:249,C:209,D:169}; S.k.grado=g; S.k.prezzo=base[g];},
   kDif:l=>{S.k.difetti[l]=!S.k.difetti[l];},
   kCan:l=>{S.k.canali[l]=!S.k.canali[l];},
-  kMeno:()=>{S.k.prezzo=Math.max(190,S.k.prezzo-10);},
+  kMeno:()=>{const giu=S.k.ex==='reso'?0:(S.k.ex==='lettura'?180:80); S.k.prezzo=Math.max(giu,S.k.prezzo-10);},
   kPiu:()=>{S.k.prezzo+=10;},
-  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto';
+  kFatto:()=>{ if(!S.k.banc) return; S.k.scr='fatto'; S.k.aiuto='';
+    if(S.k.ex==='reso'){const siti=Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', ');
+      S.c.ric=Object.assign({},S.c.ric,{[S.k.rsn]:{grade:S.k.grado,price:+S.k.prezzo,siti,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),car:oggiIt(),carMs:Date.now(),gg:0}}); return;}
     if(S.k.ex==='lettura'&&!S.k.lettFatto){S.k.lettFatto=true; S.c.lettCaricati=2;}
     else if(S.k.ex==='certus'){S.k.n+=1; const siti=Object.keys(S.k.canali).filter(x=>S.k.canali[x]).join(', '); S.c.carApp=(S.c.carApp||[]).concat([{sn:'PF3XXXX'+(5+(S.c.carApp||[]).length+1),grade:S.k.grado,price:+S.k.prezzo,banc:S.k.banc,shelf:S.k.bancPosto,dif:Object.keys(S.k.difetti).filter(x=>S.k.difetti[x]).join(', '),siti}]);}},
   kBanc:v=>{if(v==='nuovo'){S.k.scr='nuovoB'; S.k.nb={stampata:false,posto:null}; return;} S.k.banc=v; S.k.bancPosto=(bancaliVivi().find(m=>m[3]===v)||['S11-2-1'])[0];},
@@ -2069,15 +2099,16 @@ function corp(){
     const LV=lottiVivi(), vn=S.c.vn||[], piu=vn.reduce((a,v)=>a+v.netto,0);
     const magazzino=LV.reduce((a,r)=>a+Math.max(r[3]-r[5],0),0);
     const vendAnno=LV.reduce((a,r)=>a+r[5],0), incAnno=LV.reduce((a,r)=>a+nEur(r[6]),0);
-    const vendOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato').length, vendMese=214+vn.length;
-    const incOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato'&&ORD_VEND[o[5]]).reduce((a,o)=>{const d=DEVICES.find(x=>x.sn===o[5]); return a+nettoVendita(ORD_VEND[o[5]][0],ORD_VEND[o[5]][1],d?d.costo:0);},0)+piu, incMese=26840+piu;
+    const rMese=resiDi(r=>stessoMese(r.ms)), rOggi=resiDi(r=>stessoGiorno(r.ms));
+    const vendOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato'&&o[7]!=='Reso').length, vendMese=214+vn.length-rMese.length;
+    const incOggi=ORDINI.filter(o=>/^\d\d:\d\d$/.test(o[0])&&o[7]!=='Annullato'&&ORD_VEND[o[5]]).reduce((a,o)=>{const d=DEVICES.find(x=>x.sn===o[5]); return a+nettoVendita(ORD_VEND[o[5]][0],ORD_VEND[o[5]][1],d?d.costo:0);},0)+piu-rOggi.reduce((a,r)=>a+r.rimborso,0), incMese=26840+piu-rMese.reduce((a,r)=>a+r.rimborso,0);
     const daSpedire=ORDINI.filter(o=>o[7]==='Da preparare').length;
     const inv=pcInventario(), nResi=inv.filter(d=>d.stato==='Reso').length, nConf=inv.filter(d=>d.stato!=='Venduto'&&d.price!=null&&d.conf===false).length;
     const nInterr=stageOggi().falliti;   /* come il programma: le interruzioni di oggi */
     const conta=(n,uno,tanti)=>n===1?uno:n+' '+tanti;
     /* come il programma: le voci si contano dai dati, compaiono solo se c'è qualcosa da fare */
     const guarda=[['11 PC invenduti da oltre 60 giorni','inv','Inventario',true]];
-    if(nResi) guarda.push([conta(nResi,'1 reso da rimettere in vendita','resi da rimettere in vendita'),'inv','Inventario',false]);
+    if(nResi) guarda.push([conta(nResi,'1 reso da caricare','resi da caricare'),'inv','Inventario',true]);
     if(nConf) guarda.push([conta(nConf,'1 prezzo da confermare','prezzi da confermare'),'inv','Inventario',false]);
     if(daSpedire) guarda.push([conta(daSpedire,'1 ordine da spedire','ordini da spedire'),'ordini','Ordini',false]);
     if(nInterr) guarda.push([conta(nInterr,'1 postazione interrotta allo stage','postazioni interrotte allo stage'),'stage','Stage Computer',true]);
@@ -2086,7 +2117,10 @@ function corp(){
     const nMail=C_MAILS.filter((m,i)=>m.nuova&&!(c.lette||{})[i]).length;
     if(nMail) guarda.push([conta(nMail,'1 mail da leggere','mail da leggere'),'mail','Mail',false]);
     const inVendita=968-vn.length+(c.carApp||[]).filter(x=>x.siti).length+(S.k.lettFatto&&Object.keys(S.k.canali).some(x=>S.k.canali[x])?1:0);
-    const can=[['Back Market',62],['Azienda',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2],['Amazon',0]].map(x=>[x[0],x[1]+vn.filter(v=>v.sito===x[0]).length]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+    const can=[['Back Market',62],['Azienda',46],['eBay',44],['Refurbed',30],['Subito',30],['Sito',2],['Amazon',0]].map(x=>[x[0],x[1]+vn.filter(v=>v.sito===x[0]).length-rMese.filter(r=>r.sito===x[0]).length]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+    /* «Chiedi» per la Direzione (come la Home del programma): domande del mese e spesa del mese e dell'anno, in dollari */
+    const chiesti=CHIEDI_PROVA.map(([ore,costo])=>({ms:Date.now()-ore*3600000,costo})).filter(x=>new Date(x.ms).getFullYear()===new Date().getFullYear()), chMese=chiesti.filter(x=>stessoMese(x.ms));
+    const usd=n=>'$ '+n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:n<1?4:2}), somma=l=>usd(l.reduce((a,x)=>a+x.costo,0));
     const maxCan=Math.max(...can.map(x=>x[1]));
     const per3=(v)=>`<div class="per3">${[['Oggi',v[0]],[meseOra(),v[1]],[String(new Date().getFullYear()),v[2]]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div>`;
     body=`<div class="kpi">
@@ -2094,6 +2128,7 @@ function corp(){
       <div class="glass card"><div class="lbl">Ordini</div><div class="big">${daSpedire}</div></div>
       <div class="glass card"><div class="lbl">Venduti</div>${per3([fNum(vendOggi),fNum(vendMese),fNum(vendAnno)])}</div>
       <div class="glass card"><div class="lbl">Incassato</div>${per3([fEur(incOggi),fEur(incMese),fEur(incAnno)])}</div>
+      <div class="glass card" style="grid-column:1 / -1"><div class="lbl">Chiedi</div><div class="per3">${[['Domande',fNum(chMese.length)],[meseOra(),somma(chMese)],[String(new Date().getFullYear()),somma(chiesti)]].map(x=>`<div><div class="lbl">${x[0]}</div><div class="big">${x[1]}</div></div>`).join('')}</div></div>
     </div>
     <div class="glass card stack">
       <div class="row between"><h3 style="font-size:18px">Stage</h3><div class="row" style="gap:4px">${['Oggi','Mese'].map(x=>chip(x,'cPer',x,c.per===x)).join('')}</div></div>
@@ -2145,7 +2180,7 @@ function corp(){
     <div class="row">${b('Carica fattura d’acquisto e DDT','cDdt')}${c.nuovoL?'':b('Nuovo','cNuovoL','','ghost')}</div>`;
   }
   if(s==='inv'){
-    title='Inventario'; hintTxt='scegli marca e grado: il numero dei PC si aggiorna subito. Tocca un PC per aprire la sua scheda. Come funziona tutto: tasto «Guida» accanto al titolo.';
+    title='Inventario'; hintTxt='scegli marca, grado e stato: il numero dei PC si aggiorna subito. Tocca un PC per aprire la sua scheda. Come funziona tutto: tasto «Guida» accanto al titolo.';
     const list=invFiltrati();
     const segb=(lab,act,arg,on)=>`<button class="${on?'on':''}" data-act="${act}" data-arg="${arg}">${lab}</button>`;
     const DL='<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11"/></svg>';
@@ -2154,6 +2189,7 @@ function corp(){
     const filters=`<div class="filtri">
       <div class="grp"><span class="lbl">Marca</span><div class="seg">${[['Tutti','Tutte'],['Lenovo','Lenovo'],['HP','HP'],['Dell','Dell'],['Apple','Apple']].map(([v,l])=>segb(l,'cBrand',v,c.brand===v)).join('')}</div></div>
       <div class="grp"><span class="lbl">Grado</span><div class="seg">${['Tutti','A','B','C','D'].map(v=>segb(v,'cGrado',v,c.grado===v)).join('')}</div></div>
+      <div class="grp"><span class="lbl">Stato</span><div class="seg">${['Tutti','Disponibile','Venduto','Reso'].map(v=>segb(v,'cStatoF',v,c.statoF===v)).join('')}</div></div>
       <div class="grp"><span class="lbl">Vista</span>${vista}</div>
       <div class="grp"><span class="lbl">Download</span><div class="row between" style="gap:10px">${scarica}<span class="lbl"><b style="color:var(--ink)">${list.length}</b> PC</span></div></div>
     </div>${c.invMsg==='vuoto'?'<div class="warn">Con questi filtri non c’è nessun PC in vendita</div>':''}`;
@@ -2179,10 +2215,14 @@ function corp(){
     }
   }
   if(s==='ordini'){
-    title='Ordini'; hintTxt='premi «Etichetta spedizione» su un ordine da preparare.';
-    body=`${c.ordMsg&&c.ordMsg!=='ddt'?msg(c.ordMsg):''}
+    title='Ordini'; hintTxt='premi «Etichetta spedizione» su un ordine da preparare. Proposta 25/11: su un ordine spedito, «Reso» registra il reso (rimborso e motivo); il PC va tra i resi da caricare in Home, Inventario e App Corporation.';
+    body=`${c.ordMsg&&c.ordMsg!=='ddt'?msg(c.ordMsg):''}${c.ordErr?`<div class="warn">${c.ordErr}</div>`:''}
     <div class="glass tbox"><table class="t" style="min-width:900px"><thead><tr><th>Ora</th><th>Sito</th><th>Marca</th><th>Modello</th><th>Grado</th><th>Seriale</th><th>Posto</th><th>Stato</th><th></th></tr></thead><tbody>
-    ${ORDINI.map((o,i)=>{const st=o[7]==='Da preparare'?pill(o[7]):(o[7]==='Annullato'?pill(o[7],'red'):pill(o[7],'dark'));return `<tr><td>${o[0]}</td><td>${o[1]}</td><td>${o[2]}</td><td><b>${o[3]}</b></td><td>${pill(o[4],'dark')}</td><td>${o[5]}</td><td>${o[6]}</td><td>${st}</td><td>${o[7]==='Da preparare'?b('Etichetta spedizione','cEtichetta',i,'ghost sm'):''}</td></tr>`;}).join('')}
+    ${ORDINI.map((o,i)=>{const st=o[7]==='Da preparare'?pill(o[7]):(o[7]==='Annullato'||o[7]==='Reso'?pill(o[7],'red'):pill(o[7],'dark'));
+      /* 25/11: «Reso» sugli ordini spediti (come Ordini del programma): rimborso e motivo, poi «Conferma» */
+      const qui=c.resoI===i, pr=prezzoOrdine(o);
+      return `<tr><td>${o[0]}</td><td>${o[1]}</td><td>${o[2]}</td><td><b>${o[3]}</b></td><td>${pill(o[4],'dark')}</td><td>${o[5]}</td><td>${o[6]}</td><td>${st}</td><td><span class="row" style="gap:6px;flex-wrap:nowrap">${o[7]==='Da preparare'?b('Etichetta spedizione','cEtichetta',i,'ghost sm'):''}${o[7]==='Spedito'&&pr!=null?b('Reso','cResoApri',i,'ghost sm'):''}</span></td></tr>`
+        +(qui?`<tr><td colspan="9"><span class="row"><label class="field"><span class="lbl">Rimborso €</span><input class="input" style="max-width:110px" inputmode="decimal" data-reso="rimborso" value="${c.resoRimb}"></label><label class="field"><span class="lbl">Motivo</span><input class="input" style="max-width:260px" data-reso="motivo" value="${gEsc(c.resoMot)}"></label>${bOff('Conferma','cResoOk',!!c.resoMot.trim()&&String(c.resoRimb).trim()!=='','sm')}${b('Annulla','cResoNo','','ghost sm')}</span></td></tr>`:'');}).join('')}
     </tbody></table></div>`;
   }
   if(s==='stage'){
@@ -2459,19 +2499,56 @@ function kSteps(cur){
   const ci=st.findIndex(x=>x[0]===cur);
   return `<div class="row" style="gap:6px;justify-content:space-between;flex-wrap:nowrap">${st.map((x,i)=>`<span title="${x[0]}" style="flex:1;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;${i===ci?'background:var(--solid);color:var(--on-solid)':(i<ci?'background:var(--soft);color:var(--ink)':'box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)')}">${KI[x[1]]}</span>`).join('')}</div>`;
 }
+/* 25/11: Guida e Chiedi anche nell'app (come AiutiApp del programma): in cima a ogni schermata; il pannello sale dal basso */
+function aiutiApp(){const k=S.k, g=GUIDA.find(x=>x.id==='entrate'); if(!g) return '';
+  const tasti=`<div class="row aiuti" style="justify-content:flex-end;gap:8px"><button type="button" class="aiuto ${k.aiuto==='guida'?'on':''}" data-act="kAiuto" data-arg="guida">${LIBRO}Guida</button><button type="button" class="aiuto ${k.aiuto==='chiedi'?'on':''}" data-act="kAiuto" data-arg="chiedi">${FUMETTO}Chiedi</button></div>`;
+  const dentro='position:absolute;top:auto;left:12px;right:12px;bottom:12px;width:auto;max-width:none;max-height:78%';
+  const testa=t=>`<div class="row between"><h3 style="font-size:20px">${t}</h3><button type="button" class="chipbtn" data-act="kAiuto" data-arg="">Chiudi</button></div>`;
+  const pan=k.aiuto==='guida'?`<div class="glass card stack pannello" role="dialog" aria-label="${g.titolo}" style="${dentro}">${testa(g.titolo)}${testoSezione(g,true)}</div>`
+    :k.aiuto==='chiedi'?`<div class="glass card stack pannello" role="dialog" aria-label="Chiedi" style="${dentro}">${testa('Chiedi')}
+      ${k.chat.length?`<div class="stack" style="gap:10px">${k.chat.map(m=>`<div class="bolla ${m.ruolo==='io'?'io':''}">${gEsc(m.testo)}</div>`).join('')}</div>`:''}
+      <div class="row" style="flex-wrap:nowrap"><input class="input" id="chiediApp" style="flex:1;min-width:0" placeholder="Scrivi una parola o una domanda" enterkeyhint="send" aria-label="Domanda"><button type="button" class="chipbtn on" data-act="kInvia" disabled style="opacity:.35;cursor:not-allowed">Invia</button></div></div>`:'';
+  return {tasti,pan};}
+/* i resi da caricare (come la lista dei device «Reso» nell'app del programma), per seriale */
+const resiApp=()=>pcInventario().filter(d=>d.stato==='Reso').sort((a,b)=>String(a.sn).localeCompare(String(b.sn)));
+/* «Uguali»: gli stessi PC (modello e grado) in vendita adesso, senza questo */
+const uguali=(model,grade,sn)=>pcInventario().filter(d=>d.stato==='Disponibile'&&d.model===model&&d.grade===grade&&d.sn!==sn&&d.price!=null).map(d=>d.price);
 function caricoApp(){
   const k=S.k; let inner='';
   const on='chipbtn on', off='chipbtn';
+  const A_=aiutiApp(), testa=A_.tasti||'';
+  /* il PC in carico: reso (il primo da caricare), letto al banco (L-016) o formattato (L-015) */
+  const rs=k.ex==='reso'?pcInventario().find(d=>d.sn===k.rsn):null;
+  const pcSn=k.ex==='reso'?k.rsn:(k.ex==='lettura'?'PF4L0002':'PF3XXXX6'), pcModel=rs?rs.model:'ThinkPad T14 Gen 2', pcBrand=rs?rs.brand:'Lenovo';
+  const ug=uguali(pcModel,k.grado,pcSn), lo=ug.length?Math.min(...ug):null, hi=ug.length?Math.max(...ug):null;
+  const minimo=k.ex==='reso'?null:(k.ex==='lettura'?180:80);
   if(k.scr==='scan'){
+    const R=resiApp();
     inner=`<div class="pscr">
+      ${testa}
       ${kSteps('scan')}
+      ${R.length?`<div class="pcard stack" style="padding:12px 14px;gap:6px;border:2px solid var(--alert)"><div class="row between"><b>Resi da caricare</b>${pill(R.length,'red')}</div>${R.map(x=>`<div class="row between" style="flex-wrap:nowrap"><b>${x.sn}</b><span class="lbl">${x.brand} ${x.model}</span></div>`).join('')}</div>`:''}
       <div class="lbl">${k.lettFatto?`Lotto L-015 · ${k.n} di 612 caricati`:`Lotto L-016 · ${S.c.lettCaricati} di 3 caricati`}</div>
-      <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM ${k.lettFatto?'20W000AUIX':'20W0004XIX'}</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N ${k.lettFatto?'PF3XXXX6':'PF4L0002'}</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Inquadra l’etichetta sotto il PC. Il seriale si legge dalla foto e si controlla sul sito del marchio.</div></div>
+      <div class="cam"><div class="label"><div style="font-size:11px;color:#6a6874">MTM ${k.lettFatto?'20W000AUIX':'20W0004XIX'}</div><div style="font-size:20px;font-weight:800;margin-top:4px">S/N ${k.lettFatto?'PF3XXXX6':'PF4L0002'}</div><div style="font-size:11px;color:#6a6874;margin-top:4px">20V 3.25A</div></div><div class="camtxt">Etichetta sotto il PC</div></div>
       <div class="row" style="gap:10px;flex-wrap:nowrap"><button class="bigbtn" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.cam}Foto</button><button class="bigbtn ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px" data-act="kGo" data-arg="scheda">${KI.pen}Manuale</button></div>
     </div>`;
   }
-  if(k.scr==='scheda'&&k.ex==='lettura'){
+  if(k.scr==='scheda'&&k.ex==='reso'&&rs){
     inner=`<div class="pscr">
+      ${testa}
+      ${kSteps('scheda')}
+      <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">${rs.sn}</b></div>${pill('Verificato su '+rs.brand,'ok')}</div>
+      <div class="row" style="gap:6px">${pill('Reso','red')}</div>
+      <div class="ptitle" style="font-size:24px">${rs.brand} ${rs.model}</div>
+      <div class="pcard" style="padding:4px 14px">
+        <div class="kvp"><span>Processore</span><b>${rs.cpu}</b></div><div class="kvp"><span>RAM</span><b>${rs.ram}</b></div><div class="kvp"><span>Disco</span><b>${rs.disk}</b></div><div class="kvp" style="border:0"><span>Schermo</span><b>${rs.screen}</b></div>
+      </div>
+      <div style="flex:1"></div>
+      <button class="bigbtn" data-act="kGo" data-arg="grado">Avanti</button>
+    </div>`;
+  } else if(k.scr==='scheda'&&k.ex==='lettura'){
+    inner=`<div class="pscr">
+      ${testa}
       ${kSteps('scheda')}
       <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF4L0002</b></div>${pill('Verificato su Lenovo','ok')}</div>
       <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Letto al banco')}</div>
@@ -2484,6 +2561,7 @@ function caricoApp(){
     </div>`;
   } else if(k.scr==='scheda'){
     inner=`<div class="pscr">
+      ${testa}
       ${kSteps('scheda')}
       <div class="pcard row between" style="padding:12px 14px"><div><div class="lbl">Letto dalla foto</div><b style="font-size:18px">PF3XXXX6</b></div>${pill('Verificato su Lenovo','ok')}</div>
       <div class="row" style="gap:6px">${pill('Nel DDT')}${pill('Lavorato da noi')}</div>
@@ -2498,8 +2576,8 @@ function caricoApp(){
   if(k.scr==='grado'){
     const dif=['Graffi sul coperchio','Ammaccatura','Tastiera lucida','Segni sullo schermo','Batteria sotto 80%','Manca un tasto'];
     inner=`<div class="pscr">
+      ${testa}
       ${kSteps('grado')}
-      <div class="lbl">Il programma propone B dal report. Cambialo con un tocco.</div>
       <div class="grades">${['A','B','C','D'].map(g=>`<button class="gbtn ${k.grado===g?'on':''}" data-act="kGrado" data-arg="${g}">${g}</button>`).join('')}</div>
       <div class="lbl">Difetti visti</div>
       <div class="row" style="gap:8px">${dif.map(x=>`<button class="${k.difetti[x]?on:off}" data-act="kDif" data-arg="${x}">${x}</button>`).join('')}</div>
@@ -2509,11 +2587,12 @@ function caricoApp(){
   }
   if(k.scr==='prezzo'){
     inner=`<div class="pscr">
+      ${testa}
       ${kSteps('prezzo')}
       <div class="pcard stack" style="padding:16px;align-items:center;gap:10px">
         <div class="lbl">Proposto per il grado ${k.grado}</div>
         <div class="stepper" style="width:100%"><button class="round" data-act="kMeno" aria-label="Meno 10 euro">−</button><div style="font-size:46px;font-weight:800;letter-spacing:-.04em">€ ${k.prezzo}</div><button class="round" data-act="kPiu" aria-label="Più 10 euro">+</button></div>
-        <div class="lbl" style="text-align:center">Back Market oggi tra 259 e 299 euro, eBay tra 230 e 270. Il minimo per questo PC è 190 euro.</div>
+        ${lo!==null||minimo?`<div class="row" style="gap:16px;justify-content:center">${lo!==null?`<span class="lbl">Uguali <b style="color:var(--ink)">${lo===hi?'€ '+lo:'€ '+lo+'–'+hi}</b></span>`:''}${minimo?`<span class="lbl">Minimo <b style="color:var(--ink)">€ ${minimo}</b></span>`:''}</div>`:''}
       </div>
       <div class="lbl">Pubblica su</div>
       <div class="row" style="gap:8px">${Object.keys(k.canali).map(x=>`<button class="${k.canali[x]?on:off}" data-act="kCan" data-arg="${x}">${x}</button>`).join('')}</div>
@@ -2523,8 +2602,8 @@ function caricoApp(){
   }
   if(k.scr==='bancale'){
     inner=`<div class="pscr">
+      ${testa}
       ${kSteps('bancale')}
-      <div style="font-size:17px">Su quale bancale lo metti? Scansiona l’etichetta del bancale, oppure premi «Nuovo».</div>
       ${k.banc?`<div class="pcard row between" style="padding:14px;border:2px solid var(--ok);background:var(--ok-soft)"><div><div class="lbl">Bancale</div><b style="font-size:20px">${k.banc}</b><div class="lbl">Posto ${k.bancPosto} · ${k.banc==='B-0300'?'14 computer':'nuovo'}</div></div><b style="color:var(--ok);font-size:20px">✓</b></div>`
       :`<div class="scanbox"><span style="display:inline-block;transform:scale(1.8);margin:8px">${KI.pal}</span><span class="lbl">Etichetta del bancale</span></div>`}
       <div style="flex:1"></div>
@@ -2538,12 +2617,12 @@ function caricoApp(){
     const num=(n,done)=>`<span style="width:30px;height:30px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;${done?'background:var(--ok);color:#fff':'border:2px solid currentColor'}">${done?'✓':n}</span>`;
     inner=`<div class="pscr">
       <button class="back" data-act="kGo" data-arg="bancale">Indietro</button>
+      ${testa}
       <div><div class="lbl">Bancale nuovo</div><div class="ptitle">B-0303</div></div>
       <div class="pcard stack" style="padding:14px;gap:10px;${st(nb.stampata,true)}"><div class="row" style="gap:10px;flex-wrap:nowrap">${num(1,nb.stampata)}<b style="font-size:20px">Etichetta</b></div>
-        <div style="font-size:17px">${nb.stampata?'Stampata: attaccala sul bancale.':'Stampa l’etichetta con il QR e attaccala sul bancale.'}</div>
         ${nb.stampata?'':`<button class="bigbtn" data-act="kNbStampa">Stampa</button>`}</div>
       <div class="pcard stack" style="padding:14px;gap:10px;${st(!!nb.posto,nb.stampata)}"><div class="row" style="gap:10px;flex-wrap:nowrap">${num(2,!!nb.posto)}<b style="font-size:20px">Posto</b></div>
-        <div style="font-size:17px">${nb.posto?'Messo in '+nb.posto+': è già nella pianta del magazzino.':'Porta il bancale nel posto libero proposto, <b>S11-3-2</b>, e scansiona l’etichetta dello scaffale.'}</div>
+        <span class="lbl">${nb.posto?'Posto':'Proposto'} <b style="color:var(--ink);font-size:17px">${nb.posto||'S11-3-2'}</b></span>
         ${nb.posto?'':`<button class="bigbtn" data-act="kNbPosto" aria-label="Scansiona il posto" style="display:flex;align-items:center;justify-content:center">${KI.cam}</button>`}</div>
       <div style="flex:1"></div>
       <button class="bigbtn" data-act="kNbFatto" ${nb.posto?'':'disabled style="opacity:.35;cursor:not-allowed"'}>Fatto</button>
@@ -2552,21 +2631,22 @@ function caricoApp(){
   if(k.scr==='fatto'){
     const att=Object.keys(k.canali).filter(x=>k.canali[x]);
     inner=`<div class="pscr">
-      <div class="pcard" style="padding:12px 14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">Caricato</b></div>
-      <div class="lbl">Mettilo sul bancale ${k.banc}, posto ${k.bancPosto}. È già nell’inventario della Corporation e nell’Excel.</div>
+      ${testa}
+      <div class="pcard" style="padding:12px 14px;border:2px solid var(--ok);background:var(--ok-soft)"><b style="color:var(--ok)">${k.ex==='reso'?'Reso ricaricato':'Caricato'}</b></div>
+      <div class="row" style="gap:16px"><span class="lbl">Bancale <b style="color:var(--ink)">${k.banc}</b></span><span class="lbl">Posto <b style="color:var(--ink)">${k.bancPosto}</b></span></div>
       <div class="pcard row" style="padding:16px;gap:14px;flex-wrap:nowrap">
         <svg width="76" height="76" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges" style="flex:none;background:#ffffff;border-radius:6px"><g fill="#111214"><rect x="0" y="0" width="7" height="7"></rect><rect x="14" y="0" width="7" height="7"></rect><rect x="0" y="14" width="7" height="7"></rect></g><g fill="#ffffff"><rect x="1" y="1" width="5" height="5"></rect><rect x="15" y="1" width="5" height="5"></rect><rect x="1" y="15" width="5" height="5"></rect></g><g fill="#111214"><rect x="2" y="2" width="3" height="3"></rect><rect x="16" y="2" width="3" height="3"></rect><rect x="2" y="16" width="3" height="3"></rect><rect x="9" y="1" width="2" height="2"></rect><rect x="8" y="5" width="3" height="1"></rect><rect x="9" y="8" width="4" height="2"></rect><rect x="14" y="9" width="2" height="3"></rect><rect x="17" y="10" width="3" height="2"></rect><rect x="8" y="12" width="2" height="3"></rect><rect x="11" y="14" width="3" height="2"></rect><rect x="15" y="15" width="2" height="2"></rect><rect x="18" y="17" width="2" height="3"></rect><rect x="9" y="17" width="3" height="3"></rect><rect x="1" y="9" width="3" height="2"></rect></g></svg>
-        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">ThinkPad T14 Gen 2</div><div class="lbl">${k.ex==='lettura'?'PF4L0002 · lotto L-016':'PF3XXXXX · lotto L-015'} · ${k.banc}</div></div>
+        <div style="flex:1;min-width:0"><div class="row between"><b>MESSINA</b><b style="font-size:22px">${k.grado}</b></div><div style="font-size:14px;font-weight:600">${pcModel}</div><div class="lbl">${pcSn} · lotto ${rs?rs.lotto:(k.ex==='lettura'?'L-016':'L-015')} · ${k.banc}</div></div>
       </div>
-      <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}. Quando si vende su un sito, sparisce dagli altri.</div>
+      <div class="pcard" style="padding:14px;line-height:1.6">In vendita a <b>€ ${k.prezzo}</b> su ${att.length?att.join(', '):'nessun sito'}</div>
       <div style="flex:1"></div>
       <button class="bigbtn" data-act="kGo" data-arg="scan">Prossimo</button>
     </div>`;
   }
   return `<div class="appsec">
-    <div class="appinfo glass"><h2>App Corporation</h2><p style="margin:8px 0 0"><b>Entrate</b>: caricare un computer o un telefono in magazzino.</p><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p><p class="lbl" style="margin:8px 0 0">Proposta: la prima foto è un PC del lotto L-016 già letto al banco (strada Lettura): la scheda è già piena con i dati veri del PC.</p>
+    <div class="appinfo glass"><h2>App Corporation</h2><p style="margin:8px 0 0"><b>Entrate</b>: caricare un computer o un telefono in magazzino.</p><p class="muted" style="margin:8px 0 0">Sui computer non ci sono più codici a barre: si parte dalla foto del seriale.</p><p class="lbl" style="margin:8px 0 0">Proposta: se ci sono resi da caricare, la prima foto è il reso: si carica come un PC normale e torna in vendita. Poi un PC del lotto L-016 già letto al banco (strada Lettura): la scheda è già piena con i dati veri del PC.</p>
       <ol><li>In alto le icone dicono a che punto sei: foto, scheda, grado, prezzo, bancale.</li><li>Premi «Foto» (o «Manuale» se il seriale non si legge) e controlla la scheda.</li><li>Scegli il grado, regola il prezzo e i siti.</li><li>Scansiona il bancale o premi «Nuovo».</li><li>Premi «Conferma»: il PC è già in inventario con bancale e posto.</li></ol><p class="lbl" style="margin:10px 0 0">Il magazzino è uno solo per tutto il capannone: nel gestionale dei Trasporti la Corporation è un cliente, qui vedete solo i vostri bancali.</p></div>
-    <div class="phone"><div class="screen">${inner}</div></div>
+    <div class="phone"><div class="screen">${inner}${A_.pan||''}</div></div>
   </div>`;
 }
 
@@ -2666,10 +2746,15 @@ document.addEventListener('input',e=>{const t=e.target;
   if(t.dataset&&t.dataset.perm){S.perm[t.dataset.perm]=t.value; return;}
   if(t.id==='s-cGo'&&S.view==='corp'&&S.c.sec==='guida'){S.c.gq=t.value; const l=document.getElementById('guidaLista'); if(l) l.innerHTML=guidaLista(); return;}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='chiediIn'&&e.target.value.trim()){e.preventDefault(); A.aiInvia(); render(); const el=document.getElementById('chiediIn'); if(el) el.focus();}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='chiediApp'&&e.target.value.trim()){e.preventDefault(); A.kInvia(); render(); const el=document.getElementById('chiediApp'); if(el) el.focus();}});
+document.addEventListener('input',e=>{if(e.target.id!=='chiediApp') return; const bt=document.querySelector('button[data-act="kInvia"]'), ok=!!e.target.value.trim(); if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';}});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.sch; if(!k||!S.c.sch) return;
   if(k==='bancale') e.target.value=e.target.value.toUpperCase(); S.c.sch[k]=e.target.value;
   const sc=S.c.sch, ok={sVendi:numIt(sc.prezzo)>0};
   Object.keys(ok).forEach(a=>{const bt=document.querySelector(`button[data-act="${a}"]`); if(bt){bt.disabled=!ok[a]; bt.style.opacity=ok[a]?'':'.35'; bt.style.cursor=ok[a]?'':'not-allowed';}});});
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.reso; if(!k) return; S.c[k==='rimborso'?'resoRimb':'resoMot']=e.target.value;
+  const ok=!!S.c.resoMot.trim()&&String(S.c.resoRimb).trim()!=='', bt=document.querySelector('button[data-act="cResoOk"]');
+  if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';}});
 document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.nl; if(!k) return; S.c.nl[k]=e.target.value;
   const n=S.c.nl, ok=S.c.strada&&String(n.codice).trim()&&+n.pezzi>0&&String(n.costo).trim(), bt=document.querySelector('button[data-act="cApriL"]');
   if(bt){bt.disabled=!ok; bt.style.opacity=ok?'':'.35'; bt.style.cursor=ok?'':'not-allowed';}});
